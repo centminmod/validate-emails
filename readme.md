@@ -4,10 +4,10 @@
 The `validate_emails.py` email validation script is a Python-based tool that allows you to validate and classify email addresses using SMTP (Simple Mail Transfer Protocol) checks. It provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
 
 ## Features
-- Validates email addresses using SMTP checks
-- Validates `-f` from email address's SPF, DKIM, DMARC records and logs them
+- Validates email addresses using syntax, DNS and SMTP checks
+- Validates `-f` from email address's SPF, DKIM, DMARC records and logs them for troubleshooting mail deliverability
 - Support local self-hosted email verification + [API support](#api-support) for [EmailListVerify](https://centminmod.com/emaillistverify) [[example](#emaillistverify-1)] and [MillionVerifier](https://centminmod.com/millionverifier) [[example](#millionverifier)]
-- Classifies email addresses into various categories based on the SMTP response
+- Classifies email addresses into various categories based on the syntax, DNS, and SMTP response
 - Supports concurrent processing for faster validation of multiple email addresses
 - Provides detailed logging for tracking the validation process
 - Allows customization of delay between requests to respect email server limitations
@@ -16,9 +16,10 @@ The `validate_emails.py` email validation script is a Python-based tool that all
 - Checks email addresses against custom blacklists and whitelists
 - Supports different test modes for syntax, DNS, SMTP, and disposable email checks
 - Configurable SMTP port and TLS/SSL support
+- Supports SMTP profiles.
 - Supports different DNS lookup methods: asyncio, concurrent, and sequential
 - Supports different processing modes: thread and asyncio
-- Generates SQL queries for updating user status in XenForo based on email validation results
+- Generates SQL queries for updating user status in XenForo forum based email validation results. Allowing you to clean up your Xenforo user database's email addresses.
 
 ## Requirements
 - Python 3.6 minimum. Script tested on AlmaLinux 8 Python 3.6 and AlmaLinux 9 Python 3.9.
