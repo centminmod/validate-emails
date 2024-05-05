@@ -6,7 +6,11 @@ The `validate_emails.py` email validation script is a Python-based tool that all
 ## Features
 - Validates email addresses using syntax, DNS and SMTP checks
 - Validates `-f` from email address's SPF, DKIM, DMARC records and logs them for troubleshooting mail deliverability
-- Support local self-hosted email verification + [API support](#api-support) for [EmailListVerify](https://centminmod.com/emaillistverify) [[example](#emaillistverify-1)] and [MillionVerifier](https://centminmod.com/millionverifier) [[example](#millionverifier)]
+- Support local self-hosted email verification + [API support](#api-support) for:
+  - [EmailListVerify](https://centminmod.com/emaillistverify) [[example](#emaillistverify-1)] 
+  - [MillionVerifier](https://centminmod.com/millionverifier) [[example](#millionverifier)]
+  - [CaptainVerify](https://centminmod.com/captainverify) [[example](#captainverify-api)]
+  - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
 - Classifies email addresses into various categories based on the syntax, DNS, and SMTP response
 - Supports concurrent processing for faster validation of multiple email addresses
 - Provides detailed logging for tracking the validation process
@@ -27,7 +31,22 @@ The `validate_emails.py` email validation script is a Python-based tool that all
 ## Usage
 1. Open a terminal or command prompt and navigate to the directory where the script is located.
 
-2. Run the script with the desired command-line arguments. The available arguments are:
+2. Run the script with the desired command-line arguments. 
+
+```
+python validate_emails.py 
+usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATCH_SIZE] [-d] [-v] [-delay DELAY]
+                          [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
+                          [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE]
+                          [-wl WHITELIST_FILE] [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE]
+                          [-xfprefix XF_PREFIX] [-profile] [-wf WORKER_FACTOR]
+                          [-api {emaillistverify,millionverifier,captainverify,proofy}] [-apikey EMAILLISTVERIFY_API_KEY]
+                          [-apikey_mv MILLIONVERIFIER_API_KEY] [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY]
+                          [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS]
+validate_emails.py: error: the following arguments are required: -f/--from_email
+```
+
+The available arguments are:
 
   - `-f`, `--from_email` (required):
     - Description: The email address to use in the MAIL FROM command.
@@ -89,10 +108,19 @@ The `validate_emails.py` email validation script is a Python-based tool that all
     - Description: Specify the API to use for email verification. Available options are:
       - `emaillistverify`: Use the EmailListVerify API.
       - `millionverifier`: Use the MillionVerifier API.
+      - `captainverify`: Use the CaptainVerify API.
   - `-apikey`, `--emaillistverify_api_key` (optional):
     - Description: The API key for the EmailListVerify service.
   - `-apikey_mv`, `--millionverifier_api_key` (optional):
     - Description: The API key for the MillionVerifier service.
+  - `-apikey_cv`, `--captainverify_api_key` (optional):
+    - Description: The API key for the CaptainVerify service.
+  - `-apikey_pf`, `--proofy_api_key` (optional):
+    - Description: The API key for the Proofy service.
+  - `-apiuser_pf`, `--proofy_user_id` (optional):
+    - Description: The Proofy userid.
+  - `-pf_max_connections`, `--proofy_max_connections` (optional):
+    - Description: Maximum number of concurrent connections for the Proofy.io API (default: 1)
 
 Validates `-f` from email address's SPF, DKIM, DMARC records when argument is passed and logs them 
 
@@ -516,7 +544,7 @@ mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gm
 Filter using `jq` tool for `free_email = yes` emails only
 
 ```
-./validate_emails.py -f user@domain1.com -l emaillist.txt -tm all | jq '.[] | select(.free_email == "yes")'
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all | jq '.[] | select(.free_email == "yes")'
 {
   "email": "user@mailsac.com",
   "status": "ok",
@@ -1867,4 +1895,477 @@ mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@doma
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
+```
+
+## CaptainVerify API
+
+Add [CaptainVerify](https://centminmod.com/captainverify) API support. 
+
+CaptainVerify's API has rate limits, as such script needed to add such to it's routines.
+
+> The API is limited to a maximum of 2 simultaneous connections and 50 checks per minute. When integrating the API, make sure your application does not exceed this limit.
+
+### `update_captainverify_rate_limit` Function
+
+The `update_captainverify_rate_limit` function is responsible for managing the rate limiting of requests to the CaptainVerify API. It ensures that the script complies with the API's rate limits of a maximum of 2 simultaneous connections and 50 checks per minute.
+
+#### Purpose
+
+The purpose of the `update_captainverify_rate_limit` function is to coordinate access to the CaptainVerify API across multiple processes and prevent exceeding the API's rate limits. It achieves this by using a shared file (`captainverify_rate_limit.json`) to store and update the rate limiting information.
+
+#### Functionality
+
+The `update_captainverify_rate_limit` function performs the following steps:
+
+1. It takes a `lock_file` parameter, which specifies the path to the file used for storing the rate limiting information.
+2. It opens the `lock_file` in read and write mode (`'r+'`) to allow reading from and writing to the file.
+3. It acquires an exclusive lock on the file using the `fcntl.flock` function with the `fcntl.LOCK_EX` flag. This ensures that only one process can access and modify the file at a time, preventing race conditions.
+4. It reads the existing rate limiting data from the file using `json.load`. The rate limiting data includes the timestamp of the last request (`last_request_time`) and the count of requests made within the current minute (`request_count`).
+5. It calculates the elapsed time since the last request by subtracting `last_request_time` from the current time.
+6. If the elapsed time is less than 60 seconds (indicating that the current minute has not passed), it increments the `request_count` by 1.
+7. If the `request_count` exceeds 50 (the maximum allowed requests per minute), it calculates the remaining time until the current minute completes and sleeps for that duration using `time.sleep`. After sleeping, it updates `last_request_time` to the current time and resets `request_count` to 1.
+8. If the elapsed time is greater than or equal to 60 seconds (indicating that a new minute has started), it updates `last_request_time` to the current time and resets `request_count` to 1.
+9. It updates the `last_request_time` and `request_count` values in the `data` dictionary.
+10. It seeks to the beginning of the file using `file.seek(0)`, writes the updated `data` dictionary to the file using `json.dump`, and truncates any remaining content in the file using `file.truncate()`. This ensures that the file contains only the updated rate limiting data.
+11. It releases the exclusive lock on the file using `fcntl.flock` with the `fcntl.LOCK_UN` flag, allowing other processes to access the file.
+
+#### Usage
+
+The `update_captainverify_rate_limit` function is called within the `validate_and_classify` function whenever an email verification request is made to the CaptainVerify API (i.e., when `args.api == 'captainverify'` and `args.test_mode == 'all'`).
+
+By calling `update_captainverify_rate_limit` before making the API request, the script ensures that the rate limiting information is updated and that the API's rate limits are respected across multiple processes.
+
+The `lock_file` parameter specifies the path to the file used for storing the rate limiting information. In the provided code, the file is named `'captainverify_rate_limit.json'` and is initialized in the `main` function.
+
+Manual email test via their dashboard reveals
+
+```csv
+email;status;free;disposable;role;ok_for_all;protected;did_you_mean;details
+user@mailsac.com;risky;0;1;1;1;0;;low quality
+xyz@centmil1.com;invalid;0;0;0;0;0;;smtp error
+user+to@domain1.com;ok;0;0;0;0;0;;
+user@tempr.email;risky;0;1;1;1;0;;low quality
+info@domain2.com;risky;0;0;1;0;0;;low quality
+xyz@domain1.com;invalid;0;0;0;0;0;;email error
+abc@domain1.com;invalid;0;0;1;0;0;;email error
+123@domain1.com;invalid;0;0;1;0;0;;email error
+pop@domain1.com;invalid;0;0;0;0;0;;email error
+pip@domain1.com;invalid;0;0;0;0;0;;email error
+user@gmail.com;ok;1;0;0;0;0;;
+op999@gmail.com;invalid;1;0;0;0;0;;email error
+user@yahoo.com;unknown;1;0;0;0;0;;
+user1@outlook.com;ok;1;0;0;0;0;;
+user2@hotmail.com;ok;1;0;0;0;0;;
+```
+
+[CaptainVerify](https://centminmod.com/captainverify) API enabled run `-api captainverify -apikey_cv $cvkey`
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api captainverify -apikey_cv $cvkey -xf -xfdb xenforo -xfprefix xf_
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "risky",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo\""
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo\""
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo\""
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo\""
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "risky",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo\""
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo\""
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo\""
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "risky",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo\""
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "risky",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com'; xenforo\""
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo\""
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com'; xenforo\""
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+```
+
+`jq` filterd for Xenforo MySQL queries only
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api captainverify -apikey_cv $cvkey -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com'; xenforo"
+```
+
+## Proofy API
+
+Add [Proofy.io](https://centminmod.com/proofy) API support
+
+[Proofy.io](https://centminmod.com/proofy) API enabled run `-api proofy -apikey_pf $pkey -apiuser_pf $puser`
+
+```
+validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -apikey_pf $pkey -apiuser_pf $puser -xf -xfdb xenforo -xfprefix xf_
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo\""
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo\""
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo\""
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo\""
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo\""
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo\""
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo\""
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo\""
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo\""
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com'; xenforo\""
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+```
+
+Unfortunately, Proofy.io has a stricter max concurrent connection limit so will slow down processing of email verifications. Proofy.io API limits mean email verifications are at least 2x or more slower. As such need to add a `-pf_max_connections` parameter which set to `1` by default when argument not passed on command line like above. But even with `-pf_max_connections 2` Proofy.io API complains and email `status = api_error` occur.
+
+From `email_verification_log_2024-05-05_14-06-36.log`
+
+```
+2024-05-05 14:07:08,450 - ERROR - Unexpected API response for user2@hotmail.com: {'error': True, 'message': 'You already use the maximum number of simultaneous connections. Try this request later.'}
+2024-05-05 14:07:08,450 - ERROR - Max retries exceeded for user2@hotmail.com. Skipping
+```
+
+Testing Proofy.io, ran out of credits from log `email_verification_log_2024-05-05_14-20-50.log`
+
+```
+2024-05-05 14:21:35,810 - ERROR - Unexpected API response for user2@hotmail.com: {'error': True, 'message': "You don't have checks. Check your balance."}
+2024-05-05 14:21:46,461 - ERROR - Max retries exceeded for user2@hotmail.com. Skipping.
+```
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -apikey_pf $pkey -apiuser_pf $puser -xf -xfdb xenforo -xfprefix xf_ -pf_max_connections 2
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "unknown"
+    }
+]
+```
+
+`jq` filterd for Xenforo MySQL queries only
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -apikey_pf $pkey -apiuser_pf $puser -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com'; xenforo"
 ```
