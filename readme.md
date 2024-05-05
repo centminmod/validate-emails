@@ -37,12 +37,12 @@ The `validate_emails.py` email validation script is a Python-based tool that all
 python validate_emails.py 
 usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATCH_SIZE] [-d] [-v] [-delay DELAY]
                           [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
-                          [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE]
-                          [-wl WHITELIST_FILE] [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE]
-                          [-xfprefix XF_PREFIX] [-profile] [-wf WORKER_FACTOR]
-                          [-api {emaillistverify,millionverifier,captainverify,proofy}] [-apikey EMAILLISTVERIFY_API_KEY]
-                          [-apikey_mv MILLIONVERIFIER_API_KEY] [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY]
-                          [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS]
+                          [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
+                          [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
+                          [-wf WORKER_FACTOR] [-api {emaillistverify,millionverifier,captainverify,proofy}]
+                          [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY] [-apibulk {emaillistverify}]
+                          [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY] [-apiuser_pf PROOFY_USER_ID]
+                          [-pf_max_connections PROOFY_MAX_CONNECTIONS]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
@@ -109,6 +109,8 @@ The available arguments are:
       - `emaillistverify`: Use the EmailListVerify API.
       - `millionverifier`: Use the MillionVerifier API.
       - `captainverify`: Use the CaptainVerify API.
+  - `-apibulk`, `--api_bulk` (optional):
+    - Description: Use EmailListVerify Bulk file API method.
   - `-apikey`, `--emaillistverify_api_key` (optional):
     - Description: The API key for the EmailListVerify service.
   - `-apikey_mv`, `--millionverifier_api_key` (optional):
@@ -1615,6 +1617,143 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "email": "user2@hotmail.com",
         "status": "ok",
         "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+```
+
+### EmailListVerify Bulk File API
+
+Added support for EmailListVerify Bulk File API upload with added `-apibulk emaillistverify` argument. Unfortunately for the below number of emails, the bulk API upload took way longer to process at 45 seconds versus 2.2 seconds for per email verification without `-apibulk emaillistverify` due to remote processing.
+
+```
+cat email_verification_log_2024-05-05_17-03-01.log
+
+2024-05-05 17:03:02,607 - INFO - File MIME type: text/plain
+2024-05-05 17:03:02,607 - INFO - Request data: {'filename': 'emaillist_20240505170302.txt'}
+2024-05-05 17:03:02,607 - INFO - File data: {'file_contents': ('emaillist_20240505170302.txt', <_io.BufferedReader name='emaillist.txt'>, 'text/plain')}
+2024-05-05 17:03:03,293 - INFO - File uploaded successfully. File ID: 2400498
+2024-05-05 17:03:03,832 - INFO - File processing in progress. Status: progress
+2024-05-05 17:03:09,420 - INFO - File processing in progress. Status: progress
+2024-05-05 17:03:14,883 - INFO - File processing in progress. Status: progress
+2024-05-05 17:03:20,148 - INFO - File processing in progress. Status: progress
+2024-05-05 17:03:25,334 - INFO - File processing in progress. Status: progress
+2024-05-05 17:03:30,533 - INFO - File processing in progress. Status: progress
+2024-05-05 17:03:35,801 - INFO - File processing in progress. Status: progress
+2024-05-05 17:03:41,075 - INFO - File processing in progress. Status: progress
+2024-05-05 17:03:46,421 - INFO - File processing completed. Retrieving results from: https://files-elv.s3.eu-central-1.amazonaws.com/2024-05/276e5d9b771214ca9e5e6b59f67b481bfa0a2fabc_all.csv
+2024-05-05 17:03:46,783 - INFO - Results file downloaded: emaillistverify_results_1714928583.csv
+2024-05-05 17:03:46,784 - INFO - Results retrieved successfully. Total lines: 15
+```
+
+with `-apibulk emaillistverify` argument
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -api emaillistverify -apikey $elvkey -apibulk emaillistverify -tm all
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "disposable",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "dead_server",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "disposable",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "valid",
+        "status_code": "",
         "free_email": "yes",
         "disposable_email": "no"
     }
