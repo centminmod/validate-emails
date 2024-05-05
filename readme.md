@@ -9,6 +9,7 @@ The `validate_emails.py` email validation script is a Python-based tool that all
 - Support local self-hosted email verification + [API support](#api-support) for:
   - [EmailListVerify](https://centminmod.com/emaillistverify) [[example](#emaillistverify-1)] 
   - [MillionVerifier](https://centminmod.com/millionverifier) [[example](#millionverifier)]
+  - [MyEmailVerifier](https://centminmod.com/myemailverifier) [[example](#myemailverifier-api)]
   - [CaptainVerify](https://centminmod.com/captainverify) [[example](#captainverify-api)]
   - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
 - Classifies email addresses into various categories based on the syntax, DNS, and SMTP response
@@ -39,10 +40,11 @@ usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATC
                           [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
                           [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
                           [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
-                          [-wf WORKER_FACTOR] [-api {emaillistverify,millionverifier,captainverify,proofy}]
+                          [-wf WORKER_FACTOR] [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier}]
                           [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY] [-apibulk {emaillistverify}]
                           [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY] [-apiuser_pf PROOFY_USER_ID]
-                          [-pf_max_connections PROOFY_MAX_CONNECTIONS]
+                          [-pf_max_connections PROOFY_MAX_CONNECTIONS] [-apikey_mev MYEMAILVERIFIER_API_KEY]
+                          [-mev_max_connections MEV_MAX_CONNECTIONS]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
@@ -108,21 +110,27 @@ The available arguments are:
     - Description: Specify the API to use for email verification. Available options are:
       - `emaillistverify`: Use the EmailListVerify API.
       - `millionverifier`: Use the MillionVerifier API.
+      - `myemailverifier`: Use the MyEmailVerifier API.
       - `captainverify`: Use the CaptainVerify API.
+      - `proofy`: Use the Proofy API.
   - `-apibulk`, `--api_bulk` (optional):
     - Description: Use EmailListVerify Bulk file API method.
   - `-apikey`, `--emaillistverify_api_key` (optional):
     - Description: The API key for the EmailListVerify service.
   - `-apikey_mv`, `--millionverifier_api_key` (optional):
     - Description: The API key for the MillionVerifier service.
+  - `-apikey_mev`, `--myemailverifier-api-key` (optional):
+    - Description: The API key for the MyEmailVerifier service.
   - `-apikey_cv`, `--captainverify_api_key` (optional):
     - Description: The API key for the CaptainVerify service.
   - `-apikey_pf`, `--proofy_api_key` (optional):
     - Description: The API key for the Proofy service.
   - `-apiuser_pf`, `--proofy_user_id` (optional):
     - Description: The Proofy userid.
-  - `-pf_max_connections`, `--proofy_max_connections` (optional):
+  - `-pf_max_connections` (optional):
     - Description: Maximum number of concurrent connections for the Proofy.io API (default: 1)
+  - `-mev_max_connections` (optional):
+    - Description: Maximum number of concurrent connections for the MyEmailVerifier API (default: 1)
 
 Validates `-f` from email address's SPF, DKIM, DMARC records when argument is passed and logs them 
 
@@ -2507,4 +2515,137 @@ mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tem
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com'; xenforo"
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com'; xenforo"
+```
+
+## MyEmailVerifier API
+
+Add [MyEmailVerifier](https://centminmod.com/myemailverifier) API support
+
+[MyEmailVerifier](https://centminmod.com/myemailverifier) API enabled run `-api myemailverifier -apikey_mev $mevkey`
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -api myemailverifier -apikey_mev $mevkey -tm all
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+```
+
+`jq` filterd for Xenforo MySQL queries only
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -api myemailverifier -apikey_mev $mevkey -tm all -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
+
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
 ```
