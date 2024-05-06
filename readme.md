@@ -11,8 +11,8 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
 - Validates email addresses using syntax, DNS and SMTP checks
 - Validates `-f` from email address's SPF, DKIM, DMARC records and logs them for troubleshooting mail deliverability
 - Support local self-hosted email verification + [API support](#api-support) for:
-  - [EmailListVerify](https://centminmod.com/emaillistverify) [[example](#emaillistverify-1)] 
-  - [MillionVerifier](https://centminmod.com/millionverifier) [[example](#millionverifier)]
+  - [EmailListVerify](https://centminmod.com/emaillistverify) [[example](#emaillistverify-1), [bulk API](#emaillistverify-bulk-file-api)] 
+  - [MillionVerifier](https://centminmod.com/millionverifier) [[example](#millionverifier), [bulk API](#millionverifier-bulk-file-api)]
   - [MyEmailVerifier](https://centminmod.com/myemailverifier) [[example](#myemailverifier-api)]
   - [CaptainVerify](https://centminmod.com/captainverify) [[example](#captainverify-api)]
   - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
