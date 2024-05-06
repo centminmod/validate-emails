@@ -39,15 +39,26 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
 2. Run the script with the desired command-line arguments. 
 
 ```
-python validate_emails.py 
-usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATCH_SIZE] [-d] [-v] [-delay DELAY]
-                          [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
-                          [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
-                          [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
-                          [-wf WORKER_FACTOR] [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier}]
-                          [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY] [-apibulk {emaillistverify}]
-                          [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY] [-apiuser_pf PROOFY_USER_ID]
-                          [-pf_max_connections PROOFY_MAX_CONNECTIONS] [-apikey_mev MYEMAILVERIFIER_API_KEY]
+validate_emails.py 
+usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE]
+                          [-b BATCH_SIZE] [-d] [-v] [-delay DELAY]
+                          [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT]
+                          [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
+                          [-dns {asyncio,concurrent,sequential}]
+                          [-p {thread,asyncio}] [-bl BLACKLIST_FILE]
+                          [-wl WHITELIST_FILE]
+                          [-smtp {default,ses,generic,rotate}] [-xf]
+                          [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
+                          [-wf WORKER_FACTOR]
+                          [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier}]
+                          [-apikey EMAILLISTVERIFY_API_KEY]
+                          [-apikey_mv MILLIONVERIFIER_API_KEY]
+                          [-apibulk {emaillistverify,millionverifier}]
+                          [-apikey_cv CAPTAINVERIFY_API_KEY]
+                          [-apikey_pf PROOFY_API_KEY]
+                          [-apiuser_pf PROOFY_USER_ID]
+                          [-pf_max_connections PROOFY_MAX_CONNECTIONS]
+                          [-apikey_mev MYEMAILVERIFIER_API_KEY]
                           [-mev_max_connections MEV_MAX_CONNECTIONS]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
