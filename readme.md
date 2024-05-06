@@ -1232,7 +1232,122 @@ python validate_emails.py -f user@domain.com -e user+to@domain.com -tm syntax
 
 # API Support
 
-Script now has added external Email cleaning service API support. 
+In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy). Links to services maybe affiliate links. If you found this information useful ;)
+
+| Provider                         | 1k        | 2k        | 5k        | 10k       | 25k       | 30k       | 50k       | 70k       | 100k      |
+|----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | -         | -         | $4 (0.0008)| $24 (0.0024)| $49 (0.00196)| -         | $89 (0.00178)| -         | $169 (0.00169)|
+| [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#table-compare))  | -         | -         | -         | $37 (0.0037)| $49 (0.00196)| -         | $77 (0.00154)| -         | $129 (0.00129)|
+| [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#table-compare)) | -         | $14 (0.007)| $28 (0.0056)| $39 (0.0039)| $79 (0.00316)| -         | $149 (0.00298)| -         | $239 (0.00239)|
+| [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#table-compare))   | $7 (0.007) | -         | $30 (0.006) | $60 (0.006) | $75 (0.003)  | -         | $150 (0.003) | -         | $200 (0.002)  |
+| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#table-compare))                    | -         | -         | $16 (0.0032)| $29 (0.0029)| -         | $63 (0.0021)| $99 (0.00198)| $124 (0.00177)| $149 (0.00149)|
+
+| Provider                         | 200k      | 250k      | 300k      | 500k      | 1m        | 2.5m      | 5m        | 10m       |
+|----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | -         | $349 (0.001396)| -         | $449 (0.000898)| $599 (0.000599)| $1190 (0.000476)| $1990 (0.000398)| $3290 (0.000329)|
+| [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#table-compare))  | -         | -         | -         | $259 (0.000518)| $389 (0.000389)| -         | $1439 (0.000288)| $2529 (0.000253)|
+| [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#table-compare)) | -         | $349 (0.001396)| -         | $549 (0.001098)| $749 (0.000749)| $1249 (0.0005) | $1849 (0.00037)| -         |
+| [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#table-compare))   | -         | $250 (0.001)  | -         | $500 (0.001)  | $650 (0.00065)| -         | $2000 (0.0004) | -         |
+| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#table-compare))                    | $229 (0.001145)| -         | $289 (0.000963)| $429 (0.000858)| $699 (0.000699)| $1399 (0.00056)| -         | -         |
+
+## Table Compare
+
+Table comparing the JSON field values for each email address across the 5 different Email cleaning service APIs and also compared to local script non-API queries results.
+
+Tested on the same sample `emaillist.txt` of email addresses. These are their respective returned values for `status` JSON field which retrieved from the respective API services. While `status_code` (not used with external APIs), `free_email` and `disposable_email` JSON fields are from local script code/databases where applicable.
+
+| Email | API | status | status_code | free_email | disposable_email |
+|----------------------|-------------------|------------|-------------|------------|------------------|
+| user@mailsac.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | yes | yes |
+| user@mailsac.com | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | false | yes |
+| user@mailsac.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | no | yes |
+| user@mailsac.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | yes |
+| user@mailsac.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | yes | yes |
+| user@mailsac.com | Local Script | ok | 250 | yes | yes |
+| xyz@centmil1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | no | no |
+| xyz@centmil1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
+| xyz@centmil1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
+| xyz@centmil1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
+| xyz@centmil1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
+| xyz@centmil1.com | Local Script | invalid_format | null | unknown | no |
+| user+to@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | no | no |
+| user+to@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | false | no |
+| user+to@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | no | no |
+| user+to@domain1.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | no | no |
+| user+to@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | no | no |
+| user+to@domain1.com | Local Script | ok | 250 | no | no |
+| xyz@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
+| xyz@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
+| xyz@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
+| xyz@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
+| xyz@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
+| xyz@domain1.com | Local Script | unknown_email | 550 | no | no |
+| abc@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
+| abc@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
+| abc@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
+| abc@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
+| abc@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
+| abc@domain1.com | Local Script | unknown_email | 550 | no | no |
+| 123@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
+| 123@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
+| 123@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | no | no |
+| 123@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
+| 123@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
+| 123@domain1.com | Local Script | unknown_email | 550 | no | no |
+| pop@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
+| pop@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
+| pop@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
+| pop@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
+| pop@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
+| pop@domain1.com | Local Script | unknown_email | 550 | no | no |
+| pip@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
+| pip@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
+| pip@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
+| pip@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
+| pip@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
+| pip@domain1.com | Local Script | unknown_email | 550 | no | no |
+| user@tempr.email | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | no | yes |
+| user@tempr.email | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | false | yes |
+| user@tempr.email | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | no | yes |
+| user@tempr.email | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | yes |
+| user@tempr.email | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | yes |
+| user@tempr.email | Local Script | ok | 250 | no | yes |
+| info@domain2.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | no | no |
+| info@domain2.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | false | no |
+| info@domain2.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | no | no |
+| info@domain2.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | no | no |
+| info@domain2.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | no | no |
+| info@domain2.com | Local Script | ok | 250 | no | no |
+| user@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | yes | no |
+| user@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | true | no |
+| user@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | yes | no |
+| user@gmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | yes | no |
+| user@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | yes | no |
+| user@gmail.com | Local Script | ok | 250 | yes | no |
+| op999@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | yes | no |
+| op999@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | true | no |
+| op999@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | yes | no |
+| op999@gmail.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
+| op999@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | yes | no |
+| op999@gmail.com | Local Script | unknown_email | 550 | yes | no |
+| user@yahoo.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | yes | no |
+| user@yahoo.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | true | no |
+| user@yahoo.com | [CaptainVerify](https://centminmod.com/captainverify) | unknown | null | yes | no |
+| user@yahoo.com | [Proofy.io](https://centminmod.com/proofy) | unknown | null | no | no |
+| user@yahoo.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | yes | no |
+| user@yahoo.com | Local Script | ok | 250 | yes | no |
+| user1@outlook.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | yes | no |
+| user1@outlook.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | true | no |
+| user1@outlook.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | yes | no |
+| user1@outlook.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | yes | no |
+| user1@outlook.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | yes | no |
+| user1@outlook.com | Local Script | ok | 250 | yes | no |
+| user2@hotmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | yes | no |
+| user2@hotmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | true | no |
+| user2@hotmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | yes | no |
+| user2@hotmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | yes | no |
+| user2@hotmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | yes | no |
+| user2@hotmail.com | Local Script | ok | 250 | yes | no |
 
 ## EmailListVerify
 
@@ -1795,6 +1910,8 @@ Manual email test via their dashboard reveals
 
 [MillionVerifier](https://centminmod.com/millionverifier) API enabled run `-api millionverifier -apikey_mv $mvkey`
 
+Also updated code to retrive API results for `free_email_api` and `role_api` while `free_email` and `disposable_email` are local script database lookup based
+
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey
 [
@@ -1802,106 +1919,136 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "email": "user@mailsac.com",
         "status": "disposable",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "yes"
+        "free_email": "yes",
+        "disposable_email": "yes",
+        "free_email_api": false,
+        "role_api": true
     },
     {
         "email": "xyz@centmil1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
     },
     {
         "email": "user+to@domain1.com",
         "status": "ok",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
     },
     {
         "email": "xyz@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
     },
     {
         "email": "abc@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": true
     },
     {
         "email": "123@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
     },
     {
         "email": "pop@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
     },
     {
         "email": "pip@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
     },
     {
         "email": "user@tempr.email",
         "status": "disposable",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "yes"
+        "free_email": "no",
+        "disposable_email": "yes",
+        "free_email_api": false,
+        "role_api": true
     },
     {
         "email": "info@domain2.com",
         "status": "ok",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": true
     },
     {
         "email": "user@gmail.com",
         "status": "ok",
         "status_code": null,
-        "free_email": true,
-        "disposable_email": "no"
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
     },
     {
         "email": "op999@gmail.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": true,
-        "disposable_email": "no"
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
     },
     {
         "email": "user@yahoo.com",
         "status": "ok",
         "status_code": null,
-        "free_email": true,
-        "disposable_email": "no"
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
     },
     {
         "email": "user1@outlook.com",
         "status": "ok",
         "status_code": null,
-        "free_email": true,
-        "disposable_email": "no"
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
     },
     {
         "email": "user2@hotmail.com",
         "status": "ok",
         "status_code": null,
-        "free_email": true,
-        "disposable_email": "no"
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
     }
 ]
 ```
@@ -1915,115 +2062,145 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "email": "user@mailsac.com",
         "status": "disposable",
         "status_code": null,
-        "free_email": false,
+        "free_email": "yes",
         "disposable_email": "yes",
+        "free_email_api": false,
+        "role_api": true,
         "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo\""
     },
     {
         "email": "xyz@centmil1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
+        "free_email": "no",
         "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false,
         "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo\""
     },
     {
         "email": "user+to@domain1.com",
         "status": "ok",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
     },
     {
         "email": "xyz@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
+        "free_email": "no",
         "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false,
         "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo\""
     },
     {
         "email": "abc@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
+        "free_email": "no",
         "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": true,
         "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo\""
     },
     {
         "email": "123@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
+        "free_email": "no",
         "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false,
         "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo\""
     },
     {
         "email": "pop@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
+        "free_email": "no",
         "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false,
         "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo\""
     },
     {
         "email": "pip@domain1.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": false,
+        "free_email": "no",
         "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false,
         "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo\""
     },
     {
         "email": "user@tempr.email",
         "status": "disposable",
         "status_code": null,
-        "free_email": false,
+        "free_email": "no",
         "disposable_email": "yes",
+        "free_email_api": false,
+        "role_api": true,
         "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo\""
     },
     {
         "email": "info@domain2.com",
         "status": "ok",
         "status_code": null,
-        "free_email": false,
-        "disposable_email": "no"
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": true
     },
     {
         "email": "user@gmail.com",
         "status": "ok",
         "status_code": null,
-        "free_email": true,
-        "disposable_email": "no"
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
     },
     {
         "email": "op999@gmail.com",
         "status": "invalid",
         "status_code": null,
-        "free_email": true,
+        "free_email": "yes",
         "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false,
         "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo\""
     },
     {
         "email": "user@yahoo.com",
         "status": "ok",
         "status_code": null,
-        "free_email": true,
-        "disposable_email": "no"
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
     },
     {
         "email": "user1@outlook.com",
         "status": "ok",
         "status_code": null,
-        "free_email": true,
-        "disposable_email": "no"
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
     },
     {
         "email": "user2@hotmail.com",
         "status": "ok",
         "status_code": null,
-        "free_email": true,
-        "disposable_email": "no"
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
     }
 ]
 ```
@@ -2042,6 +2219,321 @@ mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@doma
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
+```
+
+### MillionVerifier Bulk File API
+
+Added support for [MillionVerifier](https://centminmod.com/millionverifier) Bulk File API upload with added `-apibulk millionverifier` argument. Unfortunately for the below number of emails, the bulk API upload took a bit longer to process at 7 seconds versus 2.2 seconds for per email verification without `-apibulk millionverifier` due to remote processing.
+
+```
+cat email_verification_log_2024-05-06_05-36-30.log
+
+2024-05-06 05:36:31,484 - INFO - Uploading file: emaillist.txt
+2024-05-06 05:36:31,484 - INFO - Request URL: https://bulkapi.millionverifier.com/bulkapi/v2/upload?key=APIKEY&remove_duplicates=1
+2024-05-06 05:36:31,484 - INFO - Request data: {'key': 'APIKEY'}
+2024-05-06 05:36:31,484 - INFO - Request files: {'file_contents': <_io.BufferedReader name='emaillist.txt'>}
+2024-05-06 05:36:31,765 - INFO - Response status code: 200
+2024-05-06 05:36:31,765 - INFO - Response content: {
+    "file_id": "26458323",
+    "file_name": "emaillist.txt",
+    "status": "unknown",
+    "unique_emails": 0,
+    "updated_at": "2024-05-06 05:36:31",
+    "createdate": "2024-05-06 05:36:31",
+    "percent": 0,
+    "total_rows": 0,
+    "verified": 0,
+    "unverified": 0,
+    "ok": 0,
+    "catch_all": 0,
+    "disposable": 0,
+    "invalid": 0,
+    "unknown": 0,
+    "reverify": 0,
+    "credit": 0,
+    "estimated_time_sec": 0,
+    "error": ""
+}
+
+2024-05-06 05:36:31,765 - INFO - Response JSON: {'file_id': '26458323', 'file_name': 'emaillist.txt', 'status': 'unknown', 'unique_emails': 0, 'updated_at': '2024-05-06 05:36:31', 'createdate': '2024-05-06 05:36:31', 'percent': 0, 'total_rows': 0, 'verified': 0, 'unverified': 0, 'ok': 0, 'catch_all': 0, 'disposable': 0, 'invalid': 0, 'unknown': 0, 'reverify': 0, 'credit': 0, 'estimated_time_sec': 0, 'error': ''}
+2024-05-06 05:36:31,765 - INFO - File uploaded successfully. File ID: 26458323
+2024-05-06 05:36:32,046 - INFO - File processing in progress. Progress: 0%
+2024-05-06 05:36:37,328 - INFO - File processing completed. Retrieving results.
+2024-05-06 05:36:37,607 - INFO - Results file downloaded: millionverifier_results_20240506053637.csv
+2024-05-06 05:36:37,608 - INFO - Results retrieved successfully. Total lines: 15
+```
+
+with `-apibulk millionverifier` argument
+
+Also updated code to retrive API results for `free_email_api` and `role_api` while `free_email` and `disposable_email` are local script database lookup based
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey -apibulk millionverifier
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "disposable",
+        "free_email": "yes",
+        "disposable_email": "yes",
+        "free_email_api": "no",
+        "role_api": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "invalid",
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "role_api": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "ok",
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "role_api": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "disposable",
+        "free_email": "no",
+        "disposable_email": "yes",
+        "free_email_api": "no",
+        "role_api": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "role_api": "yes"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "invalid",
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "role_api": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "invalid",
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "role_api": "yes"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "invalid",
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "role_api": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "invalid",
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "role_api": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "invalid",
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "role_api": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "role_api": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "invalid",
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "role_api": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "unknown",
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "role_api": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "role_api": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "role_api": "no"
+    }
+]
+```
+
+without `-apibulk millionverifier` argument for per email checks
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "disposable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes",
+        "free_email_api": false,
+        "role_api": true
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": true
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "disposable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "free_email_api": false,
+        "role_api": true
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": true
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
+    }
+]
 ```
 
 ## CaptainVerify API
