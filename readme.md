@@ -1,7 +1,11 @@
 # Email Validation Script
 
 ## Overview
-The `validate_emails.py` email validation script is a Python-based tool that allows you to validate and classify email addresses using SMTP (Simple Mail Transfer Protocol) checks. It provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
+The `validate_emails.py` email validation script is a Python-based tool that allows you to validate and classify email addresses using SMTP (Simple Mail Transfer Protocol) checks. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support). The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list. T
+
+The script offers specific support for Xenforo forum member email list verification through dedicated Xenforo argument flags. These flags enable you to mark invalid Xenforo forum member emails and move them to a `bounce_email` status, effectively disabling Xenforo email sending to those members without actually deleting the Xenforo member account. You can then setup a Xenforo forum wide notice targetting `bounce_email` status users - prompting them to update their email addresses.
+
+The `validate_emails.py` email validation script was written by George Liu (eva2000) for his paid consulting clients usage. The below is public documentation for the script.
 
 ## Features
 - Validates email addresses using syntax, DNS and SMTP checks
@@ -21,7 +25,7 @@ The `validate_emails.py` email validation script is a Python-based tool that all
 - Checks email addresses against custom blacklists and whitelists
 - Supports different test modes for syntax, DNS, SMTP, and disposable email checks
 - Configurable SMTP port and TLS/SSL support
-- Supports SMTP profiles.
+- Supports SMTP profiles. However, using SMTP relay profiles won't get accurate SMTP checks. Locally ran server SMTP checks are more accurate.
 - Supports different DNS lookup methods: asyncio, concurrent, and sequential
 - Supports different processing modes: thread and asyncio
 - Generates SQL queries for updating user status in XenForo forum based email validation results. Allowing you to clean up your Xenforo user database's email addresses.
@@ -209,6 +213,8 @@ password = your_ses_password
 
 If the `ses` SMTP profile is specified using the `-smtp ses` argument, the script will load the SMTP settings from the `ses.ini` file.
 
+However, using SMTP relay profiles won't get accurate SMTP checks. Locally ran server SMTP checks are more accurate.
+
 ### -smtp rotate
 
 The `rotate.ini` file is used to store multiple SMTP profiles that can be rotated during the email verification process with `-smtp rotate` argument is passed on command line. Each profile represents a different SMTP server configuration.
@@ -253,6 +259,8 @@ When the `rotate` profile is selected using the `-smtp rotate` option, the scrip
 
 Make sure to populate the `rotate.ini` file with the appropriate SMTP server settings for each profile before using the `rotate` profile option.
 
+However, using SMTP relay profiles won't get accurate SMTP checks. Locally ran server SMTP checks are more accurate.
+
 ### -smtp generic
 
 The `smtp.ini` file is used to store the configuration for a single generic SMTP server that can be used for email verification with `-smtp generic` argument is passed on command line.
@@ -280,6 +288,8 @@ The properties for the generic profile are:
 When the `generic` profile is selected using the `-smtp generic` option, the script will use the SMTP server settings defined in the `smtp.ini` file for all email verification requests.
 
 Make sure to populate the `smtp.ini` file with the appropriate SMTP server settings before using the `generic` profile option.
+
+However, using SMTP relay profiles won't get accurate SMTP checks. Locally ran server SMTP checks are more accurate.
 
 ## Customization
 You can customize the behavior of the script by modifying the following variables in the code:
