@@ -1,7 +1,7 @@
 # Email Validation Script
 
 ## Overview
-The `validate_emails.py` email validation script is a Python-based tool that allows you to validate and classify email addresses using SMTP (Simple Mail Transfer Protocol) checks. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support). The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list. T
+The `validate_emails.py` email validation script is a Python-based tool that allows you to validate and classify email addresses using SMTP (Simple Mail Transfer Protocol) checks. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support). The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
 
 The script offers specific support for Xenforo forum member email list verification through dedicated Xenforo argument flags. These flags enable you to mark invalid Xenforo forum member emails and move them to a `bounce_email` status, effectively disabling Xenforo email sending to those members without actually deleting the Xenforo member account. You can then setup a Xenforo forum wide notice targetting `bounce_email` status users - prompting them to update their email addresses.
 
@@ -118,7 +118,7 @@ The available arguments are:
       - `captainverify`: Use the CaptainVerify API.
       - `proofy`: Use the Proofy API.
   - `-apibulk`, `--api_bulk` (optional):
-    - Description: Use EmailListVerify Bulk file API method.
+    - Description: Use `emaillistverify` or `millionverifier` values for Bulk file API method.
   - `-apikey`, `--emaillistverify_api_key` (optional):
     - Description: The API key for the EmailListVerify service.
   - `-apikey_mv`, `--millionverifier_api_key` (optional):
