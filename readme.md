@@ -1407,6 +1407,8 @@ Personal experience with all 5 providers:
   - CaptainVerify has 4 classifications [valid, invalid, risky, unknown]
   - Proofy.io has 4 classifications [deliverable, risky, undeliverable, unknown]
 
+## Email Verification Provider Comparison Costs
+
 | Provider                         | 1k        | 2k        | 5k        | 10k       | 25k       | 30k       | 50k       | 70k       | 100k      |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
 | [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | -         | -         | $4 (0.0008)| $24 (0.0024)| $49 (0.00196)| -         | $89 (0.00178)| -         | $169 (0.00169)|
