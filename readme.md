@@ -636,7 +636,8 @@ Where [EmailListVerify](https://centminmod.com/emaillistverify) status codes are
 - `unknown` The email delivery failed, but no reason was given
 - `accept_all`  The server is set to accept all emails at a specific domain.,These domains accept any email you send to them
 - `disposable`  The email is a temporary address to receive letters and expires,after certain time period
-- `spam_traps`  The email address is maintained by an ISP or a third party,which neither clicks nor opens emails
+- `spamtrap`  The email address is maintained by an ISP or a third party,which neither clicks nor opens emails
+- `invalid_mx` An undocumentated status value that isn't in their documentation. As the name implies, invalid MX DNS records
 
 Filter for disposable_email = yes
 
@@ -1743,7 +1744,8 @@ Where [EmailListVerify](https://centminmod.com/emaillistverify) status codes are
 - `unknown` The email delivery failed, but no reason was given
 - `accept_all`  The server is set to accept all emails at a specific domain.,These domains accept any email you send to them
 - `disposable`  The email is a temporary address to receive letters and expires,after certain time period
-- `spam_traps`  The email address is maintained by an ISP or a third party,which neither clicks nor opens emails
+- `spamtrap`  The email address is maintained by an ISP or a third party,which neither clicks nor opens emails
+- `invalid_mx` An undocumentated status value that isn't in their documentation. As the name implies, invalid MX DNS records
 
 [EmailListVerify](https://centminmod.com/emaillistverify) API integration via `-api` and `apikey` arguments combined with Xenforo flags to display the MySQL query to update invalid user's email addresses to `email_bounce` status in Xenforo database.
 
