@@ -28,7 +28,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
 - Supports SMTP profiles. However, using SMTP relay profiles won't get accurate SMTP checks. Locally ran server SMTP checks are more accurate.
 - Supports different DNS lookup methods: asyncio, concurrent, and sequential
 - Supports different processing modes: thread and asyncio
-- Generates SQL queries for updating user status in XenForo forum based email validation results. Allowing you to clean up your Xenforo user database's email addresses.
+- [Xenforo](#xenforo) support. Generates SQL queries for updating user status in XenForo forum based email validation results. Allowing you to clean up your Xenforo user database's email addresses.
 
 ## Requirements
 - Python 3.6 minimum. Script tested on AlmaLinux 8 Python 3.6 and AlmaLinux 9 Python 3.9.
@@ -361,6 +361,12 @@ password = YOUR_AWS_SES_SMTP_PASSWORD
 
 Xenforo support to display MySQL query for bad emails only to set their status to `email_bounce` passing flags `-xf` and `-xfdb xenforo` and `-xfprefix xf_` with `disposable_email` status field
 
+Xenforo arguments mode for `-xf -xfdb xenforo -xfprefix xf_` has ben updated to output
+
+- `xf_sql` for MySQL query you can run on SSH command line. The command's double quotes are escaped `\"` so you remove the backslash manually, or use below outlined `jq` tool to automatically remove it
+- `xf_sql_batch` for MySQL query run in MySQL client, phpmyadmin etc
+- `xf_sql_user` for MySQL query you can run on SSH command line to look up Xenforo user details for that email address. The command's double quotes are escaped `\"` so you remove the backslash manually, or use below outlined `jq` tool to automatically remove it
+
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb xenforo -xfprefix xf_
 [
@@ -369,7 +375,10 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status": "ok",
         "status_code": 250,
         "free_email": "yes",
-        "disposable_email": "yes"
+        "disposable_email": "yes",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo",
+        "xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';",
+        "xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@mailsac.com'\\G\" xenforo"
     },
     {
         "email": "xyz@centmil1.com",
@@ -391,7 +400,9 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo",
+        "xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';",
+        "xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@domain1.com'\\G\" xenforo"
     },
     {
         "email": "abc@domain1.com",
@@ -399,7 +410,9 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo",
+        "xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';",
+        "xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'abc@domain1.com'\\G\" xenforo"
     },
     {
         "email": "123@domain1.com",
@@ -407,7 +420,9 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo",
+        "xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';",
+        "xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = '123@domain1.com'\\G\" xenforo"
     },
     {
         "email": "pop@domain1.com",
@@ -415,7 +430,9 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo",
+        "xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';",
+        "xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pop@domain1.com'\\G\" xenforo"
     },
     {
         "email": "pip@domain1.com",
@@ -423,14 +440,19 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo",
+        "xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';",
+        "xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pip@domain1.com'\\G\" xenforo"
     },
     {
         "email": "user@tempr.email",
         "status": "ok",
         "status_code": 250,
         "free_email": "no",
-        "disposable_email": "yes"
+        "disposable_email": "yes",
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo",
+        "xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';",
+        "xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@tempr.email'\\G\" xenforo"
     },
     {
         "email": "info@domain2.com",
@@ -452,7 +474,9 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "yes",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo",
+        "xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';",
+        "xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'op999@gmail.com'\\G\" xenforo"
     },
     {
         "email": "user@yahoo.com",
@@ -476,6 +500,81 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "disposable_email": "no"
     }
 ]
+```
+
+Use `jq` tool to filter for `xf_sql` only
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';" xenforo
+```
+
+Use `jq` tool to filter for `xf_sql_batch` only. You can pipe or place this output into a `update.sql` file and import into your Xenforo MySQL database to batch update the user's `user_state`
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql_batch) | .xf_sql_batch'
+UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';
+UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';
+UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';
+UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';
+UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';
+UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';
+UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';
+UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';
+```
+
+Use `jq` tool to filter for `xf_sql_user` only. This allows you to run on SSH command line the Xenforo database lookup for the Xenforo user details for the specific email address
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql_user) | .xf_sql_user'
+mysql -e "SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@mailsac.com'\G" xenforo
+mysql -e "SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@domain1.com'\G" xenforo
+mysql -e "SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'abc@domain1.com'\G" xenforo
+mysql -e "SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = '123@domain1.com'\G" xenforo
+mysql -e "SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pop@domain1.com'\G" xenforo
+mysql -e "SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pip@domain1.com'\G" xenforo
+mysql -e "SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@tempr.email'\G" xenforo
+mysql -e "SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'op999@gmail.com'\G" xenforo
+```
+
+Example running one of these commands for `pop@domain1.com` on server where Xenforo is installed. The `user_state` would either be `valid` prior to running above `UPDATE` command or `email_bounce` after running `UPDATE` command.
+
+```
+mysql -e "SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pop@domain1.com'\G" xenforo
+*************************** 1. row ***************************
+            user_id: 11
+           username: pop
+              email: pop@domain1.com
+      user_group_id: 2
+secondary_group_ids: 3,4,6,8
+      message_count: 191817
+      register_date: 1400868747
+      last_activity: 1715011284
+         user_state: email_bounce
+       is_moderator: 1
+           is_admin: 1
+          is_banned: 0
+```
+
+`register_date` date
+
+```
+date -d @1400868747
+Fri May 23 18:12:27 UTC 2014
+```
+
+`last_activity` date
+
+```
+date -d @1715011284
+Mon May  6 16:01:24 UTC 2024
 ```
 
 ```
@@ -564,12 +663,12 @@ Using `jq` tool to only list MySQL queries for bad emails only
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
 
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';" xenforo
 ```
 
 Filter using `jq` tool for `free_email = yes` emails only
@@ -1518,7 +1617,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emai
         "status_code": null,
         "free_email": "yes",
         "disposable_email": "yes",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo"
     },
     {
         "email": "xyz@centmil1.com",
@@ -1526,7 +1625,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emai
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';\" xenforo"
     },
     {
         "email": "user+to@domain1.com",
@@ -1541,7 +1640,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emai
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo"
     },
     {
         "email": "abc@domain1.com",
@@ -1549,7 +1648,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emai
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo"
     },
     {
         "email": "123@domain1.com",
@@ -1557,7 +1656,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emai
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo"
     },
     {
         "email": "pop@domain1.com",
@@ -1565,7 +1664,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emai
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo"
     },
     {
         "email": "pip@domain1.com",
@@ -1573,7 +1672,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emai
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo"
     },
     {
         "email": "user@tempr.email",
@@ -1581,7 +1680,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emai
         "status_code": null,
         "free_email": "no",
         "disposable_email": "yes",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo"
     },
     {
         "email": "info@domain2.com",
@@ -1603,7 +1702,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emai
         "status_code": null,
         "free_email": "yes",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo"
     },
     {
         "email": "user@yahoo.com",
@@ -1633,15 +1732,15 @@ Using `jq` tool to just filter for MySQL queries.
 
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';" xenforo
 ```
 
 Looks like Emaillistverify might be correct = `unknown` for status value. So they differentiate disposable emails = `unknown` I think regardless of whether the email passes SMTP check. Guess that makes sense, so I should also mark disposable emails so they show `xf_sql` query
@@ -1657,7 +1756,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 250,
         "free_email": "yes",
         "disposable_email": "yes",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo"
     },
     {
         "email": "xyz@centmil1.com",
@@ -1679,7 +1778,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo"
     },
     {
         "email": "abc@domain1.com",
@@ -1687,7 +1786,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo"
     },
     {
         "email": "123@domain1.com",
@@ -1695,7 +1794,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo"
     },
     {
         "email": "pop@domain1.com",
@@ -1703,7 +1802,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo"
     },
     {
         "email": "pip@domain1.com",
@@ -1711,7 +1810,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo"
     },
     {
         "email": "user@tempr.email",
@@ -1719,7 +1818,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 250,
         "free_email": "no",
         "disposable_email": "yes",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo"
     },
     {
         "email": "info@domain2.com",
@@ -1741,7 +1840,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
         "status_code": 550,
         "free_email": "yes",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo"
     },
     {
         "email": "user@yahoo.com",
@@ -2087,7 +2186,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "yes",
         "free_email_api": false,
         "role_api": true,
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo"
     },
     {
         "email": "xyz@centmil1.com",
@@ -2097,7 +2196,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "no",
         "free_email_api": false,
         "role_api": false,
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';\" xenforo"
     },
     {
         "email": "user+to@domain1.com",
@@ -2116,7 +2215,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "no",
         "free_email_api": false,
         "role_api": false,
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo"
     },
     {
         "email": "abc@domain1.com",
@@ -2126,7 +2225,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "no",
         "free_email_api": false,
         "role_api": true,
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo"
     },
     {
         "email": "123@domain1.com",
@@ -2136,7 +2235,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "no",
         "free_email_api": false,
         "role_api": false,
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo"
     },
     {
         "email": "pop@domain1.com",
@@ -2146,7 +2245,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "no",
         "free_email_api": false,
         "role_api": false,
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo"
     },
     {
         "email": "pip@domain1.com",
@@ -2156,7 +2255,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "no",
         "free_email_api": false,
         "role_api": false,
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo"
     },
     {
         "email": "user@tempr.email",
@@ -2166,7 +2265,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "yes",
         "free_email_api": false,
         "role_api": true,
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo"
     },
     {
         "email": "info@domain2.com",
@@ -2194,7 +2293,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "no",
         "free_email_api": true,
         "role_api": false,
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo"
     },
     {
         "email": "user@yahoo.com",
@@ -2231,15 +2330,15 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
 
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';" xenforo
 ```
 
 ### MillionVerifier Bulk File API
@@ -2629,7 +2728,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "no",
         "disposable_email": "yes",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo"
     },
     {
         "email": "xyz@centmil1.com",
@@ -2637,7 +2736,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';\" xenforo"
     },
     {
         "email": "user+to@domain1.com",
@@ -2652,7 +2751,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo"
     },
     {
         "email": "abc@domain1.com",
@@ -2660,7 +2759,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo"
     },
     {
         "email": "123@domain1.com",
@@ -2668,7 +2767,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo"
     },
     {
         "email": "pop@domain1.com",
@@ -2676,7 +2775,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo"
     },
     {
         "email": "pip@domain1.com",
@@ -2684,7 +2783,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo"
     },
     {
         "email": "user@tempr.email",
@@ -2692,7 +2791,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "no",
         "disposable_email": "yes",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo"
     },
     {
         "email": "info@domain2.com",
@@ -2700,7 +2799,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com';\" xenforo"
     },
     {
         "email": "user@gmail.com",
@@ -2715,7 +2814,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "yes",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo"
     },
     {
         "email": "user@yahoo.com",
@@ -2723,7 +2822,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
         "status_code": null,
         "free_email": "yes",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com';\" xenforo"
     },
     {
         "email": "user1@outlook.com",
@@ -2746,17 +2845,17 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api capt
 
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api captainverify -apikey_cv $cvkey -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com';" xenforo
 ```
 
 ## Proofy API
@@ -2774,7 +2873,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "yes",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo"
     },
     {
         "email": "xyz@centmil1.com",
@@ -2782,7 +2881,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';\" xenforo"
     },
     {
         "email": "user+to@domain1.com",
@@ -2797,7 +2896,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo"
     },
     {
         "email": "abc@domain1.com",
@@ -2805,7 +2904,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo"
     },
     {
         "email": "123@domain1.com",
@@ -2813,7 +2912,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo"
     },
     {
         "email": "pop@domain1.com",
@@ -2821,7 +2920,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo"
     },
     {
         "email": "pip@domain1.com",
@@ -2829,7 +2928,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo"
     },
     {
         "email": "user@tempr.email",
@@ -2837,7 +2936,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "yes",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo"
     },
     {
         "email": "info@domain2.com",
@@ -2859,7 +2958,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo"
     },
     {
         "email": "user@yahoo.com",
@@ -2867,7 +2966,7 @@ validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -api
         "status_code": null,
         "free_email": "no",
         "disposable_email": "no",
-        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com'; xenforo\""
+        "xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com';\" xenforo"
     },
     {
         "email": "user1@outlook.com",
@@ -3017,17 +3116,17 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proo
 
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -apikey_pf $pkey -apiuser_pf $puser -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'info@domain2.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yahoo.com';" xenforo
 ```
 
 ## MyEmailVerifier API
@@ -3152,13 +3251,13 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -api myemailverif
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -api myemailverifier -apikey_mev $mevkey -tm all -xf -xfdb xenforo -xfprefix xf_ | jq -r '.[] | select(.xf_sql) | .xf_sql'
 
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email'; xenforo"
-mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com'; xenforo"
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';" xenforo
+mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';" xenforo
 ```
