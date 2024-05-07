@@ -1362,7 +1362,41 @@ Personal experience with all 5 providers:
   - API documentation
   - Less restrictive on API connection and rate limits. Meaning if you are doing per email API checks for many email addresses, the speed of completion will be faster. Though if you're doing many email address checks, you'd want to use their respective bulk email API end points to upload a single text file for processing.
   - For bulk API speed though, MillionVerifier is much faster than EmailListVerify. For the sample 15 email addresses tested below, MillionVerifier bulk API took ~7 seconds, EmailListVerify bulk API took ~45 seconds. Compared to per email address verification checks, both taking between 2.2 to 3.3 seconds. EmailListVerify seems to have much more detailed status classifications (see below) compared to ther others so more processing is done on their end.
-- MillionVerifier API logging for billing is the mosted detailed. They also show per API call credit usage balance details and even list in the logs refunded credits for bulk API file uploaded emails classified as 'risky' but I can't find any info on what they class as 'risky' given they have 4 classifications and none are labelled as 'risky'. On below sample 15 email addresses tested, I always got 1 refunded credit so it applies to one email address. I suspect it's `xyz@centmil1.com` as it's an invalid domain DNS one so it probably didn't cost them anything for a simple DNS lookup? Seems refunds only apply to bulk API and not per email verification checks? AFAIK, the other providers don't refund any credits that I can see.
+- MillionVerifier API logging for billing is the mosted detailed with historical running balances. They also show per API call credit usage balance details and even list in the logs refunded credits for bulk API file uploaded emails classified as 'risky' (`catch_all` or `unknown`) https://help.millionverifier.com/payments-credits/refund-for-risky-emails. AFAIK, the other providers don't refund any credits that I can see. Howver, on below sample 15 email addresses tested, I always got 1 refunded credit so it applies to one email address which is a known valid email `user@yahoo.com` which is classed as `unknown` in bulk API but classed as `ok` in per email verification API. Seems to be a bug in their bulk API then as the refunds only apply to bulk API and not per email verification checks. 
+  
+  single email API check for `user@yahoo.com` returns `ok`
+  ```
+  python validate_emails.py -f user@domain1.com -e user@yahoo.com -api millionverifier -apikey_mv $mvkey -tm all
+  [
+      {
+          "email": "user@yahoo.com",
+          "status": "ok",
+          "status_code": null,
+          "free_email": "yes",
+          "disposable_email": "no",
+          "free_email_api": true,
+          "role_api": false
+      }
+  ]
+  ```
+
+  bulk API upload check excerpt for `user@yahoo.com` returns `unknown`
+
+  ```
+  python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey -apibulk millionverifier
+  [
+   
+      {
+          "email": "user@yahoo.com",
+          "status": "unknown",
+          "free_email": "yes",
+          "disposable_email": "no",
+          "free_email_api": "yes",
+          "role_api": "no"
+      },
+
+  ]
+  ```
 - MyEmailVerifier API is limited to 30 requests per minute for per email address verification checks. For the sample 15 email addresses tested below, took ~5.5 seconds to complete per email address verification checks
 - CaptainVerify API is limited to a maximum of 2 simultaneous connections and 50 checks per minute for per email address verification checks. For the sample 15 email addresses tested below, took ~4.6 seconds to complete per email address verification checks
 - Proofy.io has the most restrictive API limits but I can't seem to find any documentation of the actual limits, so I have to code it so it isn't as fast as other providers for per email verification checks. It will be the slowest of the 5 providers for per email verification checks. For the sample 15 email addresses tested below, took ~9.5 seconds to complete per email address verification checks
