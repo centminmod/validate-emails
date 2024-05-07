@@ -16,6 +16,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
   - [MyEmailVerifier](https://centminmod.com/myemailverifier) [[example](#myemailverifier-api)]
   - [CaptainVerify](https://centminmod.com/captainverify) [[example](#captainverify-api)]
   - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
+  - [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accuracte email verification results.
 - Classifies email addresses into various categories based on the syntax, DNS, and SMTP response
 - Supports concurrent processing for faster validation of multiple email addresses
 - Provides detailed logging for tracking the validation process
@@ -39,27 +40,16 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
 2. Run the script with the desired command-line arguments. 
 
 ```
-validate_emails.py 
-usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE]
-                          [-b BATCH_SIZE] [-d] [-v] [-delay DELAY]
-                          [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT]
-                          [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
-                          [-dns {asyncio,concurrent,sequential}]
-                          [-p {thread,asyncio}] [-bl BLACKLIST_FILE]
-                          [-wl WHITELIST_FILE]
-                          [-smtp {default,ses,generic,rotate}] [-xf]
-                          [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
-                          [-wf WORKER_FACTOR]
-                          [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier}]
-                          [-apikey EMAILLISTVERIFY_API_KEY]
-                          [-apikey_mv MILLIONVERIFIER_API_KEY]
-                          [-apibulk {emaillistverify,millionverifier}]
-                          [-apikey_cv CAPTAINVERIFY_API_KEY]
-                          [-apikey_pf PROOFY_API_KEY]
-                          [-apiuser_pf PROOFY_USER_ID]
-                          [-pf_max_connections PROOFY_MAX_CONNECTIONS]
-                          [-apikey_mev MYEMAILVERIFIER_API_KEY]
-                          [-mev_max_connections MEV_MAX_CONNECTIONS]
+python validate_emails.py 
+usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATCH_SIZE] [-d] [-v] [-delay DELAY]
+                          [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
+                          [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
+                          [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
+                          [-wf WORKER_FACTOR] [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier}]
+                          [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
+                          [-apibulk {emaillistverify,millionverifier}] [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY]
+                          [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS] [-apikey_mev MYEMAILVERIFIER_API_KEY]
+                          [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
@@ -128,6 +118,8 @@ The available arguments are:
       - `myemailverifier`: Use the MyEmailVerifier API.
       - `captainverify`: Use the CaptainVerify API.
       - `proofy`: Use the Proofy API.
+  - `-apimerge`, `--api_merge` (optional):
+    - Description: Merge and combine `emaillistverify` or `millionverifier` API results into one result
   - `-apibulk`, `--api_bulk` (optional):
     - Description: Use `emaillistverify` or `millionverifier` values for Bulk file API method.
   - `-apikey`, `--emaillistverify_api_key` (optional):
@@ -1474,6 +1466,8 @@ python validate_emails.py -f user@domain.com -e user+to@domain.com -tm syntax
 # API Support
 
 In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy). Links to services maybe affiliate links. If you found this information useful ;)
+
+Updated: Added [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accuracte email verification results.
 
 ## Personal Experience
 
@@ -3643,3 +3637,1091 @@ mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@doma
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';" xenforo
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';" xenforo
 ```
+
+# API Merge
+
+Added support for `-apimerge` argument which allows you to merge Merging [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accuracte email verification results. 
+
+The table below shows how long it took to execute and process the verification checks using `validate_emails.py` and merged APIs. Looks like subsequent runs were faster due to probably primed caches at respective providers' backends.
+
+| API Merge Command | Processing Time |
+|-------------------|-----------------|
+| Per Email Verification | 15.946 seconds |
+| Bulk API File Upload | 47.536 seconds |
+| Per Email Verification with Xenforo | 10.666 seconds |
+| Bulk API File Upload with Xenforo | 41.260 seconds |
+
+Merging [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results for both into one JSON result output for per email verification checks
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey -api millionverifier -apikey_mv $mvkey -apimerge
+[
+    {
+        "email": "user@mailsac.com",
+        "elv_status": "disposable",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "yes",
+        "mv_status": "disposable",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "yes",
+        "mv_free_email_api": false,
+        "mv_role_api": true
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false
+    },
+    {
+        "email": "user+to@domain1.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false
+    },
+    {
+        "email": "user@tempr.email",
+        "elv_status": "disposable",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "yes",
+        "mv_status": "disposable",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "yes",
+        "mv_free_email_api": false,
+        "mv_role_api": true
+    },
+    {
+        "email": "info@domain2.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": true
+    },
+    {
+        "email": "xyz@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false
+    },
+    {
+        "email": "abc@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": true
+    },
+    {
+        "email": "123@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false
+    },
+    {
+        "email": "pop@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false
+    },
+    {
+        "email": "pip@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false
+    },
+    {
+        "email": "user@gmail.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false
+    },
+    {
+        "email": "op999@gmail.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false
+    },
+    {
+        "email": "user@yahoo.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false
+    },
+    {
+        "email": "user1@outlook.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false
+    },
+    {
+        "email": "user2@hotmail.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false
+    }
+]
+
+real    0m15.946s
+user    0m1.017s
+sys     0m0.037s
+```
+
+Merging [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results for both into one JSON result output for bulk API file upload checks `-apibulk`
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey -apibulk emaillistverify -api millionverifier -apikey_mv $mvkey -apibulk millionverifier -apimerge
+
+[
+    {
+        "email": "user@mailsac.com",
+        "elv_status": "disposable",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "yes",
+        "mv_status": "disposable",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "yes",
+        "mv_free_email_api": "no",
+        "mv_role_api": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "elv_status": "dead_server",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "elv_status": "disposable",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "yes",
+        "mv_status": "disposable",
+        "mv_free_email": "no",
+        "mv_disposable_email": "yes",
+        "mv_free_email_api": "no",
+        "mv_role_api": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "yes"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "yes"
+    },
+    {
+        "email": "123@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "unknown",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no"
+    }
+]
+
+real    0m47.536s
+user    0m0.612s
+sys     0m0.021s
+```
+
+Merging [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results for both into one JSON result output for per email verification checks + Xenforo flags
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey -api millionverifier -apikey_mv $mvkey -apimerge -xf -xfdb xenforo -xfprefix xf_
+
+[
+    {
+        "email": "user@mailsac.com",
+        "elv_status": "disposable",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "yes",
+        "mv_status": "disposable",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "yes",
+        "mv_free_email_api": false,
+        "mv_role_api": true,
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@mailsac.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@mailsac.com'\\G\" xenforo"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false,
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@centmil1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@centmil1.com'\\G\" xenforo"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false
+    },
+    {
+        "email": "user@tempr.email",
+        "elv_status": "disposable",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "yes",
+        "mv_status": "disposable",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "yes",
+        "mv_free_email_api": false,
+        "mv_role_api": true,
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@tempr.email'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@tempr.email'\\G\" xenforo"
+    },
+    {
+        "email": "info@domain2.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": true
+    },
+    {
+        "email": "xyz@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false,
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "abc@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": true,
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'abc@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'abc@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "123@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false,
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = '123@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = '123@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "pop@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false,
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pop@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pop@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "pip@domain1.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": false,
+        "mv_role_api": false,
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pip@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pip@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "user@gmail.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false
+    },
+    {
+        "email": "op999@gmail.com",
+        "elv_status": "invalid",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false,
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'op999@gmail.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'op999@gmail.com'\\G\" xenforo"
+    },
+    {
+        "email": "user@yahoo.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false
+    },
+    {
+        "email": "user1@outlook.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false
+    },
+    {
+        "email": "user2@hotmail.com",
+        "elv_status": "ok",
+        "elv_status_code": null,
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_status_code": null,
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": true,
+        "mv_role_api": false
+    }
+]
+
+real    0m10.666s
+user    0m1.008s
+sys     0m0.034s
+```
+
+Merging [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results for both into one JSON result output for bulk API file upload checks `-apibulk` + Xenforo flags
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey -apibulk emaillistverify -api millionverifier -apikey_mv $mvkey -apibulk millionverifier -apimerge -xf -xfdb xenforo -xfprefix xf_
+
+[
+    {
+        "email": "user@mailsac.com",
+        "elv_status": "disposable",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "yes",
+        "mv_status": "disposable",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "yes",
+        "mv_free_email_api": "no",
+        "mv_role_api": "yes",
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@mailsac.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@mailsac.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@mailsac.com'\\G\" xenforo"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "elv_status": "dead_server",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no",
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@centmil1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@centmil1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@centmil1.com'\\G\" xenforo"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "elv_status": "disposable",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "yes",
+        "mv_status": "disposable",
+        "mv_free_email": "no",
+        "mv_disposable_email": "yes",
+        "mv_free_email_api": "no",
+        "mv_role_api": "yes",
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@tempr.email'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'user@tempr.email'\\G\" xenforo"
+    },
+    {
+        "email": "info@domain2.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "yes"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no",
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'xyz@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'xyz@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "abc@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "yes",
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'abc@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'abc@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'abc@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "123@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no",
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = '123@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = '123@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = '123@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "pop@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no",
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pop@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pop@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "pip@domain1.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "no",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "no",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "no",
+        "mv_role_api": "no",
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pip@domain1.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'pip@domain1.com'\\G\" xenforo"
+    },
+    {
+        "email": "user@gmail.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "elv_status": "email_disabled",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "invalid",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no",
+        "elv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo",
+        "elv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';",
+        "elv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'op999@gmail.com'\\G\" xenforo",
+        "mv_xf_sql": "mysql -e \"UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';\" xenforo",
+        "mv_xf_sql_batch": "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';",
+        "mv_xf_sql_user": "mysql -e \"SELECT user_id, username, email, user_group_id, secondary_group_ids, message_count, register_date, last_activity, user_state, is_moderator, is_admin, is_banned FROM xf_user WHERE email = 'op999@gmail.com'\\G\" xenforo"
+    },
+    {
+        "email": "user@yahoo.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "elv_status": "valid",
+        "elv_status_code": "",
+        "elv_free_email": "yes",
+        "elv_disposable_email": "no",
+        "mv_status": "ok",
+        "mv_free_email": "yes",
+        "mv_disposable_email": "no",
+        "mv_free_email_api": "yes",
+        "mv_role_api": "no"
+    }
+]
+
+real    0m41.260s
+user    0m0.581s
+sys     0m0.033s
+```
+
+## API Merge Filters
+
+For API merged results, if you ran the commands and piped them into a `results.txt` file, you can then query and filter them using `jq` tool for different combinations of `elv_status` and `mv_status` values as follows:
+
+1. Find good emails, filter good emails where `elv_status` is "valid" and `mv_status` is "ok":
+```bash
+cat results.txt | jq '.[] | select(.elv_status == "valid" and .mv_status == "ok")'
+```
+
+```
+cat results.txt | jq '.[] | select(.elv_status == "valid" and .mv_status == "ok")'
+{
+  "email": "user+to@domain1.com",
+  "elv_status": "valid",
+  "elv_status_code": "",
+  "elv_free_email": "no",
+  "elv_disposable_email": "no",
+  "mv_status": "ok",
+  "mv_free_email": "no",
+  "mv_disposable_email": "no",
+  "mv_free_email_api": "no",
+  "mv_role_api": "no"
+}
+{
+  "email": "info@domain2.com",
+  "elv_status": "valid",
+  "elv_status_code": "",
+  "elv_free_email": "no",
+  "elv_disposable_email": "no",
+  "mv_status": "ok",
+  "mv_free_email": "no",
+  "mv_disposable_email": "no",
+  "mv_free_email_api": "no",
+  "mv_role_api": "yes"
+}
+{
+  "email": "user@gmail.com",
+  "elv_status": "valid",
+  "elv_status_code": "",
+  "elv_free_email": "yes",
+  "elv_disposable_email": "no",
+  "mv_status": "ok",
+  "mv_free_email": "yes",
+  "mv_disposable_email": "no",
+  "mv_free_email_api": "yes",
+  "mv_role_api": "no"
+}
+{
+  "email": "user1@outlook.com",
+  "elv_status": "valid",
+  "elv_status_code": "",
+  "elv_free_email": "yes",
+  "elv_disposable_email": "no",
+  "mv_status": "ok",
+  "mv_free_email": "yes",
+  "mv_disposable_email": "no",
+  "mv_free_email_api": "yes",
+  "mv_role_api": "no"
+}
+{
+  "email": "user2@hotmail.com",
+  "elv_status": "valid",
+  "elv_status_code": "",
+  "elv_free_email": "yes",
+  "elv_disposable_email": "no",
+  "mv_status": "ok",
+  "mv_free_email": "yes",
+  "mv_disposable_email": "no",
+  "mv_free_email_api": "yes",
+  "mv_role_api": "no"
+}
+```
+
+2. Find bad emails, filter emails where `elv_status` is "invalid" and `mv_status` is "invalid":
+```bash
+cat results.txt | jq '.[] | select(.elv_status == "invalid" and .mv_status == "invalid")'
+```
+
+3. Filter emails where `elv_status` is "valid" but `mv_status` is not "ok":
+
+This filters for if you ran MillionVerifier bulk API and there is a bug in `unknown` status, you can use EmailListVerify API to double check it's status.
+
+```bash
+cat results.txt | jq '.[] | select(.elv_status == "valid" and .mv_status != "ok")'
+```
+```
+cat results.txt | jq '.[] | select(.elv_status == "valid" and .mv_status != "ok")'
+{
+  "email": "user@yahoo.com",
+  "elv_status": "valid",
+  "elv_status_code": "",
+  "elv_free_email": "yes",
+  "elv_disposable_email": "no",
+  "mv_status": "unknown",
+  "mv_free_email": "yes",
+  "mv_disposable_email": "no",
+  "mv_free_email_api": "yes",
+  "mv_role_api": "no"
+}
+```
+
+4. Filter emails where `elv_status` is not "valid" but `mv_status` is "ok":
+
+This would be the reverse of previous check, to double check EmailListVerify's result against MillionVerifier
+
+```bash
+cat results.txt | jq '.[] | select(.elv_status != "valid" and .mv_status == "ok")'
+```
+
+5. Filter bad emails where `elv_status` is not "valid" and `mv_status` is not "ok":
+```bash
+cat results.txt | jq '.[] | select(.elv_status != "valid" and .mv_status != "ok")'
+```
+
+6. Filter emails where `elv_status` is "disposable" and `mv_status` is "disposable":
+```bash
+cat results.txt | jq '.[] | select(.elv_status == "disposable" and .mv_status == "disposable")'
+```
+
+7. Filter emails where `elv_status` is "unknown" and `mv_status` is "unknown":
+```bash
+cat results.txt | jq '.[] | select(.elv_status == "unknown" and .mv_status == "unknown")'
+```
+
+8. Filter emails where either `elv_status` or `mv_status` is "invalid":
+```bash
+cat results.txt | jq '.[] | select(.elv_status == "invalid" or .mv_status == "invalid")'
+```
+
+9. Filter emails where either `elv_status` or `mv_status` is "disposable":
+```bash
+cat results.txt | jq '.[] | select(.elv_status == "disposable" or .mv_status == "disposable")'
+```
+
+10. Filter emails where either `elv_status` or `mv_status` is "unknown":
+```bash
+cat results.txt | jq '.[] | select(.elv_status == "unknown" or .mv_status == "unknown")'
+```
+
+11. Filter emails where `elv_status` is "valid" and `mv_status` is "unknown":
+
+This filters for if you ran MillionVerifier bulk API and there is a bug in `unknown` status, you can use EmailListVerify API to double check it's status.
+
+```
+cat results.txt | jq '.[] | select(.elv_status == "valid" and .mv_status == "unknown")'
+```
+```
+cat results.txt | jq '.[] | select(.elv_status == "valid" and .mv_status == "unknown")'
+{
+  "email": "user@yahoo.com",
+  "elv_status": "valid",
+  "elv_status_code": "",
+  "elv_free_email": "yes",
+  "elv_disposable_email": "no",
+  "mv_status": "unknown",
+  "mv_free_email": "yes",
+  "mv_disposable_email": "no",
+  "mv_free_email_api": "yes",
+  "mv_role_api": "no"
+}
+```
+
+These `jq` queries cover various combinations of `elv_status` and `mv_status` values, allowing you to filter the `results.txt` file based on different criteria. You can adjust the specific status values in the queries according to your needs and the available status values in the `results.txt` file.
+
+Remember to replace `results.txt` with the actual path to your file if it's located in a different directory.
