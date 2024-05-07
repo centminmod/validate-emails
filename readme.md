@@ -1369,6 +1369,8 @@ Personal experience with all 5 providers:
   > We're glad you reached out to us about this issue, and we're here to help.
   > The discrepancy you're seeing in the results is likely because we were unable to connect to the server during the verification process, leading to an "Unknown" result. However, for the single API, the connection went through smoothly, allowing us to verify the email without any problems. An "Unknown" result simply means that we couldn't determine the existence of the email at the time of verification.
   > If you have any more questions, queries, or issues, we're more than happy to assist.
+
+  I tried a few attempts at bulk API for the same list of 15 emails, and `user@yahoo.com` is always marked as status = `unknown` and never anything different though? It would be hard to differentiate status classifications if it's due connection issues if they're lumped into other emails in unknown label. Maybe would be better to have a separate classification for connection issues so we can differentiate as such. For example, EmailListVerify has 18 different status classifications including for connection related issues.
   
   single email API check for `user@yahoo.com` returns `ok`
   ```
@@ -2802,6 +2804,8 @@ I reached out to MillionVerifier chat support which was initially handled via Mi
 > We're glad you reached out to us about this issue, and we're here to help.
 > The discrepancy you're seeing in the results is likely because we were unable to connect to the server during the verification process, leading to an "Unknown" result. However, for the single API, the connection went through smoothly, allowing us to verify the email without any problems. An "Unknown" result simply means that we couldn't determine the existence of the email at the time of verification.
 > If you have any more questions, queries, or issues, we're more than happy to assist.
+
+I tried a few attempts at bulk API for the same list of 15 emails, and `user@yahoo.com` is always marked as status = `unknown` and never anything different though? It would be hard to differentiate status classifications if it's due connection issues if they're lumped into other emails in unknown label. Maybe would be better to have a separate classification for connection issues so we can differentiate as such. For example, EmailListVerify has 18 different status classifications including for connection related issues.
   
 single email API check for `user@yahoo.com` returns `ok`
 ```
