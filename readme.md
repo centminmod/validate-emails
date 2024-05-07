@@ -16,7 +16,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
   - [MyEmailVerifier](https://centminmod.com/myemailverifier) [[example](#myemailverifier-api)]
   - [CaptainVerify](https://centminmod.com/captainverify) [[example](#captainverify-api)]
   - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
-  - [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accuracte email verification results.
+  - [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
 - Classifies email addresses into various categories based on the syntax, DNS, and SMTP response
 - Supports concurrent processing for faster validation of multiple email addresses
 - Provides detailed logging for tracking the validation process
@@ -1467,7 +1467,7 @@ python validate_emails.py -f user@domain.com -e user+to@domain.com -tm syntax
 
 In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy). Links to services maybe affiliate links. If you found this information useful ;)
 
-Updated: Added [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accuracte email verification results.
+Updated: Added [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
 
 ## Personal Experience
 
@@ -3640,7 +3640,7 @@ mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gm
 
 # API Merge
 
-Added support for `-apimerge` argument which allows you to merge Merging [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accuracte email verification results. 
+Added support for `-apimerge` argument which allows you to merge Merging [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results. 
 
 The table below shows how long it took to execute and process the verification checks using `validate_emails.py` and merged APIs. Looks like subsequent runs were faster due to probably primed caches at respective providers' backends.
 
