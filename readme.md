@@ -1360,12 +1360,12 @@ Personal experience with all 5 providers:
 
 - EmailListVerify and MillionVerifier while being cheaper than the others seem to be better for the following:
   - API documentation
-  - Less restrictive on API connection and rate limits. Meaning if you are doing per email API checks for many email addresses, the speed of completion will be faster. Though if you're doing many email address checks, you'd want to use their respective bulk email API end points to update a single text file for processing.
+  - Less restrictive on API connection and rate limits. Meaning if you are doing per email API checks for many email addresses, the speed of completion will be faster. Though if you're doing many email address checks, you'd want to use their respective bulk email API end points to upload a single text file for processing.
   - For bulk API speed though, MillionVerifier is much faster than EmailListVerify. For the sample 15 email addresses tested below, MillionVerifier bulk API took ~7 seconds, EmailListVerify bulk API took ~45 seconds. Compared to per email address verification checks, both taking ~2.2 seconds. EmailListVerify seems to have much more detailed status classifications (see below) compared to ther others so more processing is done on their end.
-- MyEmailVerifier API is limited to 30 requests per minute for per email address verification checks.
-- CaptainVerify API is limited to a maximum of 2 simultaneous connections and 50 checks per minute for per email address verification checks.
-- Proofy.io has the most restrictive API limits but I can't seem to find any documentation of the actual limits, so I have to code it so it isn't as fast as other providers for per email verification checks. It will be the slowest of the 5 providers for per email verification checks.
-- The number of API returned status value classifications returned by the 5 providers differs. Some have finer grain classifications for emails than others.
+- MyEmailVerifier API is limited to 30 requests per minute for per email address verification checks. For the sample 15 email addresses tested below, took ~5.5 seconds to complete per email address verification checks
+- CaptainVerify API is limited to a maximum of 2 simultaneous connections and 50 checks per minute for per email address verification checks. For the sample 15 email addresses tested below, took ~4.6 seconds to complete per email address verification checks
+- Proofy.io has the most restrictive API limits but I can't seem to find any documentation of the actual limits, so I have to code it so it isn't as fast as other providers for per email verification checks. It will be the slowest of the 5 providers for per email verification checks. For the sample 15 email addresses tested below, took ~9.5 seconds to complete per email address verification checks
+- The number of API returned status value classifications returned by the 5 providers differs. Some have a more detailed classifications for emails than others.
   - EmailListVerify has 18 classifications [ok, error, invalid_mx, smtp_error, smtp_protocol, unknown_email, attempt_rejected, relay_error, antispam_system, email_disabled, domain_error, ok_for_all, dead_server, syntax_error, unknown, accept_all, disposable, spamtrap]
   - MillionVerifier has 5 classifications [ok, catch_all, unknown, disposable, invalid]
   - MyEmailVerifier has 4 classifications [valid, invalid, catch-all, unknown]
