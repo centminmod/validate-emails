@@ -187,7 +187,7 @@ The script outputs the validation results in JSON format. Each email address is 
 - `email`: The email address.
 - `status`: The validation status of the email address. Possible values are:
   - `valid_format`: The email address has a valid format.
-  - `invalid_format`: The email address has an invalid format.
+  - `invalid`: The email address has an invalid format.
   - `valid_dns`: The email address has valid DNS records.
   - `invalid_dns`: The email address has invalid DNS records.
   - `ok`: The email address passed SMTP validation.
@@ -382,7 +382,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
     },
     {
         "email": "xyz@centmil1.com",
-        "status": "invalid_format",
+        "status": "invalid",
         "status_code": null,
         "free_email": "unknown",
         "disposable_email": "no"
@@ -582,7 +582,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
 
 [
   {
-    "status": "invalid_format",
+    "status": "invalid",
     "count": 1
   },
   {
@@ -595,6 +595,126 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
   }
 ]
 ```
+
+### Xenforo Email Bounce Log
+
+Example lookup for Xenforo forum's email bounce log via my custom `xf_bounce_log.py` for email address `hnyfmw@canadlan-drugs.com` that is bouncing emails. And using `validate_emails.py` script's local and API to lookup email address status.
+
+```
+./xf_bounce_log.py -d $xfdb -n 10 -s desc | jq '.[] | select(.recipient == "hnyfmw@canadlan-drugs.com") | {bounce_id, message_type, action_taken, user_id, recipient, status_code, diagnostic_info, "Delivered-To": .raw_message["Delivered-To:"], "Delivery-date": .raw_message["Delivery-date:"], "Delivery-date": .raw_message["Delivery-date:"], "Subject": .raw_message["Subject:"]}'
+
+{
+  "bounce_id": 203,
+  "message_type": "bounce",
+  "action_taken": "soft",
+  "user_id": 122136,
+  "recipient": "hnyfmw@canadlan-drugs.com",
+  "status_code": "4.4.7",
+  "diagnostic_info": " 550 4.4.7 Message expired: unable to deliver in 840 minutes.<421 4.4.0 Unable to lookup DNS for canadlan-drugs.com>",
+  "Delivered-To": "bouncer@domain1.com",
+  "Delivery-date": "Fri, 26 Apr 2024 15:44:06 +0000",
+  "Subject": "Delivery Status Notification (Failure)"
+}
+```
+
+`validate_emails.py` self-hosted local email verification check for syntax, DNS and SMTP checks for `hnyfmw@canadlan-drugs.com`
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all         
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "no"
+    }
+]
+
+real    0m0.932s
+user    0m0.428s
+sys     0m0.025s
+```
+
+`validate_emails.py` using external [EmailListVerify](https://centminmod.com/emaillistverify) API email verification check
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api emaillistverify -apikey $elvkey
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    }
+]
+
+real    0m2.626s
+user    0m0.461s
+sys     0m0.023s
+```
+
+`validate_emails.py` using external [MillionVerifier](https://centminmod.com/millionverifier) API email verification check
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api millionverifier -apikey_mv $mvkey
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false
+    }
+]
+
+real    0m1.142s
+user    0m0.455s
+sys     0m0.024s
+```
+
+`validate_emails.py` using external [MyEmailVerifier](https://centminmod.com/myemailverifier) API email verification check
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api myemailverifier -apikey_mev $mevkey
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    }
+]
+
+real    0m1.823s
+user    0m0.463s
+sys     0m0.019s
+```
+
+`validate_emails.py` using external [CaptainVerify](https://centminmod.com/captainverify) API email verification check
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api captainverify -apikey_cv $cvkey
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    }
+]
+
+real    0m25.264s
+user    0m0.457s
+sys     0m0.022s
+```
+
+Unfortunately, I ran out of credits to test with [Proofy.io](https://centminmod.com/proofy).
 
 ## EmailListVerify
 
@@ -848,7 +968,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm dns -v
     },
     {
         "email": "xyz@centmil1.com",
-        "status": "invalid_format",
+        "status": "invalid",
         "status_code": null,
         "free_email": "unknown",
         "disposable_email": "notchecked"
@@ -967,7 +1087,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -v
     },
     {
         "email": "xyz@centmil1.com",
-        "status": "invalid_format",
+        "status": "invalid",
         "status_code": null,
         "free_email": "unknown",
         "disposable_email": "no"
@@ -1372,7 +1492,7 @@ Personal experience with all 5 providers:
   > If you have any more questions, queries, or issues, we're more than happy to assist.
 
   I tried a few attempts at bulk API for the same list of 15 emails, and `user@yahoo.com` is always marked as status = `unknown` and never anything different though? It would be hard to differentiate status classifications if it's due connection issues if they're lumped into other emails in unknown label. Maybe would be better to have a separate classification for connection issues so we can differentiate as such. For example, EmailListVerify has 18 different status classifications including for connection related issues.
-  
+
   single email API check for `user@yahoo.com` returns `ok`
   ```
   python validate_emails.py -f user@domain1.com -e user@yahoo.com -api millionverifier -apikey_mv $mvkey -tm all
@@ -1529,7 +1649,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | xyz@centmil1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
 | xyz@centmil1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
 | xyz@centmil1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
-| xyz@centmil1.com | Local Script | invalid_format | null | unknown | no |
+| xyz@centmil1.com | Local Script | invalid | null | unknown | no |
 | user+to@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | no | no |
 | user+to@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | false | no |
 | user+to@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | no | no |
@@ -1901,7 +2021,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -xf -xfdb
     },
     {
         "email": "xyz@centmil1.com",
-        "status": "invalid_format",
+        "status": "invalid",
         "status_code": null,
         "free_email": "unknown",
         "disposable_email": "no"
