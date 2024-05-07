@@ -1362,7 +1362,13 @@ Personal experience with all 5 providers:
   - API documentation
   - Less restrictive on API connection and rate limits. Meaning if you are doing per email API checks for many email addresses, the speed of completion will be faster. Though if you're doing many email address checks, you'd want to use their respective bulk email API end points to upload a single text file for processing.
   - For bulk API speed though, MillionVerifier is much faster than EmailListVerify. For the sample 15 email addresses tested below, MillionVerifier bulk API took ~7 seconds, EmailListVerify bulk API took ~45 seconds. Compared to per email address verification checks, both taking between 2.2 to 3.3 seconds. EmailListVerify seems to have much more detailed status classifications (see below) compared to ther others so more processing is done on their end.
-- MillionVerifier API logging for billing is the mosted detailed with historical running balances. They also show per API call credit usage balance details and even list in the logs refunded credits for bulk API file uploaded emails classified as 'risky' (`catch_all` or `unknown`) https://help.millionverifier.com/payments-credits/refund-for-risky-emails. AFAIK, the other providers don't refund any credits that I can see. However, on below sample 15 email addresses tested, I always got 1 refunded credit so it applies to one email address which is a known valid email `user@yahoo.com` which is classed as `unknown` in bulk API but classed as `ok` in per email verification API. Seems to be a bug in their bulk API then as the refunds only apply to bulk API and not per email verification checks. 
+- MillionVerifier API logging for billing is the mosted detailed with historical running balances. They also show per API call credit usage balance details and even list in the logs refunded credits for bulk API file uploaded emails classified as 'risky' (`catch_all` or `unknown`) https://help.millionverifier.com/payments-credits/refund-for-risky-emails. AFAIK, the other providers don't refund any credits that I can see. However, on below sample 15 email addresses tested, I always got 1 refunded credit so it applies to one email address which is a known valid email `user@yahoo.com` which is classed as `unknown` in bulk API but classed as `ok` in per email verification API. Seems to be a bug in their bulk API then as the refunds only apply to bulk API and not per email verification checks due to differences in classifications in bulk API vs per email verification API. 
+
+  I reached out to MillionVerifier chat support which was initially handled via Milly their AI chat bot which later referred me to support. They emailed me back saying:
+
+  > We're glad you reached out to us about this issue, and we're here to help.
+  > The discrepancy you're seeing in the results is likely because we were unable to connect to the server during the verification process, leading to an "Unknown" result. However, for the single API, the connection went through smoothly, allowing us to verify the email without any problems. An "Unknown" result simply means that we couldn't determine the existence of the email at the time of verification.
+  > If you have any more questions, queries, or issues, we're more than happy to assist.
   
   single email API check for `user@yahoo.com` returns `ok`
   ```
@@ -1397,6 +1403,82 @@ Personal experience with all 5 providers:
 
   ]
   ```
+  As such you can't 100% rely on the status output to do tasks like updating Xenforo user's `user_state` status to stop sending emails to them without further verification for such emails. Same can be same for other providers, probably need to really double check your results if you're relying on the results for important tasks. You can filter MillionVerifier's `unknown` status emails and feed them into another commercial provider's API to double check i.e. EmailListVerify or use script's self-hosted local email check. Given cheaper MillionVerifier pricing, it might be more economical to do it this way?
+
+  MillionVerifier bulk API filter `-api millionverifier -apikey_mv $mvkey -apibulk millionverifier` filter using `jq` for `unknown` status emails piped into text file `results-millionverifier-bulk-api-unknown-only.txt`
+
+  ```
+  python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey -apibulk millionverifier | jq '.[] | select(.status == "unknown")' 2>&1 > results-millionverifier-bulk-api-unknown-only.txt
+  ```
+
+  The `results-millionverifier-bulk-api-unknown-only.txt` contents will show all MillionVerifier bulk API returned `unknown` status results.
+
+  ```
+  cat results-millionverifier-bulk-api-unknown-only.txt                                            
+  {
+    "email": "user@yahoo.com",
+    "status": "unknown",
+    "free_email": "yes",
+    "disposable_email": "no",
+    "free_email_api": "yes",
+    "role_api": "no"
+  }
+  ```
+
+  Using same `results-millionverifier-bulk-api-unknown-only.txt` file, and `jq` just filter out the email addresses into a new `results-millionverifier-bulk-api-unknown-only-emails.txt` file
+
+
+  ```
+  cat results-millionverifier-bulk-api-unknown-only.txt | jq -r '.email' | tee results-millionverifier-bulk-api-unknown-only-emails.txt
+  user@yahoo.com
+  ```
+
+  Then use EmailListVerify bulk API to verify the filtered MillionVerifier `unknown` status list filtered file `results-millionverifier-bulk-api-unknown-only-emails.txt` and double check the status which confirms it's actually a `valid` email.
+
+  ```
+  python validate_emails.py -f user@domain1.com -l results-millionverifier-bulk-api-unknown-only-emails.txt -tm all -api emaillistverify -apikey $elvkey -apibulk emaillistverify
+
+  [
+      {
+          "email": "user@yahoo.com",
+          "status": "valid",
+          "status_code": "",
+          "free_email": "yes",
+          "disposable_email": "no"
+      }
+  ]
+  ```
+
+  Or EmailListVerify per email verification API check
+
+  ```
+  ./validate_emails.py -f user@domain1.com -e user@yahoo.com -tm all -api emaillistverify -apikey $elvkey -tm all
+  [
+      {
+          "email": "user@yahoo.com",
+          "status": "valid",
+          "status_code": null,
+          "free_email": "yes",
+          "disposable_email": "no"
+      }
+  ]
+  ```
+
+  Or if it's a few emails, via `validate_emails.py` script's self-hosted local email syntax, DNS and SMTP check
+
+  ```
+    validate_emails.py -f user@domain1.com -e user@yahoo.com -tm all
+  [
+      {
+          "email": "user@yahoo.com",
+          "status": "ok",
+          "status_code": 250,
+          "free_email": "yes",
+          "disposable_email": "no"
+      }
+  ]
+  ```
+
 - MyEmailVerifier API is limited to 30 requests per minute for per email address verification checks. For the sample 15 email addresses tested below, took ~5.5 seconds to complete per email address verification checks
 - CaptainVerify API is limited to a maximum of 2 simultaneous connections and 50 checks per minute for per email address verification checks. For the sample 15 email addresses tested below, took ~4.6 seconds to complete per email address verification checks
 - Proofy.io has the most restrictive API limits but I can't seem to find any documentation of the actual limits, so I have to code it so it isn't as fast as other providers for per email verification checks. It will be the slowest of the 5 providers for per email verification checks. For the sample 15 email addresses tested below, took ~9.5 seconds to complete per email address verification checks
@@ -2707,6 +2789,125 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
         "disposable_email": "no",
         "free_email_api": true,
         "role_api": false
+    }
+]
+```
+
+## MillionVerifier Bulk API Differences
+
+Noticed for below sample 15 email addresses tested, I always got 1 refunded credit so it applies to one email address which is a known valid email `user@yahoo.com` which is classed as `unknown` in bulk API but classed as `ok` in per email verification API. They refund credits for emails classified as 'risky' (`catch_all` or `unknown`) https://help.millionverifier.com/payments-credits/refund-for-risky-emails. Seems to be a bug in their bulk API then as the refunds only apply to bulk API and not per email verification checks due to differences in classifications in bulk API vs per email verification API. 
+
+I reached out to MillionVerifier chat support which was initially handled via Milly their AI chat bot which later referred me to support. They emailed me back saying:
+
+> We're glad you reached out to us about this issue, and we're here to help.
+> The discrepancy you're seeing in the results is likely because we were unable to connect to the server during the verification process, leading to an "Unknown" result. However, for the single API, the connection went through smoothly, allowing us to verify the email without any problems. An "Unknown" result simply means that we couldn't determine the existence of the email at the time of verification.
+> If you have any more questions, queries, or issues, we're more than happy to assist.
+  
+single email API check for `user@yahoo.com` returns `ok`
+```
+python validate_emails.py -f user@domain1.com -e user@yahoo.com -api millionverifier -apikey_mv $mvkey -tm all
+[
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": true,
+        "role_api": false
+    }
+]
+```
+
+bulk API upload check excerpt for `user@yahoo.com` returns `unknown`
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey -apibulk millionverifier
+[
+ 
+    {
+        "email": "user@yahoo.com",
+        "status": "unknown",
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "role_api": "no"
+    },
+
+]
+```
+As such you can't 100% rely on the status output to do tasks like updating Xenforo user's `user_state` status to stop sending emails to them without further verification for such emails. Same can be same for other providers, probably need to really double check your results if you're relying on the results for important tasks. You can filter MillionVerifier's `unknown` status emails and feed them into another commercial provider's API to double check i.e. EmailListVerify or use script's self-hosted local email check. Given cheaper MillionVerifier pricing, it might be more economical to do it this way?
+
+MillionVerifier bulk API filter `-api millionverifier -apikey_mv $mvkey -apibulk millionverifier` filter using `jq` for `unknown` status emails piped into text file `results-millionverifier-bulk-api-unknown-only.txt`
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey -apibulk millionverifier | jq '.[] | select(.status == "unknown")' 2>&1 > results-millionverifier-bulk-api-unknown-only.txt
+```
+
+The `results-millionverifier-bulk-api-unknown-only.txt` contents will show all MillionVerifier bulk API returned `unknown` status results.
+
+```
+cat results-millionverifier-bulk-api-unknown-only.txt                                            
+{
+  "email": "user@yahoo.com",
+  "status": "unknown",
+  "free_email": "yes",
+  "disposable_email": "no",
+  "free_email_api": "yes",
+  "role_api": "no"
+}
+```
+
+Using same `results-millionverifier-bulk-api-unknown-only.txt` file, and `jq` just filter out the email addresses into a new `results-millionverifier-bulk-api-unknown-only-emails.txt` file
+
+
+```
+cat results-millionverifier-bulk-api-unknown-only.txt | jq -r '.email' | tee results-millionverifier-bulk-api-unknown-only-emails.txt
+user@yahoo.com
+```
+
+Then use EmailListVerify bulk API to verify the filtered MillionVerifier `unknown` status list filtered file `results-millionverifier-bulk-api-unknown-only-emails.txt` and double check the status which confirms it's actually a `valid` email.
+
+```
+python validate_emails.py -f user@domain1.com -l results-millionverifier-bulk-api-unknown-only-emails.txt -tm all -api emaillistverify -apikey $elvkey -apibulk emaillistverify
+
+[
+    {
+        "email": "user@yahoo.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+```
+
+Or EmailListVerify per email verification API check
+
+```
+./validate_emails.py -f user@domain1.com -e user@yahoo.com -tm all -api emaillistverify -apikey $elvkey -tm all
+[
+    {
+        "email": "user@yahoo.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+```
+
+Or if it's a few emails, via `validate_emails.py` script's self-hosted local email syntax, DNS and SMTP check
+
+```
+  validate_emails.py -f user@domain1.com -e user@yahoo.com -tm all
+[
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
     }
 ]
 ```
