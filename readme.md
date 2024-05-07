@@ -28,7 +28,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
 - Supports SMTP profiles. However, using SMTP relay profiles won't get accurate SMTP checks. Locally ran server SMTP checks are more accurate.
 - Supports different DNS lookup methods: asyncio, concurrent, and sequential
 - Supports different processing modes: thread and asyncio
-- [Xenforo](#xenforo) support. Generates SQL queries for updating user status in XenForo forum based email validation results. Allowing you to clean up your Xenforo user database's email addresses.
+- [Xenforo](#xenforo) support. Generates SQL queries for updating user status `user_state` in XenForo forum based email validation results. Allowing you to clean up your Xenforo user database's email addresses by disabling email sending to those specific bad email addresses.
 
 ## Requirements
 - Python 3.6 minimum. Script tested on AlmaLinux 8 Python 3.6 and AlmaLinux 9 Python 3.9.
@@ -1353,6 +1353,24 @@ python validate_emails.py -f user@domain.com -e user+to@domain.com -tm syntax
 # API Support
 
 In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy). Links to services maybe affiliate links. If you found this information useful ;)
+
+## Personal Experience
+
+Personal experience with all 5 providers:
+
+- EmailListVerify and MillionVerifier while being cheaper than the others seem to be better for the following:
+  - API documentation
+  - Less restrictive on API connection and rate limits. Meaning if you are doing per email API checks for many email addresses, the speed of completion will be faster. Though if you're doing many email address checks, you'd want to use their respective bulk email API end points to update a single text file for processing.
+  - For bulk API speed though, MillionVerifier is much faster than EmailListVerify. For the sample 15 email addresses tested below, MillionVerifier bulk API took ~7 seconds, EmailListVerify bulk API took ~45 seconds. Compared to per email address verification checks, both taking ~2.2 seconds. EmailListVerify seems to have much more detailed status classifications (see below) compared to ther others so more processing is done on their end.
+- MyEmailVerifier API is limited to 30 requests per minute for per email address verification checks.
+- CaptainVerify API is limited to a maximum of 2 simultaneous connections and 50 checks per minute for per email address verification checks.
+- Proofy.io has the most restrictive API limits but I can't seem to find any documentation of the actual limits, so I have to code it so it isn't as fast as other providers for per email verification checks. It will be the slowest of the 5 providers for per email verification checks.
+- The number of API returned status value classifications returned by the 5 providers differs. Some have finer grain classifications for emails than others.
+  - EmailListVerify has 18 classifications [ok, error, invalid_mx, smtp_error, smtp_protocol, unknown_email, attempt_rejected, relay_error, antispam_system, email_disabled, domain_error, ok_for_all, dead_server, syntax_error, unknown, accept_all, disposable, spamtrap]
+  - MillionVerifier has 5 classifications [ok, catch_all, unknown, disposable, invalid]
+  - MyEmailVerifier has 4 classifications [valid, invalid, catch-all, unknown]
+  - CaptainVerify has 4 classifications [valid, invalid, risky, unknown]
+  - Proofy.io has 4 classifications [deliverable, risky, undeliverable, unknown]
 
 | Provider                         | 1k        | 2k        | 5k        | 10k       | 25k       | 30k       | 50k       | 70k       | 100k      |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
