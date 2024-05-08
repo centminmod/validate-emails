@@ -30,6 +30,7 @@
   - [API Merge](#api-merge)
     - [API Merge Filters](#api-merge-filters)
 - [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
+  - [EmailListVerify API Check Times: Regular vs Cached](#emaillistverify-api-check-times-regular-vs-cached)
 
 ## Overview
 The `validate_emails.py` email validation script is a Python-based tool that allows you to validate and classify email addresses using SMTP (Simple Mail Transfer Protocol) checks. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support). The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
