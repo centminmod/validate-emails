@@ -1,5 +1,36 @@
 # Email Validation Script
 
+- [Overview](#overview)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Usage](#usage)
+- [Output](#output)
+- [Logging](#logging)
+- [Configuration](#configuration)
+  - [-smtp ses](#-smtp-ses)
+  - [-smtp rotate](#-smtp-rotate)
+  - [-smtp generic](#-smtp-generic)
+- [Customization](#customization)
+- [Troubleshooting](#troubleshooting)
+- [Example Usage](#example-usage) 
+  - [Xenforo](#xenforo)
+  - [Xenforo Email Bounce Log](#xenforo-email-bounce-log)
+- [API Support](#api-support)
+  - [Personal Experience](#personal-experience)
+  - [Email Verification Provider Comparison Costs](#email-verification-provider-comparison-costs)
+  - [Table Compare](#table-compare)
+  - [EmailListVerify](#emaillistverify)
+  - [EmailListVerify Bulk File API](#emaillistverify-bulk-file-api)
+  - [MillionVerifier](#millionverifier)
+  - [MillionVerifier Bulk File API](#millionverifier-bulk-file-api)
+  - [MillionVerifier Bulk API Differences](#millionverifier-bulk-api-differences)
+  - [CaptainVerify API](#captainverify-api)
+  - [Proofy API](#proofy-api)
+  - [MyEmailVerifier API](#myemailverifier-api)
+  - [API Merge](#api-merge)
+    - [API Merge Filters](#api-merge-filters)
+- [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
+
 ## Overview
 The `validate_emails.py` email validation script is a Python-based tool that allows you to validate and classify email addresses using SMTP (Simple Mail Transfer Protocol) checks. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support). The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
 
@@ -17,6 +48,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
   - [CaptainVerify](https://centminmod.com/captainverify) [[example](#captainverify-api)]
   - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
   - [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
+- Supports [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage) for [EmailListVerify](https://centminmod.com/emaillistverify) per email check API
 - Classifies email addresses into various categories based on the syntax, DNS, and SMTP response
 - Supports concurrent processing for faster validation of multiple email addresses
 - Provides detailed logging for tracking the validation process
@@ -49,7 +81,7 @@ usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATC
                           [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
                           [-apibulk {emaillistverify,millionverifier}] [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY]
                           [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS] [-apikey_mev MYEMAILVERIFIER_API_KEY]
-                          [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
+                          [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge] [-apicachettl APICACHETTL] [-apicachecheck APICACHECHECK]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
@@ -138,6 +170,10 @@ The available arguments are:
     - Description: Maximum number of concurrent connections for the Proofy.io API (default: 1)
   - `-mev_max_connections` (optional):
     - Description: Maximum number of concurrent connections for the MyEmailVerifier API (default: 1)
+  - `-apicachettl` (optional):
+    - Description:  this sets the cache TTL duration in seconds for how long Cloudflare CDN/KV stores in cache (default: 300 seconds)
+  - `-apicachecheck` (optional):
+    - Description:  operates when `-apicachettl` is set and takes `count` or `list` options to query the Cloudflare KV storage cache to count number of cached entries or list the entries themselves
 
 Validates `-f` from email address's SPF, DKIM, DMARC records when argument is passed and logs them 
 
@@ -4725,3 +4761,136 @@ cat results.txt | jq '.[] | select(.elv_status == "valid" and .mv_status == "unk
 These `jq` queries cover various combinations of `elv_status` and `mv_status` values, allowing you to filter the `results.txt` file based on different criteria. You can adjust the specific status values in the queries according to your needs and the available status values in the `results.txt` file.
 
 Remember to replace `results.txt` with the actual path to your file if it's located in a different directory.
+
+# Cloudflare HTTP Forward Proxy Cache With KV Storage
+
+`validate_emails.py` script's [EmailListVerify](https://centminmod.com/emaillistverify) per email chceck API routines has been updated to support a custom Cloudflare HTTP forward proxy Worker cache configuration which can take the script's API request and forward it to EmailListVerify's API end point. The Cloudflare Worker script will then save the API result into Cloudflare KV storage on their edge servers and save with a date timestamp. This can potentially reduce your overall [EmailListVerify](https://centminmod.com/emaillistverify) per email verification costs if you need to run `validate_emails.py` a few times back to back bypassing having to need to call `validate_emails.py` API itself.
+
+`validate_emails.py` script added `-apicachettl` and `-apicachecheck` arguments:
+
+- `-apicachettl` this sets the cache TTL duration in seconds for how long Cloudflare CDN/KV stores in cache. Default value is 300s or 5mins
+- `-apicachecheck` takes `count` or `list` option to query the Cloudflare KV storage cache to count number of cached entries or list the entries themselves
+
+Examples to illustrate how the Cloudflare HTTP forward proxy caching KV worker workers for testing email address `hnyfmw5@canadlan-drugs.com`
+
+Via direct EmailListVerify API call returns email address status = `unknown`
+
+```
+curl -s "https://apps.emaillistverify.com/api/verifyEmail?secret=$elvkey&email=hnyfmw5@canadlan-drugs.com&timeout=15"
+unknown
+```
+
+Uncached usual run via the script usual result response would be `unknown`
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw5@canadlan-drugs.com -tm all -api emaillistverify -apikey $elvkey
+[
+    {
+        "email": "hnyfmw5@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "no"
+    }
+]
+
+real    0m2.600s
+user    0m0.279s
+sys     0m0.020s
+```
+
+Via Cloudflae HTTP forward proxy caching KV worker with `-apicachettl 120` argument set returns email address status = `unknown` reducing time to return the result from 2.6s to 0.397s
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw5@canadlan-drugs.com -tm all -api emaillistverify -apikey $elvkey -apicachettl 120
+[
+    {
+        "email": "hnyfmw5@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "no"
+    }
+]
+
+real    0m0.397s
+user    0m0.294s
+sys     0m0.025s
+```
+
+Log inspection
+
+```
+cat email_verification_log_2024-05-08_15-08-05.log | tail -3
+2024-05-08 15:08:06,816 - INFO - Checking cache for email: hnyfmw5@canadlan-drugs.com
+2024-05-08 15:08:07,047 - INFO - Cache check response status code: 200
+2024-05-08 15:08:07,047 - INFO - Cache result: unknow
+```
+
+Testing Cloudflae HTTP forward proxy caching KV worker directly
+
+```
+curl -s "https://cfcachedomain.com/?email=hnyfmw5@canadlan-drugs.com&cachettl=120"
+unknown
+```
+
+Cloudflae HTTP forward proxy caching KV worker console logged
+
+```
+[DEBUG] Incoming request: https://cfcachedomain.com/?email=hnyfmw5@canadlan-drugs.com&cachettl=120
+[DEBUG] Email: hnyfmw5@canadlan-drugs.com
+[DEBUG] Cache Key: emaillistverify:hnyfmw5@canadlan-drugs.com
+[DEBUG] Cache TTL: 120
+[DEBUG] Cache Check: null
+[DEBUG] API URL: https://apps.emaillistverify.com/api/verifyEmail?secret=APIKEY&email=hnyfmw5@canadlan-drugs.com&timeout=15
+[DEBUG] Response from Cloudflare CDN cache: Hit
+[DEBUG] Skipping KV cache update as response is served from Cloudflare CDN cache
+[DEBUG] Returning final response with headers: {"cache-control":"max-age=120","content-type":"text/plain"}
+```
+
+Check how many KV storage cached email result entries there are
+
+```
+curl -s "https://cfcachedomain.com/?apicachecheck=count" | jq -r
+{
+  "count": 1
+}
+```
+
+Query the actual KV storage cached email address entries including the cache age
+
+```
+curl -s "https://cfcachedomain.com/?apicachecheck=list" | jq -r
+[
+  {
+    "email": "hnyfmw5@canadlan-drugs.com",
+    "result": "unknown",
+    "timestamp": 1715175271549,
+    "age": 16,
+    "ttl": 120
+  }
+]
+```
+
+Query the KV storage cache entries count via `-apicachecheck count`
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw5@canadlan-drugs.com -tm all -api emaillistverify -apikey $elvkey -apicachettl 120 -apicachecheck count
+
+API cache count: 1
+```
+
+Query the KV storage cache entries listings via `-apicachecheck list`
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw5@canadlan-drugs.com -tm all -api emaillistverify -apikey $elvkey -apicachettl 120 -apicachecheck list
+
+API cache list:
+{'email': 'hnyfmw5@canadlan-drugs.com', 'result': 'unknown', 'timestamp': 1715175271549, 'age': 16, 'ttl': 120}
+```
+
+Cloudflare KV storage entries
+
+| Key                                        | Value                                           |
+|--------------------------------------------|--------------------------------------------------|
+| emaillistverify:hnyfmw5@canadlan-drugs.com  | {"result":"unknown","timestamp":1715175271549,"ttl":120}  |
