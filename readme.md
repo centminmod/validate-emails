@@ -4764,7 +4764,7 @@ Remember to replace `results.txt` with the actual path to your file if it's loca
 
 # Cloudflare HTTP Forward Proxy Cache With KV Storage
 
-`validate_emails.py` script's [EmailListVerify](https://centminmod.com/emaillistverify) per email chceck API routines has been updated to support a custom Cloudflare HTTP forward proxy Worker cache configuration which can take the script's API request and forward it to EmailListVerify's API end point. The Cloudflare Worker script will then save the API result into Cloudflare KV storage on their edge servers and save with a date timestamp. This can potentially reduce your overall [EmailListVerify](https://centminmod.com/emaillistverify) per email verification costs if you need to run `validate_emails.py` a few times back to back bypassing having to need to call `validate_emails.py` API itself.
+`validate_emails.py` script's [EmailListVerify](https://centminmod.com/emaillistverify) per email check API routines has been updated to support a custom Cloudflare HTTP forward proxy Worker cache configuration which can take the script's API request and forward it to EmailListVerify's API endpoint. The Cloudflare Worker script will then save the API result into Cloudflare KV storage on their edge servers and save with a date timestamp. This can potentially reduce your overall [EmailListVerify](https://centminmod.com/emaillistverify) per email verification costs if you need to run `validate_emails.py` a few times back to back bypassing having to need to call `validate_emails.py` API itself.
 
 `validate_emails.py` script added `-apicachettl` and `-apicachecheck` arguments:
 
@@ -4799,7 +4799,7 @@ user    0m0.279s
 sys     0m0.020s
 ```
 
-Via Cloudflae HTTP forward proxy caching KV worker with `-apicachettl 120` argument set returns email address status = `unknown` reducing time to return the result from 2.6s to 0.397s
+Via Cloudflare HTTP forward proxy caching KV worker with `-apicachettl 120` argument set returns email address status = `unknown` reducing time to return the result from 2.6s to 0.397s
 
 ```
 time python validate_emails.py -f user@domain1.com -e hnyfmw5@canadlan-drugs.com -tm all -api emaillistverify -apikey $elvkey -apicachettl 120
@@ -4824,17 +4824,17 @@ Log inspection
 cat email_verification_log_2024-05-08_15-08-05.log | tail -3
 2024-05-08 15:08:06,816 - INFO - Checking cache for email: hnyfmw5@canadlan-drugs.com
 2024-05-08 15:08:07,047 - INFO - Cache check response status code: 200
-2024-05-08 15:08:07,047 - INFO - Cache result: unknow
+2024-05-08 15:08:07,047 - INFO - Cache result: unknown
 ```
 
-Testing Cloudflae HTTP forward proxy caching KV worker directly
+Testing Cloudflare HTTP forward proxy caching KV worker directly
 
 ```
 curl -s "https://cfcachedomain.com/?email=hnyfmw5@canadlan-drugs.com&cachettl=120"
 unknown
 ```
 
-Cloudflae HTTP forward proxy caching KV worker console logged
+Cloudflare HTTP forward proxy caching KV worker console logged
 
 ```
 [DEBUG] Incoming request: https://cfcachedomain.com/?email=hnyfmw5@canadlan-drugs.com&cachettl=120
