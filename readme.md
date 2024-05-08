@@ -4894,3 +4894,718 @@ Cloudflare KV storage entries
 | Key                                        | Value                                           |
 |--------------------------------------------|--------------------------------------------------|
 | emaillistverify:hnyfmw5@canadlan-drugs.com  | {"result":"unknown","timestamp":1715175271549,"ttl":120}  |
+
+## EmailListVerify API Check Times: Regular vs Cached
+
+This table presents a side-by-side comparison of the time taken for regular and cached EmailListVerify API checks. Testing [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage) with [EmailListVerify](https://centminmod.com/emaillistverify) per email check API. Ran the same 15 emails `emaillist.txt` test and timed the 3 runs each.
+
+First cached email verification checks are slower due to priming the cache overhead. While subseqent cached runs were much faster compared to uncached regular email verification checks.
+
+| Run      | Regular Time | Cached Time |
+|----------|--------------|-------------|
+| 1st Run  | 5.102s       | 5.437s      |
+| 2nd Run  | 3.146s       | 1.029s      |
+| 3rd Run  | 3.248s       | 0.944s      |
+
+
+Regular uncached run 1
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+
+real    0m5.102s
+user    0m0.299s
+sys     0m0.026s
+```
+
+Regular uncached run 2
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+
+real    0m3.146s
+user    0m0.303s
+sys     0m0.022s
+```
+
+Regular uncached run 3
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "unknown",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "unknown_email",
+        "status_code": 550,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "status_code": 250,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+
+real    0m3.248s
+user    0m0.296s
+sys     0m0.030s
+```
+
+Cached run 1
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey -apicachettl 120
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "invalid_syntax",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+
+real    0m5.437s
+user    0m2.339s
+sys     0m0.044s
+```
+
+Cached run 2
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey -apicachettl 120
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "invalid_syntax",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+
+real    0m1.029s
+user    0m2.373s
+sys     0m0.043s
+```
+
+Cached run 3
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey -apicachettl 120
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "invalid_syntax",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+
+real    0m0.944s
+user    0m2.316s
+sys     0m0.050s
+```
