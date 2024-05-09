@@ -4790,7 +4790,7 @@ Remember to replace `results.txt` with the actual path to your file if it's loca
 
 `validate_emails.py` script added `-apicache`, `-apicachettl` and `-apicachecheck` arguments:
 
-- `-apicache` this sets the Cloudflare Worker's `cacheKey` and allows extending caching to other API providers in future. For now supported value is `emaillistverify` which will end up creating the `cacheKey` in Worker `const cacheKey = `${apiCache}:${email}`;` for lookups etc.
+- `-apicache` this sets the Cloudflare Worker's `cacheKey` and allows extending caching to other API providers in future. For now supported value is `emaillistverify` which will end up creating the `cacheKey` in Worker `const cacheKey = ${apiCache}:${email};` for lookups etc.
 - `-apicachettl` this sets the cache TTL duration in seconds for how long Cloudflare CDN/KV stores in cache. Default value is 300s or 5mins
 - `-apicachecheck` takes `count` or `list` option to query the Cloudflare KV storage cache to count number of cached entries or list the entries themselves
 
