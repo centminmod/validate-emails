@@ -184,7 +184,7 @@ The available arguments are:
   - `-apicachecheck` (optional):
     - Description:  operates when `-apicachettl` is set and takes `count` or `list` or `purge` options to query the Cloudflare KV storage cache to count number of cached entries or list the entries themselves
   - `-apicache-purge` (optional):
-    - Description:  purges Cloudflare CDN/KV cache when `-apicachecheck` set to `purge` options to query the 
+    - Description:  purges Cloudflare CDN/KV cache when `-apicachecheck` set to `purge` option
 
 Validates `-f` from email address's SPF, DKIM, DMARC records when argument is passed and logs them 
 
