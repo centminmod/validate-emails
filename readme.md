@@ -33,7 +33,7 @@
   - [EmailListVerify API Check Times: Regular vs Cached](#emaillistverify-api-check-times-regular-vs-cached)
 
 ## Overview
-The `validate_emails.py` email validation script is a Python-based tool that allows you to validate and classify email addresses using SMTP (Simple Mail Transfer Protocol) checks. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support). The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
+The `validate_emails.py` is a Python-based tool for email verification and email validation that allows you to classify your email addresses using SMTP (Simple Mail Transfer Protocol) checks. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support). The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
 
 The script offers specific support for Xenforo forum member email list verification through dedicated Xenforo argument flags. These flags enable you to mark invalid Xenforo forum member emails and move them to a `bounce_email` status, effectively disabling Xenforo email sending to those members without actually deleting the Xenforo member account. You can then setup a Xenforo forum wide notice targetting `bounce_email` status users - prompting them to update their email addresses.
 
@@ -80,10 +80,10 @@ usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATC
                           [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
                           [-wf WORKER_FACTOR] [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier}]
                           [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
-                          [-apibulk {emaillistverify,millionverifier}] [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY]
-                          [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS] [-apikey_mev MYEMAILVERIFIER_API_KEY]
-                          [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge] [-apicache {emaillistverify}] [-apicachettl APICACHETTL]
-                          [-apicachecheck APICACHECHECK]
+                          [-apibulk {emaillistverify,millionverifier,proofy}] [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY]
+                          [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS] [-pf_batchsize PROOFY_BATCH_SIZE]
+                          [-apikey_mev MYEMAILVERIFIER_API_KEY] [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
+                          [-apicache {emaillistverify}] [-apicachettl APICACHETTL] [-apicachecheck APICACHECHECK]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
