@@ -30,6 +30,7 @@
   - [API Merge](#api-merge)
     - [API Merge Filters](#api-merge-filters)
 - [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
+  - [EmailListVeirfy Bulk File API Cloudflare Cache Support](#emaillistveirfy-bulk-file-api-cloudflare-cache-support)
   - [EmailListVerify API Check Times: Regular vs Cached](#emaillistverify-api-check-times-regular-vs-cached)
 
 ## Overview
@@ -37,7 +38,7 @@ The `validate_emails.py` is a Python-based tool for email verification and email
 
 The script offers specific support for [Xenforo](#xenforo) forum member email list verification through dedicated Xenforo argument flags. These flags enable you to mark invalid Xenforo forum member emails and move them to a `bounce_email` status, effectively disabling Xenforo email sending to those members without actually deleting the Xenforo member account. You can then setup a Xenforo forum wide notice targetting `bounce_email` status users - prompting them to update their email addresses.
 
-To reduce potential 3rd party email verification API per email check costs, this script also supports [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage) to temporarily cache the API returned email verification status codes at the Cloudflare CDN and Cloudflare Worker KV storage level.
+To reduce potential 3rd party email verification API costs, this script also supports [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage) for both per email check and [bulk file](#emaillistveirfy-bulk-file-api-cloudflare-cache-support) API check results to be temporarily cached and return the email verification status codes at the Cloudflare CDN and Cloudflare Worker KV storage level.
 
 The `validate_emails.py` email validation script was written by George Liu (eva2000) for his paid consulting clients usage. The below is public documentation for the script.
 
@@ -4919,6 +4920,405 @@ Cloudflare KV storage entries
 | Key                                        | Value                                           |
 |--------------------------------------------|--------------------------------------------------|
 | emaillistverify:hnyfmw5@canadlan-drugs.com  | {"result":"unknown","timestamp":1715175271549,"ttl":120}  |
+
+## EmailListVeirfy Bulk File API Cloudflare Cache Support
+
+Add Cloudflare cache support to [EmailListVerify's](https://centminmod.com/emaillistverify) bulk file API routine via `-apicache emaillistverify -apicachettl 120` and ran it 3 times - for unprimed cache and primed cached run for 2nd and 3rd runs to compare time to completion. Cloudflare HTTP forward proxy KV cache Worker reduced times from 40.771s to 2.078s.
+
+| Run      | Compeletion Time |
+|----------|--------------|
+| 1st Bulk File API Run uncached | 40.771s       |
+| 2nd Bulk File API Run cached  | 2.292s       |
+| 3rd Bulk File API Run cached  | 2.078s       |
+
+
+Example 1st [EmailListVerify](https://centminmod.com/emaillistverify) bulk API unprimed Cloudflare Worker cache run timed:
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -api emaillistverify -apikey $elvkey -apibulk emaillistverify -apicache emaillistverify -apicachettl 120 -tm all
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "disposable",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "dead_server",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "disposable",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "email_disabled",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "valid",
+        "status_code": "",
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+
+real    0m40.771s
+user    0m0.469s
+sys     0m0.019s
+```
+
+Inspecting logs
+
+```
+cat $(ls -Art | tail -3 | grep 'email_verification')                                             
+2024-05-10 09:59:28,893 - INFO - File MIME type: text/plain
+2024-05-10 09:59:29,050 - INFO - Request data: {'filename': 'emaillist_20240510095928.txt'}
+2024-05-10 09:59:29,050 - INFO - File data: {'file_contents': ('emaillist_20240510095928.txt', <_io.BufferedReader name='emaillist.txt'>, 'text/plain')}
+2024-05-10 09:59:30,258 - INFO - File uploaded successfully. File ID: 2408431
+2024-05-10 09:59:30,538 - INFO - File processing in progress. Status: progress
+2024-05-10 09:59:36,056 - INFO - File processing in progress. Status: progress
+2024-05-10 09:59:41,604 - INFO - File processing in progress. Status: progress
+2024-05-10 09:59:47,171 - INFO - File processing in progress. Status: progress
+2024-05-10 09:59:52,687 - INFO - File processing in progress. Status: progress
+2024-05-10 09:59:57,959 - INFO - File processing in progress. Status: progress
+2024-05-10 10:00:03,519 - INFO - File processing in progress. Status: progress
+2024-05-10 10:00:08,927 - INFO - File processing completed. Retrieving results from: https://files-elv.s3.eu-central-1.amazonaws.com/2024-05/5b1ab4d47750dd66625245e1a0645328f93e8abc_all.csv
+2024-05-10 10:00:09,259 - INFO - Results file downloaded: emaillistverify_results_1715335169.csv
+2024-05-10 10:00:09,456 - INFO - Bulk file results cached in Cloudflare
+2024-05-10 10:00:09,456 - INFO - Results retrieved successfully. Total lines: 15
+```
+
+Example 2nd [EmailListVerify](https://centminmod.com/emaillistverify) bulk API primed Cloudflare Worker cache run timed:
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -api emaillistverify -apikey $elvkey -apibulk emaillistverify -apicache emaillistverify -apicachettl 120 -tm all
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "invalid_syntax",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+
+real    0m2.292s
+user    0m0.533s
+sys     0m0.022s
+```
+
+Log inspection shows bulk file API upload process was skipped as all email addresses in bulk file `-l emaillist.txt` passed on command line were found in Cloudflare cache.
+
+```
+cat $(ls -Art | tail -3 | grep 'email_verification')                                             
+2024-05-10 10:34:03,308 - INFO - File MIME type: text/plain
+2024-05-10 10:34:05,392 - INFO - All email results found in cache. Skipping file upload.
+```
+
+Example 3rd [EmailListVerify](https://centminmod.com/emaillistverify) bulk API primed Cloudflare Worker cache run timed:
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -api emaillistverify -apikey $elvkey -apibulk emaillistverify -apicache emaillistverify -apicachettl 120 -tm all
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "invalid_syntax",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "email_disabled",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "ok",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no"
+    }
+]
+
+real    0m2.078s
+user    0m0.527s
+sys     0m0.038s
+```
+
+Log inspection shows bulk file API upload process was skipped as all email addresses in bulk file `-l emaillist.txt` passed on command line were found in Cloudflare cache.
+
+```
+cat $(ls -Art | tail -3 | grep 'email_verification')                                             
+2024-05-10 10:34:10,862 - INFO - File MIME type: text/plain
+2024-05-10 10:34:12,724 - INFO - All email results found in cache. Skipping file upload.
+```
 
 ## EmailListVerify API Check Times: Regular vs Cached
 
