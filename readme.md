@@ -30,6 +30,7 @@
   - [API Merge](#api-merge)
     - [API Merge Filters](#api-merge-filters)
 - [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
+  - [Cloudflare Cache Purge Support](#cloudflare-cache-purge-support)
   - [EmailListVeirfy Bulk File API Cloudflare Cache Support](#emaillistveirfy-bulk-file-api-cloudflare-cache-support)
   - [EmailListVerify API Check Times: Regular vs Cached](#emaillistverify-api-check-times-regular-vs-cached)
 
@@ -76,7 +77,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
 2. Run the script with the desired command-line arguments. 
 
 ```
-python validate_emails.py 
+python validate_emails.py
 usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATCH_SIZE] [-d] [-v] [-delay DELAY]
                           [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
                           [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
@@ -86,7 +87,7 @@ usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATC
                           [-apibulk {emaillistverify,millionverifier,proofy}] [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY]
                           [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS] [-pf_batchsize PROOFY_BATCH_SIZE]
                           [-apikey_mev MYEMAILVERIFIER_API_KEY] [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
-                          [-apicache {emaillistverify}] [-apicachettl APICACHETTL] [-apicachecheck APICACHECHECK]
+                          [-apicache {emaillistverify}] [-apicachettl APICACHETTL] [-apicachecheck {count,list,purge}] [-apicache-purge]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
@@ -181,7 +182,9 @@ The available arguments are:
   - `-apicachettl` (optional):
     - Description:  this sets the cache TTL duration in seconds for how long Cloudflare CDN/KV stores in cache (default: 300 seconds)
   - `-apicachecheck` (optional):
-    - Description:  operates when `-apicachettl` is set and takes `count` or `list` options to query the Cloudflare KV storage cache to count number of cached entries or list the entries themselves
+    - Description:  operates when `-apicachettl` is set and takes `count` or `list` or `purge` options to query the Cloudflare KV storage cache to count number of cached entries or list the entries themselves
+  - `-apicache-purge` (optional):
+    - Description:  purges Cloudflare CDN/KV cache when `-apicachecheck` set to `purge` options to query the 
 
 Validates `-f` from email address's SPF, DKIM, DMARC records when argument is passed and logs them 
 
@@ -4791,11 +4794,12 @@ Remember to replace `results.txt` with the actual path to your file if it's loca
 
 `validate_emails.py` script's [EmailListVerify](https://centminmod.com/emaillistverify) per email check API routines has been updated to support a custom Cloudflare HTTP forward proxy Worker cache configuration which can take the script's API request and forward it to EmailListVerify's API endpoint. The Cloudflare Worker script will then save the API result into Cloudflare KV storage on their edge servers and save with a date timestamp. This can potentially reduce your overall [EmailListVerify](https://centminmod.com/emaillistverify) per email verification costs if you need to run `validate_emails.py` a few times back to back bypassing having to need to call `validate_emails.py` API itself.
 
-`validate_emails.py` script added `-apicache`, `-apicachettl` and `-apicachecheck` arguments:
+`validate_emails.py` script added `-apicache`, `-apicachettl`, `-apicache-purge` and `-apicachecheck` arguments:
 
 - `-apicache` this sets the Cloudflare Worker's `cacheKey` and allows extending caching to other API providers in future. For now supported value is `emaillistverify` which will end up creating the `cacheKey` in Worker `const cacheKey = ${apiCache}:${email};` for lookups etc.
+- `-apicachecheck` takes `count` or `list` or `purge` option to query the Cloudflare KV storage cache to count number of cached entries or list the entries themselves or purge Cloudflare CDN/KV stores in cache.
+- `-apicache-purge` will purge Cloudflare CDN/KV cache when `-apicachecheck` set to `purge` options to query the 
 - `-apicachettl` this sets the cache TTL duration in seconds for how long Cloudflare CDN/KV stores in cache. Default value is 300s or 5mins
-- `-apicachecheck` takes `count` or `list` option to query the Cloudflare KV storage cache to count number of cached entries or list the entries themselves
 
 Examples to illustrate how the Cloudflare HTTP forward proxy caching KV worker workers for testing email address `hnyfmw5@canadlan-drugs.com`
 
@@ -4920,6 +4924,24 @@ Cloudflare KV storage entries
 | Key                                        | Value                                           |
 |--------------------------------------------|--------------------------------------------------|
 | emaillistverify:hnyfmw5@canadlan-drugs.com  | {"result":"unknown","timestamp":1715175271549,"ttl":120}  |
+
+## Cloudflare Cache Purge Support
+
+Add support to purge Cloudflare KV storage via `-apicache-purge -apicachecheck purge` when combined with `-apicache emaillistverify` 
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -apicache-purge -apicache emaillistverify -apicachecheck purge
+
+Cache purged successfully
+```
+
+Run with `-apicachecheck count` to report the number of cached entries in Cloudflare KV storage after cache purge:
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -apicache-purge -apicache emaillistverify -apicachecheck count
+
+API cache count: {'bulk_count': 0, 'email_count': 0}
+```
 
 ## EmailListVeirfy Bulk File API Cloudflare Cache Support
 
