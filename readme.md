@@ -18,7 +18,8 @@
 - [API Support](#api-support)
   - [Personal Experience](#personal-experience)
   - [Email Verification Provider Comparison Costs](#email-verification-provider-comparison-costs)
-  - [Table Compare](#table-compare)
+  - [Email Verification Provider API Speed & Rate Limits](#email-verification-provider-api-speed-rate-limits)
+  - [Email Verification Results Table Compare](#email-verification-results-table-compare)
   - [EmailListVerify](#emaillistverify)
   - [EmailListVerify Bulk File API](#emaillistverify-bulk-file-api)
   - [MillionVerifier](#millionverifier)
@@ -1689,7 +1690,19 @@ Personal experience with all 5 providers:
 | [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#table-compare))   | -         | $250 (0.001)  | -         | $500 (0.001)  | $650 (0.00065)| -         | $2000 (0.0004) | -         |
 | [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#table-compare))                    | $229 (0.001145)| -         | $289 (0.000963)| $429 (0.000858)| $699 (0.000699)| $1399 (0.00056)| -         | -         |
 
-## Table Compare
+## Email Verification Provider API Speed & Rate Limits
+
+From fastest to slowest ranked from my API tests overall and from gathered API documentation from each respective email verification provider's web site. Speed wise, [EmailListVerify](https://centminmod.com/emaillistverify) and [MillionVerifier](https://centminmod.com/millionverifier) are neck and neck on per email verification API checks. However, for bulk file API email verification checks, [MillionVerifier](https://centminmod.com/millionverifier) wins by a lot. 
+
+| Provider Rank For API Speed      | emails/sec | emails/min |
+|----------|--------------|-------------|
+| 1. [MillionVerifier](https://centminmod.com/millionverifier)  | 400/s       | 24,000/min      |
+| 2. [EmailListVerify](https://centminmod.com/emaillistverify)  | no doc mention       | no doc mention      |
+| 3. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
+| 4. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
+| 5. [Proofy.io](https://centminmod.com/proofy)  | no doc mention       | no doc mention      |
+
+## Email Verification Results Table Compare
 
 Table comparing the JSON field values for each email address across the 5 different Email cleaning service APIs and also compared to local script non-API queries results.
 
