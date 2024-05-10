@@ -1701,7 +1701,7 @@ MillionVerifier has more detailed email verification speed information for the b
 
 | Provider Rank For API Speed      | emails/sec | emails/min |
 |----------|--------------|-------------|
-| 1. [MillionVerifier](https://centminmod.com/millionverifier)  | 400/s       | 24,000/min      |
+| 1. [MillionVerifier](https://centminmod.com/millionverifier)  | 400/s       | no doc mention     |
 | 2. [EmailListVerify](https://centminmod.com/emaillistverify)  | no doc mention       | no doc mention      |
 | 3. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
 | 4. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
