@@ -18,7 +18,7 @@
 - [API Support](#api-support)
   - [Personal Experience](#personal-experience)
   - [Email Verification Provider Comparison Costs](#email-verification-provider-comparison-costs)
-  - [Email Verification Provider API Speed & Rate Limits](#email-verification-provider-api-speed-rate-limits)
+  - [Email Verification Provider API Speed & Rate Limits](#email-verification-provider-api-speed--rate-limits)
   - [Email Verification Results Table Compare](#email-verification-results-table-compare)
   - [EmailListVerify](#emaillistverify)
   - [EmailListVerify Bulk File API](#emaillistverify-bulk-file-api)
