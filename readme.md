@@ -98,7 +98,7 @@ usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATC
                              [-pf_batchsize PROOFY_BATCH_SIZE] [-apikey_mev MYEMAILVERIFIER_API_KEY]
                              [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge] [-apicache {emaillistverify}] [-apicachettl APICACHETTL]
                              [-apicachecheck {count,list,purge}] [-apicache-purge] [-store {r2,s3}] [-store-list]
-validate_emails_s3.py: error: the following arguments are required: -f/--from_email
+validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
 The available arguments are:
@@ -362,7 +362,7 @@ cat $(ls -Art | tail -3 | grep 'email_verification')
 Non-cached [EmailListVerify](https://centminmod.com/emaillistverify) per email check API `-api emaillistverify -apikey $elvkey` run
 
 ```
-time python validate_emails_s3.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com,hnyfmw2@canadlan-drugs.com,hnyfmw3@canadlan-drugs.com -api emaillistverify -apikey $elvkey -tm all -store r2
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com,hnyfmw2@canadlan-drugs.com,hnyfmw3@canadlan-drugs.com -api emaillistverify -apikey $elvkey -tm all -store r2
 
 Output stored successfully in R2: emailapi-emaillistverify/output_20240511055822.json
 [
@@ -3935,7 +3935,7 @@ python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm a
 For email per verification API check for list of emails in `emaillist.txt` via `-l emaillist.txt`. The `status`, `sub_status` and `free_email_api` JSON fields are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
 
 ```
-time python validate_emails_s3.py -f user@domain1.com -l emaillist.txt -tm all -api zerobounce -apikey_zb $zbkey -tm all
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api zerobounce -apikey_zb $zbkey -tm all
 [
     {
         "email": "user@mailsac.com",
@@ -4082,7 +4082,7 @@ sys     0m0.065s
 Test ZeroBounce per email check API `-api zerobounce -apikey_zb $zbkey` with Cloudflare Cache `-apicache zerobounce -apicachettl 900`
 
 ```
-time python validate_emails_s3.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all -apicache zerobounce -apicachettl 900
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all -apicache zerobounce -apicachettl 900
 
 [
     {
@@ -4112,6 +4112,27 @@ Cloudflare KV storage entries
 | Key                                        | Value                                           |
 |--------------------------------------------|--------------------------------------------------|
 | zerobounce:hnyfmw@canadlan-drugs.com  | {"result":{"address":"hnyfmw@canadlan-drugs.com","status":"invalid","sub_status":"no_dns_entries","free_email":false,"did_you_mean":null,"account":"hnyfmw","domain":"canadlan-drugs.com","domain_age_days":"2026","smtp_provider":"","mx_found":"false","mx_record":"","firstname":null,"lastname":null,"gender":null,"country":null,"region":null,"city":null,"zipcode":null,"processed_at":"2024-05-11 11:39:24.133"},"timestamp":1715427564270,"ttl":900}  |
+
+Test Cloudflare R2 storage via `-store r2` to save email verification results to Cloudflare R2 bucket directory at `emailapi-zerobounce-cached/output_20240511122039.json`
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all -apicache zerobounce -apicachettl 900 -store r2
+
+Output stored successfully in R2: emailapi-zerobounce-cached/output_20240511122039.json
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    }
+]
+
+real    0m1.210s
+user    0m0.355s
+sys     0m0.031s
+```
 
 # API Merge
 
@@ -5341,7 +5362,7 @@ Cloudflare KV storage entries
 For ZeroBounce per email check API `-api zerobounce -apikey_zb $zbkey` with Cloudflare Cache `-apicache zerobounce -apicachettl 900`
 
 ```
-time python validate_emails_s3.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all -apicache zerobounce -apicachettl 900
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all -apicache zerobounce -apicachettl 900
 
 [
     {
