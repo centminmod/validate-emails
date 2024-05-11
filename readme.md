@@ -34,6 +34,7 @@
   - [API Merge](#api-merge)
     - [API Merge Filters](#api-merge-filters)
 - [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
+  - [ZeroBounce Cloudflare Cache Support](#zerobounce-cloudflare-cache-support)
   - [Cloudflare Cache Purge Support](#cloudflare-cache-purge-support)
   - [EmailListVeirfy Bulk File API Cloudflare Cache Support](#emaillistveirfy-bulk-file-api-cloudflare-cache-support)
   - [EmailListVerify API Check Times: Regular vs Cached](#emaillistverify-api-check-times-regular-vs-cached)
@@ -5334,6 +5335,8 @@ Cloudflare KV storage entries
 | Key                                        | Value                                           |
 |--------------------------------------------|--------------------------------------------------|
 | emaillistverify:hnyfmw5@canadlan-drugs.com  | {"result":"unknown","timestamp":1715175271549,"ttl":120}  |
+
+## ZeroBounce Cloudflare Cache Support
 
 For ZeroBounce per email check API `-api zerobounce -apikey_zb $zbkey` with Cloudflare Cache `-apicache zerobounce -apicachettl 900`
 
