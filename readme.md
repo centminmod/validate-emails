@@ -333,7 +333,7 @@ user    0m0.391s
 sys     0m0.039s
 ```
 
-`validate_emails.py script's Cloudflare R2 saved `emailapi-emaillistverify-cached/output_20240511051940.json` log contents
+`validate_emails.py` script's Cloudflare R2 saved `emailapi-emaillistverify-cached/output_20240511051940.json` log contents
 
 ```
 cat emailapi-emaillistverify-cached/output_20240511051940.json
@@ -341,7 +341,7 @@ cat emailapi-emaillistverify-cached/output_20240511051940.json
 [{"email": "hnyfmw@canadlan-drugs.com", "status": "unknown", "status_code": null, "free_email": "no", "disposable_email": "no"}, {"email": "hnyfmw2@canadlan-drugs.com", "status": "unknown", "status_code": null, "free_email": "no", "disposable_email": "no"}, {"email": "hnyfmw3@canadlan-drugs.com", "status": "unknown", "status_code": null, "free_email": "no", "disposable_email": "no"}]
 ```
 
-`validate_emails.py run log inspection
+`validate_emails.py` run log inspection
 
 ```
 cat $(ls -Art | tail -3 | grep 'email_verification')                                             
@@ -351,6 +351,49 @@ cat $(ls -Art | tail -3 | grep 'email_verification')
 2024-05-11 05:14:25,206 - INFO - Cache result: unknown
 2024-05-11 05:14:25,966 - INFO - Cache result: unknown
 2024-05-11 05:14:26,092 - INFO - Cache result: unknown
+```
+
+Non-cached [EmailListVerify](https://centminmod.com/emaillistverify) per email check API `api emaillistverify -apikey $elvkey` run
+
+```
+time python validate_emails_s3.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com,hnyfmw2@canadlan-drugs.com,hnyfmw3@canadlan-drugs.com -api emaillistverify -apikey $elvkey -tm all -store r2
+
+Output stored successfully in R2: emailapi-emaillistverify/output_20240511055822.json
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "hnyfmw2@canadlan-drugs.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "hnyfmw3@canadlan-drugs.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    }
+]
+
+real    0m10.612s
+user    0m0.541s
+sys     0m0.033s
+```
+
+`validate_emails.py` script's Cloudflare R2 saved `emailapi-emaillistverify/output_20240511055822.json` log contents
+
+```
+cat emailapi-emaillistverify/output_20240511055822.json
+
+[{"email": "hnyfmw@canadlan-drugs.com", "status": "unknown", "status_code": null, "free_email": "no", "disposable_email": "no"}, {"email": "hnyfmw2@canadlan-drugs.com", "status": "unknown", "status_code": null, "free_email": "no", "disposable_email": "no"}, {"email": "hnyfmw3@canadlan-drugs.com", "status": "unknown", "status_code": null, "free_email": "no", "disposable_email": "no"}]
 ```
 
 ### -smtp ses
