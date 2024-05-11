@@ -1900,8 +1900,8 @@ Personal experience with all 5 providers:
 
 Below are their respectivate pay as you go credit pricing for email verifications. The usual recommendations are to verify your lists every 3-6 months which is 2-4x times per year. Have a 25K email list = 2-4 x 25K = 50-100K email verifications per year.
 
-Update: May 11, 2024 add [Zerobounce](https://centminmod.com/zerobounce) API support
-Update: May 12, 2024 add [Reoon](https://centminmod.com/reoon) API support
+- Update: May 11, 2024 add [Zerobounce](https://centminmod.com/zerobounce) API support
+- Update: May 12, 2024 add [Reoon](https://centminmod.com/reoon) API support
 
 | Provider | 1k | 2k | 5k | 10k | 25k | 30k | 50k | 70k | 100k |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
