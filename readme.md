@@ -1679,7 +1679,7 @@ Personal experience with all 5 providers:
 
 | Provider                         | 1k        | 2k        | 5k        | 10k       | 25k       | 30k       | 50k       | 70k       | 100k      |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
-| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | -         | -         | $4 (0.0008)| $24 (0.0024)| $49 (0.00196)| -         | $89 (0.00178)| -         | $169 (0.00169)|
+| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | $4 (0.0008) | -         | $15 (0.003)| $24 (0.0024)| $49 (0.00196)| -         | $89 (0.00178)| -         | $169 (0.00169)|
 | [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#table-compare))  | -         | -         | -         | $37 (0.0037)| $49 (0.00196)| -         | $77 (0.00154)| -         | $129 (0.00129)|
 | [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#table-compare)) | -         | $14 (0.007)| $28 (0.0056)| $39 (0.0039)| $79 (0.00316)| -         | $149 (0.00298)| -         | $239 (0.00239)|
 | [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#table-compare))   | $7 (0.007) | -         | $30 (0.006) | $60 (0.006) | $75 (0.003)  | -         | $150 (0.003) | -         | $200 (0.002)  |
