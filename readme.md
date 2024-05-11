@@ -1666,7 +1666,7 @@ python validate_emails.py -f user@domain.com -e user+to@domain.com -tm syntax
 
 # API Support
 
-In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy). Links to services maybe affiliate links. If you found this information useful ;)
+In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy), [Zerobounce](https://centminmod.com/zerobounce). Links to services maybe affiliate links. If you found this information useful ;)
 
 Updated: Added [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
 
