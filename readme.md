@@ -1803,7 +1803,7 @@ Personal experience with all 5 providers:
 - CaptainVerify API is limited to a maximum of 2 simultaneous connections and 50 checks per minute for per email address verification checks. For the sample 15 email addresses tested below, took ~4.6 seconds to complete per email address verification checks
 - Proofy.io has the most restrictive API limits but I can't seem to find any documentation of the actual limits, so I have to code it so it isn't as fast as other providers for per email verification checks. It will be the slowest of the 5 providers for per email verification checks. For the sample 15 email addresses tested below, took ~9.5 seconds to complete per email address verification checks
 - Proofy.io only has [single email check](https://proofy.io/using-api) and [batch email checks](https://proofy.io/using-api) but no bulk file API support.
-- ZeroBounce API was added on May 11, 2023. They have 100 free email credits per month, making it possible to keep my script's support and development testing costs down to a minimum. API documentation is very well documented. Only annoying this right now is the web site login session durations are very short, so annoyingly you get logged out very quickly making it more secure. Make sure you use a password manager to make re-logins less annoying. Though if you're using a script and their API, you don't have to login as frequently.
+- ZeroBounce API was added on May 11, 2023. For sample 15 email addresses, it took 4.794 seconds via per email check API. They have 100 free email credits per month, making it possible to keep my script's support and development testing costs down to a minimum. API documentation is very well documented. Only annoying this right now is the web site login session durations are very short, so annoyingly you get logged out very quickly making it more secure. Make sure you use a password manager to make re-logins less annoying. Though if you're using a script and their API, you don't have to login as frequently.
 - ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) - 50,000 requests in 10 seconds (validations) before temporarily blocking for 1 minute. A maximum of 250 requests in 1 minute for the` bulkapi.zerobounce.net/` before temporarily blocking for 1 hour. And allow a maximum of 20 requests in 1 minute for the `bulkapi.zerobounce.net/v2/validatebatch` before temporarily blocking for 10 minutes. Rate limits seem more complicated so will need to test my script to ensure it operates under their rate limits.
 - The number of API returned status value classifications returned by the various providers differs. Some have a more detailed classifications for emails than others.
   - EmailListVerify has 18 classifications:
@@ -1897,102 +1897,102 @@ Updated: May 11, 2023 add [Zerobounce](https://centminmod.com/zerobounce) API su
 
 ## Email Verification Results Table Compare
 
-Table comparing the JSON field values for each email address across the 5 different Email cleaning service APIs and also compared to local script non-API queries results.
+Table comparing the JSON field values for each email address across the different Email cleaning service APIs and also compared to local script non-API queries results.
 
-Tested on the same sample `emaillist.txt` of email addresses. These are their respective returned values for `status` JSON field which retrieved from the respective API services. While `status_code` (not used with external APIs), `free_email` and `disposable_email` JSON fields are from local script code/databases where applicable.
+Tested on the same sample `emaillist.txt` of email addresses. These are their respective returned values for `status` JSON field which retrieved from the respective API services. While `status_code` (not used with external APIs), `free_email` and `disposable_email` JSON fields are from local script code/databases where applicable. The `sub_status` is a JSON field only for [Zerobounce](https://centminmod.com/zerobounce).
 
-| Email | API | status | status_code | free_email | disposable_email |
-|----------------------|-------------------|------------|-------------|------------|------------------|
-| user@mailsac.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | yes | yes |
-| user@mailsac.com | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | false | yes |
-| user@mailsac.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | no | yes |
-| user@mailsac.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | yes |
-| user@mailsac.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | yes | yes |
-| user@mailsac.com | Local Script | ok | 250 | yes | yes |
-| xyz@centmil1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | no | no |
-| xyz@centmil1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
-| xyz@centmil1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
-| xyz@centmil1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
-| xyz@centmil1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
-| xyz@centmil1.com | Local Script | invalid | null | unknown | no |
-| user+to@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | no | no |
-| user+to@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | false | no |
-| user+to@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | no | no |
-| user+to@domain1.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | no | no |
-| user+to@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | no | no |
-| user+to@domain1.com | Local Script | ok | 250 | no | no |
-| xyz@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
-| xyz@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
-| xyz@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
-| xyz@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
-| xyz@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
-| xyz@domain1.com | Local Script | unknown_email | 550 | no | no |
-| abc@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
-| abc@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
-| abc@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
-| abc@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
-| abc@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
-| abc@domain1.com | Local Script | unknown_email | 550 | no | no |
-| 123@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
-| 123@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
-| 123@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | no | no |
-| 123@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
-| 123@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
-| 123@domain1.com | Local Script | unknown_email | 550 | no | no |
-| pop@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
-| pop@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
-| pop@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
-| pop@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
-| pop@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
-| pop@domain1.com | Local Script | unknown_email | 550 | no | no |
-| pip@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | no | no |
-| pip@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | false | no |
-| pip@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | no | no |
-| pip@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
-| pip@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | no |
-| pip@domain1.com | Local Script | unknown_email | 550 | no | no |
-| user@tempr.email | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | no | yes |
-| user@tempr.email | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | false | yes |
-| user@tempr.email | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | no | yes |
-| user@tempr.email | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | yes |
-| user@tempr.email | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | no | yes |
-| user@tempr.email | Local Script | ok | 250 | no | yes |
-| info@domain2.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | no | no |
-| info@domain2.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | false | no |
-| info@domain2.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | no | no |
-| info@domain2.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | no | no |
-| info@domain2.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | no | no |
-| info@domain2.com | Local Script | ok | 250 | no | no |
-| user@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | yes | no |
-| user@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | true | no |
-| user@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | yes | no |
-| user@gmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | yes | no |
-| user@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | yes | no |
-| user@gmail.com | Local Script | ok | 250 | yes | no |
-| op999@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | yes | no |
-| op999@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | true | no |
-| op999@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | yes | no |
-| op999@gmail.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | no | no |
-| op999@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | yes | no |
-| op999@gmail.com | Local Script | unknown_email | 550 | yes | no |
-| user@yahoo.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | yes | no |
-| user@yahoo.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | true | no |
-| user@yahoo.com | [CaptainVerify](https://centminmod.com/captainverify) | unknown | null | yes | no |
-| user@yahoo.com | [Proofy.io](https://centminmod.com/proofy) | unknown | null | no | no |
-| user@yahoo.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | yes | no |
-| user@yahoo.com | Local Script | ok | 250 | yes | no |
-| user1@outlook.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | yes | no |
-| user1@outlook.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | true | no |
-| user1@outlook.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | yes | no |
-| user1@outlook.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | yes | no |
-| user1@outlook.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | yes | no |
-| user1@outlook.com | Local Script | ok | 250 | yes | no |
-| user2@hotmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | yes | no |
-| user2@hotmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | true | no |
-| user2@hotmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | yes | no |
-| user2@hotmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | yes | no |
-| user2@hotmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | yes | no |
-| user2@hotmail.com | Local Script | ok | 250 | yes | no |
+| Email | API | status | sub_status | status_code | free_email | disposable_email |
+|----------------------|-------------------|------------|-----------------|-------------|------------|------------------|
+| user@mailsac.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | yes | yes |
+| user@mailsac.com | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | null | false | yes |
+| user@mailsac.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | yes |
+| user@mailsac.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | yes |
+| user@mailsac.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | yes | yes |
+| user@mailsac.com | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | disposable | null | yes | yes |
+| xyz@centmil1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | no | no |
+| xyz@centmil1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
+| xyz@centmil1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
+| xyz@centmil1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| xyz@centmil1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
+| xyz@centmil1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | no_dns_entries | null | no | no |
+| user+to@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | no | no |
+| user+to@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | false | no |
+| user+to@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | no | no |
+| user+to@domain1.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | no | no |
+| user+to@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | no | no |
+| user+to@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | valid | alias_address | null | no | no |
+| xyz@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
+| xyz@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
+| xyz@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
+| xyz@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| xyz@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
+| xyz@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| abc@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
+| abc@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
+| abc@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
+| abc@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| abc@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
+| abc@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| 123@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
+| 123@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
+| 123@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | no |
+| 123@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| 123@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
+| 123@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| pop@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
+| pop@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
+| pop@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
+| pop@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| pop@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
+| pop@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| pip@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
+| pip@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
+| pip@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
+| pip@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| pip@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
+| pip@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| user@tempr.email | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | no | yes |
+| user@tempr.email | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | null | false | yes |
+| user@tempr.email | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | yes |
+| user@tempr.email | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | yes |
+| user@tempr.email | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | yes |
+| user@tempr.email | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | disposable | null | no | yes |
+| info@domain2.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | no | no |
+| info@domain2.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | false | no |
+| info@domain2.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | no |
+| info@domain2.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | no | no |
+| info@domain2.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | no | no |
+| info@domain2.com | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | role_based | null | no | no |
+| user@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
+| user@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
+| user@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
+| user@gmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | yes | no |
+| user@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
+| user@gmail.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
+| op999@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | yes | no |
+| op999@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | true | no |
+| op999@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | yes | no |
+| op999@gmail.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| op999@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | yes | no |
+| op999@gmail.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | yes | no |
+| user@yahoo.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
+| user@yahoo.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
+| user@yahoo.com | [CaptainVerify](https://centminmod.com/captainverify) | unknown | null | null | yes | no |
+| user@yahoo.com | [Proofy.io](https://centminmod.com/proofy) | unknown | null | null | no | no |
+| user@yahoo.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
+| user@yahoo.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
+| user1@outlook.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
+| user1@outlook.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
+| user1@outlook.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
+| user1@outlook.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | yes | no |
+| user1@outlook.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
+| user1@outlook.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
+| user2@hotmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
+| user2@hotmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
+| user2@hotmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
+| user2@hotmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | yes | no |
+| user2@hotmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
+| user2@hotmail.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
 
 ## EmailListVerify
 
