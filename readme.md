@@ -274,9 +274,11 @@ api_url=http=https://your_cf_worker.com
 
 ### S3 Storage Support
 
-Commercial email verification providers usually only store your file based uploaded or bulk file API uploaded files for a defined duration i.e. 30 days before they are deleted. And per email check API results are usually not stored at all. So if you need to store your per email check or bulk file API email verification results for longer, the script now supports saving your results to S3 object storage providers - Cloudflare R2 S3 or Amazon AWS S3.
+Commercial email verification providers usually only store your file based uploaded or bulk file API uploaded files for a defined duration i.e. 30 days before they are deleted. And per email check API results are usually not stored at all. So if you need to store your per email check or bulk file API email verification results for longer, the `validate_emails.py` script now supports saving your results to S3 object storage providers - Cloudflare R2 or Amazon AWS S3.
 
 Add optional Cloudflare R2 S3 object storage or Amazon AWS S3 object storage which will allow you to save your `validate_emails.py` ran JSON output in externel Cloudflare R2 or Amazon AWS S3 object storage buckets via `validate_emails.ini` defined:
+
+For Cloudflare R2
 
 ```
 [r2]
@@ -284,7 +286,11 @@ endpoint_url = https://your-account-id.r2.cloudflarestorage.com
 aws_access_key_id = your-r2-access-key-id
 aws_secret_access_key = your-r2-secret-access-key
 bucket_name = your-r2-bucket-name
+```
 
+For Amazon AWS S3
+
+```
 [s3]
 endpoint_url = https://your-s3-endpoint-url
 aws_access_key_id = your-s3-access-key-id
@@ -292,7 +298,7 @@ aws_secret_access_key = your-s3-secret-access-key
 bucket_name = your-s3-bucket-name
 ```
 
-Send `validate_emails.py script results to Cloudflare R2 S3 object storage via `-store r2` argument. Using EmailListVerify per email check API `api emaillistverify -apikey $elvkey` + Cloudflare cached for 120 seconds `-apicache emaillistverify -apicachettl 120`
+Below example to send `validate_emails.py` script results to Cloudflare R2 S3 object storage via `-store r2` argument. Using [EmailListVerify](https://centminmod.com/emaillistverify) per email check API `api emaillistverify -apikey $elvkey` + Cloudflare cached for 120 seconds `-apicache emaillistverify -apicachettl 120`
 
 ```
 time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com,hnyfmw2@canadlan-drugs.com,hnyfmw3@canadlan-drugs.com -api emaillistverify -apikey $elvkey -apicache emaillistverify -apicachettl 120 -tm all -store r2
