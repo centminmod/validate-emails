@@ -1677,6 +1677,8 @@ Personal experience with all 5 providers:
 
 ## Email Verification Provider Comparison Costs
 
+Below are their respectivate pay as you go credit pricing for email verifications. The usual recommendations are to verify your lists every 3-6 months which is 2-4x times per year. Have a 25K email list = 2-4 x 25K = 50-100K email verifications per year.
+
 | Provider                         | 1k        | 2k        | 5k        | 10k       | 25k       | 30k       | 50k       | 70k       | 100k      |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
 | [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | $4 (0.0008) | -         | $15 (0.003)| $24 (0.0024)| $49 (0.00196)| -         | $89 (0.00178)| -         | $169 (0.00169)|
