@@ -7,7 +7,7 @@
 - [Output](#output)
 - [Logging](#logging)
 - [Configuration](#configuration)
-  - [`validate_emails.ini` config file](#)
+  - [`validate_emails.ini` config file](#validate_emailsini-config-file)
   - [S3 Storage Support](#s3-storage-support)
   - [-smtp ses](#-smtp-ses)
   - [-smtp rotate](#-smtp-rotate)
