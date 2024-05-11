@@ -1847,14 +1847,40 @@ Personal experience with all 5 providers:
     - risky
     - undeliverable
     - unknown
-  - ZeroBounce has 7 classifications:
-    - valid
-    - invalid
-    - catch-all
-    - unknown
-    - spamtrap
-    - abuse
-    - do_not_mail
+  - ZeroBounce has 7 classifications and also 23 `sub_status` classifications:
+    - classifications:
+      - valid
+      - invalid
+      - catch-all
+      - unknown
+      - spamtrap
+      - abuse
+      - do_not_mail
+    - `sub_status` classifications:
+      - alternate
+      - antispam_system
+      - greylisted
+      - mail_server_temporary_error
+      - forcible_disconnect
+      - mail_server_did_not_respond
+      - timeout_exceeded
+      - failed_smtp_connection
+      - mailbox_quota_exceeded
+      - exception_occurred
+      - possible_trap
+      - role_based
+      - global_suppression
+      - mailbox_not_found
+      - no_dns_entries
+      - failed_syntax_check
+      - possible_typo
+      - unroutable_ip_address
+      - leading_period_removed
+      - does_not_accept_mail
+      - alias_address
+      - role_based_catch_all
+      - disposable, toxic
+
 
 ## Email Verification Provider Comparison Costs
 
