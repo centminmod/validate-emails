@@ -7,6 +7,8 @@
 - [Output](#output)
 - [Logging](#logging)
 - [Configuration](#configuration)
+  - [`validate_emails.ini` config file](#)
+  - [S3 Storage Support](#s3-storage-support)
   - [-smtp ses](#-smtp-ses)
   - [-smtp rotate](#-smtp-rotate)
   - [-smtp generic](#-smtp-generic)
@@ -42,11 +44,14 @@ The script offers specific support for [Xenforo](#xenforo) forum member email li
 
 To reduce potential 3rd party email verification API costs, this script also supports [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage) for both per email check and [bulk file](#emaillistveirfy-bulk-file-api-cloudflare-cache-support) API check results to be temporarily cached and return the email verification status codes at the Cloudflare CDN and Cloudflare Worker KV storage level.
 
+Email verification results can also be optionally saved to [Amazon AWS S3 and Cloudflare R2 object storage](#s3-storage-support) for long term storage and retrieval.
+
 The `validate_emails.py` email validation script was written by George Liu (eva2000) for his paid consulting clients usage. The below is public documentation for the script.
 
 ## Features
 - Validates email addresses using syntax, DNS and SMTP checks
 - Validates `-f` from email address's SPF, DKIM, DMARC records and logs them for troubleshooting mail deliverability
+- Optionally save your email verification results to [S3 object storage providers - Cloudflare R2 or Amazon S3](#s3-storage-support)
 - Support local self-hosted email verification + [API support](#api-support) for:
   - [EmailListVerify](https://centminmod.com/emaillistverify) [[example](#emaillistverify-1), [bulk API](#emaillistverify-bulk-file-api)] 
   - [MillionVerifier](https://centminmod.com/millionverifier) [[example](#millionverifier), [bulk API](#millionverifier-bulk-file-api)]
@@ -80,16 +85,17 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
 ```
 python validate_emails.py
 usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATCH_SIZE] [-d] [-v] [-delay DELAY]
-                          [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
-                          [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
-                          [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
-                          [-wf WORKER_FACTOR] [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier}]
-                          [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
-                          [-apibulk {emaillistverify,millionverifier,proofy}] [-apikey_cv CAPTAINVERIFY_API_KEY] [-apikey_pf PROOFY_API_KEY]
-                          [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS] [-pf_batchsize PROOFY_BATCH_SIZE]
-                          [-apikey_mev MYEMAILVERIFIER_API_KEY] [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
-                          [-apicache {emaillistverify}] [-apicachettl APICACHETTL] [-apicachecheck {count,list,purge}] [-apicache-purge]
-validate_emails.py: error: the following arguments are required: -f/--from_email
+                             [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
+                             [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
+                             [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
+                             [-wf WORKER_FACTOR] [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier}]
+                             [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
+                             [-apibulk {emaillistverify,millionverifier,proofy}] [-apikey_cv CAPTAINVERIFY_API_KEY]
+                             [-apikey_pf PROOFY_API_KEY] [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS]
+                             [-pf_batchsize PROOFY_BATCH_SIZE] [-apikey_mev MYEMAILVERIFIER_API_KEY]
+                             [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge] [-apicache {emaillistverify}] [-apicachettl APICACHETTL]
+                             [-apicachecheck {count,list,purge}] [-apicache-purge] [-store {r2,s3}] [-store-list]
+validate_emails_s3.py: error: the following arguments are required: -f/--from_email
 ```
 
 The available arguments are:
@@ -249,7 +255,7 @@ If `-v` verbose mode is used with `-tm all` for SMTP domain MX record checks, an
 
 ## Configuration
 
-### `validate_emails.ini`
+### `validate_emails.ini` config file
 
 Add `validate_emails.ini` config file support so Cloudflare Worker KV caching endpoint url can be defined outside of the script. If `validate_emails.ini` doesn't exist, you'll get this message
 
@@ -264,6 +270,81 @@ Please create the 'validate_emails.ini' file in the same directory as the script
 ```
 [settings]
 api_url=http=https://your_cf_worker.com
+```
+
+### S3 Storage Support
+
+Commercial email verification providers usually only store your file based uploaded or bulk file API uploaded files for a defined duration i.e. 30 days before they are deleted. And per email check API results are usually not stored at all. So if you need to store your per email check or bulk file API email verification results for longer, the script now supports saving your results to S3 object storage providers - Cloudflare R2 S3 or Amazon AWS S3.
+
+Add optional Cloudflare R2 S3 object storage or Amazon AWS S3 object storage which will allow you to save your `validate_emails.py` ran JSON output in externel Cloudflare R2 or Amazon AWS S3 object storage buckets via `validate_emails.ini` defined:
+
+```
+[r2]
+endpoint_url = https://your-account-id.r2.cloudflarestorage.com
+aws_access_key_id = your-r2-access-key-id
+aws_secret_access_key = your-r2-secret-access-key
+bucket_name = your-r2-bucket-name
+
+[s3]
+endpoint_url = https://your-s3-endpoint-url
+aws_access_key_id = your-s3-access-key-id
+aws_secret_access_key = your-s3-secret-access-key
+bucket_name = your-s3-bucket-name
+```
+
+Send `validate_emails.py script results to Cloudflare R2 S3 object storage via `-store r2` argument. Using EmailListVerify per email check API `api emaillistverify -apikey $elvkey` + Cloudflare cached for 120 seconds `-apicache emaillistverify -apicachettl 120`
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com,hnyfmw2@canadlan-drugs.com,hnyfmw3@canadlan-drugs.com -api emaillistverify -apikey $elvkey -apicache emaillistverify -apicachettl 120 -tm all -store r2
+
+Output stored successfully in R2: emailapi-emaillistverify-cached/output_20240511051940.json
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "hnyfmw2@canadlan-drugs.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    },
+    {
+        "email": "hnyfmw3@canadlan-drugs.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    }
+]
+
+real    0m1.663s
+user    0m0.391s
+sys     0m0.039s
+```
+
+`validate_emails.py script's Cloudflare R2 saved `emailapi-emaillistverify-cached/output_20240511051940.json` log contents
+
+```
+cat emailapi-emaillistverify-cached/output_20240511051940.json
+
+[{"email": "hnyfmw@canadlan-drugs.com", "status": "unknown", "status_code": null, "free_email": "no", "disposable_email": "no"}, {"email": "hnyfmw2@canadlan-drugs.com", "status": "unknown", "status_code": null, "free_email": "no", "disposable_email": "no"}, {"email": "hnyfmw3@canadlan-drugs.com", "status": "unknown", "status_code": null, "free_email": "no", "disposable_email": "no"}]
+```
+
+`validate_emails.py run log inspection
+
+```
+cat $(ls -Art | tail -3 | grep 'email_verification')                                             
+2024-05-11 05:14:23,074 - INFO - Checking cache for email: hnyfmw@canadlan-drugs.com
+2024-05-11 05:14:23,075 - INFO - Checking cache for email: hnyfmw2@canadlan-drugs.com
+2024-05-11 05:14:23,075 - INFO - Checking cache for email: hnyfmw3@canadlan-drugs.com
+2024-05-11 05:14:25,206 - INFO - Cache result: unknown
+2024-05-11 05:14:25,966 - INFO - Cache result: unknown
+2024-05-11 05:14:26,092 - INFO - Cache result: unknown
 ```
 
 ### -smtp ses
