@@ -62,6 +62,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
   - [CaptainVerify](https://centminmod.com/captainverify) [[example](#captainverify-api)]
   - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
   - [Zerobounce](https://centminmod.com/zerobounce) [[example](#zerobounce-api)]
+  - [Reoon](https://centminmod.com/reoon) [[example](#reoon-api)]
   - [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
 - Supports [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage) for [EmailListVerify](https://centminmod.com/emaillistverify) per email check API
 - Classifies email addresses into various categories based on the syntax, DNS, and SMTP response
