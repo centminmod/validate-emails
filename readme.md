@@ -30,7 +30,8 @@
   - [CaptainVerify API](#captainverify-api)
   - [Proofy API](#proofy-api)
   - [MyEmailVerifier API](#myemailverifier-api)
-  - [Zerobounce API](#zerobounce-api)
+  - [Zerobounce API](#zerobounce-api),
+  - [Reoon API](#reoon-api)
   - [API Merge](#api-merge)
     - [API Merge Filters](#api-merge-filters)
 - [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
@@ -91,13 +92,15 @@ usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATC
                              [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
                              [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
                              [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
-                             [-wf WORKER_FACTOR] [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier}]
+                             [-wf WORKER_FACTOR]
+                             [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier,zerobounce,reoon}]
                              [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
                              [-apibulk {emaillistverify,millionverifier,proofy}] [-apikey_cv CAPTAINVERIFY_API_KEY]
                              [-apikey_pf PROOFY_API_KEY] [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS]
-                             [-pf_batchsize PROOFY_BATCH_SIZE] [-apikey_mev MYEMAILVERIFIER_API_KEY]
-                             [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge] [-apicache {emaillistverify}] [-apicachettl APICACHETTL]
-                             [-apicachecheck {count,list,purge}] [-apicache-purge] [-store {r2,s3}] [-store-list]
+                             [-pf_batchsize PROOFY_BATCH_SIZE] [-apikey_mev MYEMAILVERIFIER_API_KEY] [-apikey_zb ZEROBOUNCE_API_KEY]
+                             [-apikey_rn REOON_API_KEY] [-reoon_mode {quick,power}] [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
+                             [-apicache {emaillistverify,zerobounce}] [-apicachettl APICACHETTL] [-apicachecheck {count,list,purge}]
+                             [-apicache-purge] [-store {r2,s3}] [-store-list]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
@@ -167,6 +170,7 @@ The available arguments are:
       - `captainverify`: Use the CaptainVerify API.
       - `proofy`: Use the Proofy API.
       - `zerobounce`: Use the Zerobounce.net API.
+      - `reoon`: Use the Zerobounce.net API.
   - `-apimerge`, `--api_merge` (optional):
     - Description: Merge and combine `emaillistverify` or `millionverifier` API results into one result
   - `-apibulk`, `--api_bulk` (optional):
@@ -181,6 +185,10 @@ The available arguments are:
     - Description: The API key for the CaptainVerify service.
   - `-apikey_zb`, `--zerobounce_api_key` (optional):
     - Description: The API key for the Zerobounce.net service.
+  - `-apikey_rn`, `--reoon_api_key` (optional):
+    - Description: The API key for the Zerobounce.net service.
+  - `-reoon_mode`, `--reoon_mode`
+    - Description: Reoon verification mode `quick` or `power`
   - `-apikey_pf`, `--proofy_api_key` (optional):
     - Description: The API key for the Proofy service.
   - `-apiuser_pf`, `--proofy_user_id` (optional):
@@ -1666,7 +1674,7 @@ python validate_emails.py -f user@domain.com -e user+to@domain.com -tm syntax
 
 # API Support
 
-In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy), [Zerobounce](https://centminmod.com/zerobounce). Links to services maybe affiliate links. If you found this information useful ;)
+In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy), [Zerobounce](https://centminmod.com/zerobounce), [Reoon(https://centminmod.com/reoon). Links to services maybe affiliate links. If you found this information useful ;)
 
 Updated: Added [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
 
@@ -1880,13 +1888,19 @@ Personal experience with all 5 providers:
       - alias_address
       - role_based_catch_all
       - disposable, toxic
+  - Reoon has 4 classifications
+    - valid
+    - invalid
+    - disposable
+    - spamtrap
 
 
 ## Email Verification Provider Comparison Costs
 
 Below are their respectivate pay as you go credit pricing for email verifications. The usual recommendations are to verify your lists every 3-6 months which is 2-4x times per year. Have a 25K email list = 2-4 x 25K = 50-100K email verifications per year.
 
-Update: May 11, 2023 add [Zerobounce](https://centminmod.com/zerobounce) API support
+Update: May 11, 2024 add [Zerobounce](https://centminmod.com/zerobounce) API support
+Update: May 12, 2024 add [Reoon](https://centminmod.com/reoon) API support
 
 | Provider | 1k | 2k | 5k | 10k | 25k | 30k | 50k | 70k | 100k |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
@@ -1896,6 +1910,7 @@ Update: May 11, 2023 add [Zerobounce](https://centminmod.com/zerobounce) API sup
 | [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#email-verification-results-table-compare)) | $7 (0.007) | - | $30 (0.006) | $60 (0.006) | $75 (0.003) | - | $150 (0.003) | - | $200 (0.002) |
 | [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-results-table-compare)) | - | - | $16 (0.0032)| $29 (0.0029)| - | $63 (0.0021)| $99 (0.00198)| $124 (0.00177)| $149 (0.00149)|
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-results-table-compare)) | - | $20 (0.01) | $45 (0.009) | $80 (0.008) | $190 (0.0076) | - | $375 (0.0075) | - | $425 (0.00425) |
+| [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | - | - | - | $11.91 (0.00119) | $29.66 (0.00119) | - | $58.95 (0.00118) | $87.86 (0.00126) | $116.40 (0.00116) |
 
 | Provider | 200k | 250k | 300k | 500k | 1m | 2.5m | 5m | 10m |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
@@ -1905,6 +1920,7 @@ Update: May 11, 2023 add [Zerobounce](https://centminmod.com/zerobounce) API sup
 | [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#email-verification-results-table-compare)) | - | $250 (0.001) | - | $500 (0.001) | $650 (0.00065)| - | $2000 (0.0004) | - |
 | [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-results-table-compare)) | $229 (0.001145)| - | $289 (0.000963)| $429 (0.000858)| $699 (0.000699)| $1399 (0.00056)| - | - |
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-results-table-compare)) | - | $940 (0.00376) | - | $1800 (0.0036) | $2750 (0.00275) | - | - | - |
+| [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | $226.80 (0.00113) | $279.75 (0.00112) | $331.20 (0.00110) | $522.00 (0.00104) | $960.00 (0.00096) | - | - | - |
 
 ## Email Verification Provider API Speed & Rate Limits
 
@@ -1912,7 +1928,9 @@ From fastest to slowest ranked from my API tests overall and from gathered API d
 
 MillionVerifier has more detailed email verification speed information for the bulk file email verification [here](https://help.millionverifier.com/bulk-email-verification/email-verification-speed) which I assume is for the web site dashboard and not for their API.
 
-Updated: May 11, 2023 add [Zerobounce](https://centminmod.com/zerobounce) API support. ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) and will update the below table after I have done some tests.
+Updated: May 11, 2024 add [Zerobounce](https://centminmod.com/zerobounce) API support. ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) and will update the below table after I have done some tests.
+
+Updated: May 12, 2024 add [Reoon](https://centminmod.com/reoon) API support. Will update below table after I have done some tests.
 
 | Provider Rank For API Speed      | emails/sec | emails/min |
 |----------|--------------|-------------|
@@ -1936,90 +1954,105 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user@mailsac.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | yes |
 | user@mailsac.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | yes | yes |
 | user@mailsac.com | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | disposable | null | yes | yes |
+| user@mailsac.com | [Reoon](https://centminmod.com/reoon) | disposable | null | null | yes | yes |
 | xyz@centmil1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | no | no |
 | xyz@centmil1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | xyz@centmil1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
 | xyz@centmil1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
 | xyz@centmil1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | xyz@centmil1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | no_dns_entries | null | no | no |
+| xyz@centmil1.com | [Reoon](https://centminmod.com/reoon) | invalid | null | null | no | no |
 | user+to@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | no | no |
 | user+to@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | false | no |
 | user+to@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | no | no |
 | user+to@domain1.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | no | no |
 | user+to@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | no | no |
 | user+to@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | valid | alias_address | null | no | no |
+| user+to@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
 | xyz@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | xyz@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | xyz@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
 | xyz@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
 | xyz@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | xyz@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| xyz@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
 | abc@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | abc@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | abc@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
 | abc@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
 | abc@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | abc@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| abc@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
 | 123@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | 123@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | 123@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | no |
 | 123@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
 | 123@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | 123@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| 123@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
 | pop@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | pop@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | pop@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
 | pop@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
 | pop@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | pop@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| pop@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
 | pip@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | pip@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | pip@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
 | pip@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
 | pip@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | pip@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
+| pip@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
 | user@tempr.email | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | no | yes |
 | user@tempr.email | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | null | false | yes |
 | user@tempr.email | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | yes |
 | user@tempr.email | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | yes |
 | user@tempr.email | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | yes |
 | user@tempr.email | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | disposable | null | no | yes |
+| user@tempr.email | [Reoon](https://centminmod.com/reoon) | disposable | null | null | yes | yes |
 | info@domain2.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | no | no |
 | info@domain2.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | false | no |
 | info@domain2.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | no |
 | info@domain2.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | no | no |
 | info@domain2.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | no | no |
 | info@domain2.com | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | role_based | null | no | no |
+| info@domain2.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
 | user@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
 | user@gmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | yes | no |
 | user@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user@gmail.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
+| user@gmail.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
 | op999@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | yes | no |
 | op999@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | true | no |
 | op999@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | yes | no |
 | op999@gmail.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
 | op999@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | yes | no |
 | op999@gmail.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | yes | no |
+| op999@gmail.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
 | user@yahoo.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user@yahoo.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user@yahoo.com | [CaptainVerify](https://centminmod.com/captainverify) | unknown | null | null | yes | no |
 | user@yahoo.com | [Proofy.io](https://centminmod.com/proofy) | unknown | null | null | no | no |
 | user@yahoo.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user@yahoo.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
+| user@yahoo.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
 | user1@outlook.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user1@outlook.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user1@outlook.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
 | user1@outlook.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | yes | no |
 | user1@outlook.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user1@outlook.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
+| user1@outlook.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
 | user2@hotmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user2@hotmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user2@hotmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
 | user2@hotmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | yes | no |
 | user2@hotmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user2@hotmail.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
+| user2@hotmail.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
 
 ## EmailListVerify
 
@@ -4158,6 +4191,455 @@ Output stored successfully in R2: emailapi-zerobounce-cached/output_202405111220
 real    0m1.210s
 user    0m0.355s
 sys     0m0.031s
+```
+
+## Reoon API
+
+Add [Reoon](https://centminmod.com/reoon) API support
+
+[Reoon](https://centminmod.com/reoon) API enabled run `-api reoon -apikey_rn $reokey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `role_account`, `mx_accepts_mail`, `spamtrap`, `mx_records`, `overall_score`, `safe_to_send`, `can_connect_smtp`, `inbox_full`, `catch_all`, `deliverable`, `disabled` JSON field is from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
+
+Reoon has 2 modes for single email verification API which can be set via `-reoon_mode` to a value of either `quick` or `power`. The default mode without `-reoon_mode` being set is `quick`.
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api reoon -apikey_rn $reokey -tm all
+
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "role_account": "no",
+        "mx_accepts_mail": "no",
+        "spamtrap": "no",
+        "mx_records": null,
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    }
+]
+
+real    0m3.748s
+user    0m0.358s
+sys     0m0.028s
+```
+
+With `-reoon_mode power`. Currently, script hasn't been configured to grab the additional information provided by `power` mode.
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api reoon -apikey_rn $reokey -tm all -reoon_mode power
+
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "role_account": "no",
+        "mx_accepts_mail": "no",
+        "spamtrap": "no",
+        "mx_records": [],
+        "verification_mode": "power",
+        "overall_score": 0,
+        "safe_to_send": "no",
+        "can_connect_smtp": "no",
+        "inbox_full": "no",
+        "catch_all": "no",
+        "deliverable": "no",
+        "disabled": "no"
+    }
+]
+
+real    0m3.196s
+user    0m0.360s
+sys     0m0.026s
+```
+
+For email per verification API check for list of emails in `emaillist.txt` via `-l emaillist.txt`. The `status` JSON field is from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api reoon -apikey_rn $reokey -tm all
+
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "disposable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes",
+        "role_account": "yes",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "in.mailsac.com",
+            "alt.mailsac.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "no",
+        "spamtrap": "no",
+        "mx_records": null,
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "aspmx.l.google.com",
+            "alt1.aspmx.l.google.com",
+            "alt2.aspmx.l.google.com",
+            "aspmx2.googlemail.com",
+            "aspmx4.googlemail.com",
+            "aspmx3.googlemail.com",
+            "aspmx5.googlemail.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "aspmx.l.google.com",
+            "alt1.aspmx.l.google.com",
+            "alt2.aspmx.l.google.com",
+            "aspmx2.googlemail.com",
+            "aspmx4.googlemail.com",
+            "aspmx3.googlemail.com",
+            "aspmx5.googlemail.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "role_account": "yes",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "aspmx.l.google.com",
+            "alt1.aspmx.l.google.com",
+            "alt2.aspmx.l.google.com",
+            "aspmx2.googlemail.com",
+            "aspmx4.googlemail.com",
+            "aspmx3.googlemail.com",
+            "aspmx5.googlemail.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "role_account": "yes",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "aspmx.l.google.com",
+            "alt1.aspmx.l.google.com",
+            "alt2.aspmx.l.google.com",
+            "aspmx2.googlemail.com",
+            "aspmx4.googlemail.com",
+            "aspmx3.googlemail.com",
+            "aspmx5.googlemail.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "aspmx.l.google.com",
+            "alt1.aspmx.l.google.com",
+            "alt2.aspmx.l.google.com",
+            "aspmx2.googlemail.com",
+            "aspmx4.googlemail.com",
+            "aspmx3.googlemail.com",
+            "aspmx5.googlemail.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "aspmx.l.google.com",
+            "alt1.aspmx.l.google.com",
+            "alt2.aspmx.l.google.com",
+            "aspmx2.googlemail.com",
+            "aspmx4.googlemail.com",
+            "aspmx3.googlemail.com",
+            "aspmx5.googlemail.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "disposable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes",
+        "role_account": "yes",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "mx.discard.email"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "role_account": "yes",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "aspmx.l.google.com",
+            "alt2.aspmx.l.google.com",
+            "alt1.aspmx.l.google.com",
+            "aspmx2.googlemail.com",
+            "aspmx5.googlemail.com",
+            "aspmx3.googlemail.com",
+            "aspmx4.googlemail.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "gmail-smtp-in.l.google.com",
+            "alt1.gmail-smtp-in.l.google.com",
+            "alt2.gmail-smtp-in.l.google.com",
+            "alt3.gmail-smtp-in.l.google.com",
+            "alt4.gmail-smtp-in.l.google.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "gmail-smtp-in.l.google.com",
+            "alt1.gmail-smtp-in.l.google.com",
+            "alt2.gmail-smtp-in.l.google.com",
+            "alt3.gmail-smtp-in.l.google.com",
+            "alt4.gmail-smtp-in.l.google.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "mta7.am0.yahoodns.net",
+            "mta5.am0.yahoodns.net",
+            "mta6.am0.yahoodns.net"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "outlook-com.olc.protection.outlook.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "valid",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "role_account": "no",
+        "mx_accepts_mail": "yes",
+        "spamtrap": "no",
+        "mx_records": [
+            "hotmail-com.olc.protection.outlook.com"
+        ],
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    }
+]
+
+real    0m2.176s
+user    0m2.350s
+sys     0m0.050s
 ```
 
 # API Merge
