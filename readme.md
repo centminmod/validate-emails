@@ -298,7 +298,7 @@ aws_secret_access_key = your-s3-secret-access-key
 bucket_name = your-s3-bucket-name
 ```
 
-Below example to send `validate_emails.py` script results to Cloudflare R2 S3 object storage via `-store r2` argument. Using [EmailListVerify](https://centminmod.com/emaillistverify) per email check API `api emaillistverify -apikey $elvkey` + Cloudflare cached for 120 seconds `-apicache emaillistverify -apicachettl 120`
+Below example to send `validate_emails.py` script results to Cloudflare R2 S3 object storage via `-store r2` argument. Using [EmailListVerify](https://centminmod.com/emaillistverify) per email check API `-api emaillistverify -apikey $elvkey` + Cloudflare cached for 120 seconds `-apicache emaillistverify -apicachettl 120`
 
 ```
 time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com,hnyfmw2@canadlan-drugs.com,hnyfmw3@canadlan-drugs.com -api emaillistverify -apikey $elvkey -apicache emaillistverify -apicachettl 120 -tm all -store r2
@@ -353,7 +353,7 @@ cat $(ls -Art | tail -3 | grep 'email_verification')
 2024-05-11 05:14:26,092 - INFO - Cache result: unknown
 ```
 
-Non-cached [EmailListVerify](https://centminmod.com/emaillistverify) per email check API `api emaillistverify -apikey $elvkey` run
+Non-cached [EmailListVerify](https://centminmod.com/emaillistverify) per email check API `-api emaillistverify -apikey $elvkey` run
 
 ```
 time python validate_emails_s3.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com,hnyfmw2@canadlan-drugs.com,hnyfmw3@canadlan-drugs.com -api emaillistverify -apikey $elvkey -tm all -store r2
