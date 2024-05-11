@@ -30,6 +30,7 @@
   - [CaptainVerify API](#captainverify-api)
   - [Proofy API](#proofy-api)
   - [MyEmailVerifier API](#myemailverifier-api)
+  - [Zerobounce API](#zerobounce-api)
   - [API Merge](#api-merge)
     - [API Merge Filters](#api-merge-filters)
 - [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
@@ -58,6 +59,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
   - [MyEmailVerifier](https://centminmod.com/myemailverifier) [[example](#myemailverifier-api)]
   - [CaptainVerify](https://centminmod.com/captainverify) [[example](#captainverify-api)]
   - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
+  - [Zerobounce](https://centminmod.com/zerobounce) [[example](#zerobounce-api)]
   - [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
 - Supports [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage) for [EmailListVerify](https://centminmod.com/emaillistverify) per email check API
 - Classifies email addresses into various categories based on the syntax, DNS, and SMTP response
@@ -163,6 +165,7 @@ The available arguments are:
       - `myemailverifier`: Use the MyEmailVerifier API.
       - `captainverify`: Use the CaptainVerify API.
       - `proofy`: Use the Proofy API.
+      - `zerobounce`: Use the Zerobounce.net API.
   - `-apimerge`, `--api_merge` (optional):
     - Description: Merge and combine `emaillistverify` or `millionverifier` API results into one result
   - `-apibulk`, `--api_bulk` (optional):
@@ -175,6 +178,8 @@ The available arguments are:
     - Description: The API key for the MyEmailVerifier service.
   - `-apikey_cv`, `--captainverify_api_key` (optional):
     - Description: The API key for the CaptainVerify service.
+  - `-apikey_zb`, `--zerobounce_api_key` (optional):
+    - Description: The API key for the Zerobounce.net service.
   - `-apikey_pf`, `--proofy_api_key` (optional):
     - Description: The API key for the Proofy service.
   - `-apiuser_pf`, `--proofy_user_id` (optional):
@@ -1798,7 +1803,9 @@ Personal experience with all 5 providers:
 - CaptainVerify API is limited to a maximum of 2 simultaneous connections and 50 checks per minute for per email address verification checks. For the sample 15 email addresses tested below, took ~4.6 seconds to complete per email address verification checks
 - Proofy.io has the most restrictive API limits but I can't seem to find any documentation of the actual limits, so I have to code it so it isn't as fast as other providers for per email verification checks. It will be the slowest of the 5 providers for per email verification checks. For the sample 15 email addresses tested below, took ~9.5 seconds to complete per email address verification checks
 - Proofy.io only has [single email check](https://proofy.io/using-api) and [batch email checks](https://proofy.io/using-api) but no bulk file API support.
-- The number of API returned status value classifications returned by the 5 providers differs. Some have a more detailed classifications for emails than others.
+- ZeroBounce API was added on May 11, 2023. They have 100 free email credits per month, making it possible to keep my script's support and development testing costs down to a minimum. API documentation is very well documented. Only annoying this right now is the web site login session durations are very short, so annoyingly you get logged out very quickly making it more secure. Make sure you use a password manager to make re-logins less annoying. Though if you're using a script and their API, you don't have to login as frequently.
+- ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) - 50,000 requests in 10 seconds (validations) before temporarily blocking for 1 minute. A maximum of 250 requests in 1 minute for the` bulkapi.zerobounce.net/` before temporarily blocking for 1 hour. And allow a maximum of 20 requests in 1 minute for the `bulkapi.zerobounce.net/v2/validatebatch` before temporarily blocking for 10 minutes. Rate limits seem more complicated so will need to test my script to ensure it operates under their rate limits.
+- The number of API returned status value classifications returned by the various providers differs. Some have a more detailed classifications for emails than others.
   - EmailListVerify has 18 classifications:
     - ok
     - error
@@ -1839,32 +1846,46 @@ Personal experience with all 5 providers:
     - risky
     - undeliverable
     - unknown
+  - ZeroBounce has 7 classifications:
+    - valid
+    - invalid
+    - catch-all
+    - unknown
+    - spamtrap
+    - abuse
+    - do_not_mail
 
 ## Email Verification Provider Comparison Costs
 
 Below are their respectivate pay as you go credit pricing for email verifications. The usual recommendations are to verify your lists every 3-6 months which is 2-4x times per year. Have a 25K email list = 2-4 x 25K = 50-100K email verifications per year.
 
-| Provider                         | 1k        | 2k        | 5k        | 10k       | 25k       | 30k       | 50k       | 70k       | 100k      |
-|----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
-| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | $4 (0.0008) | -         | $15 (0.003)| $24 (0.0024)| $49 (0.00196)| -         | $89 (0.00178)| -         | $169 (0.00169)|
-| [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#table-compare))  | -         | -         | -         | $37 (0.0037)| $49 (0.00196)| -         | $77 (0.00154)| -         | $129 (0.00129)|
-| [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#table-compare)) | -         | $14 (0.007)| $28 (0.0056)| $39 (0.0039)| $79 (0.00316)| -         | $149 (0.00298)| -         | $239 (0.00239)|
-| [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#table-compare))   | $7 (0.007) | -         | $30 (0.006) | $60 (0.006) | $75 (0.003)  | -         | $150 (0.003) | -         | $200 (0.002)  |
-| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#table-compare))                    | -         | -         | $16 (0.0032)| $29 (0.0029)| -         | $63 (0.0021)| $99 (0.00198)| $124 (0.00177)| $149 (0.00149)|
+Update: May 11, 2023 add [Zerobounce](https://centminmod.com/zerobounce) API support
 
-| Provider                         | 200k      | 250k      | 300k      | 500k      | 1m        | 2.5m      | 5m        | 10m       |
+| Provider | 1k | 2k | 5k | 10k | 25k | 30k | 50k | 70k | 100k |
+|----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | $4 (0.0008) | - | $15 (0.003)| $24 (0.0024)| $49 (0.00196)| - | $89 (0.00178)| - | $169 (0.00169)|
+| [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#table-compare)) | - | - | - | $37 (0.0037)| $49 (0.00196)| - | $77 (0.00154)| - | $129 (0.00129)|
+| [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#table-compare)) | - | $14 (0.007)| $28 (0.0056)| $39 (0.0039)| $79 (0.00316)| - | $149 (0.00298)| - | $239 (0.00239)|
+| [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#table-compare)) | $7 (0.007) | - | $30 (0.006) | $60 (0.006) | $75 (0.003) | - | $150 (0.003) | - | $200 (0.002) |
+| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#table-compare)) | - | - | $16 (0.0032)| $29 (0.0029)| - | $63 (0.0021)| $99 (0.00198)| $124 (0.00177)| $149 (0.00149)|
+| [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#table-compare)) | - | $20 (0.01) | $45 (0.009) | $80 (0.008) | $190 (0.0076) | - | $375 (0.0075) | - | $425 (0.00425) |
+
+| Provider | 200k | 250k | 300k | 500k | 1m | 2.5m | 5m | 10m |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
-| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | -         | $349 (0.001396)| -         | $449 (0.000898)| $599 (0.000599)| $1190 (0.000476)| $1990 (0.000398)| $3290 (0.000329)|
-| [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#table-compare))  | -         | -         | -         | $259 (0.000518)| $389 (0.000389)| -         | $1439 (0.000288)| $2529 (0.000253)|
-| [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#table-compare)) | -         | $349 (0.001396)| -         | $549 (0.001098)| $749 (0.000749)| $1249 (0.0005) | $1849 (0.00037)| -         |
-| [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#table-compare))   | -         | $250 (0.001)  | -         | $500 (0.001)  | $650 (0.00065)| -         | $2000 (0.0004) | -         |
-| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#table-compare))                    | $229 (0.001145)| -         | $289 (0.000963)| $429 (0.000858)| $699 (0.000699)| $1399 (0.00056)| -         | -         |
+| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#table-compare)) | - | $349 (0.001396)| - | $449 (0.000898)| $599 (0.000599)| $1190 (0.000476)| $1990 (0.000398)| $3290 (0.000329)|
+| [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#table-compare)) | - | - | - | $259 (0.000518)| $389 (0.000389)| - | $1439 (0.000288)| $2529 (0.000253)|
+| [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#table-compare)) | - | $349 (0.001396)| - | $549 (0.001098)| $749 (0.000749)| $1249 (0.0005) | $1849 (0.00037)| - |
+| [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#table-compare)) | - | $250 (0.001) | - | $500 (0.001) | $650 (0.00065)| - | $2000 (0.0004) | - |
+| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#table-compare)) | $229 (0.001145)| - | $289 (0.000963)| $429 (0.000858)| $699 (0.000699)| $1399 (0.00056)| - | - |
+| [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#table-compare)) | - | $940 (0.00376) | - | $1800 (0.0036) | $2750 (0.00275) | - | - | - |
 
 ## Email Verification Provider API Speed & Rate Limits
 
 From fastest to slowest ranked from my API tests overall and from gathered API documentation from each respective email verification provider's web site. Speed wise, [EmailListVerify](https://centminmod.com/emaillistverify) and [MillionVerifier](https://centminmod.com/millionverifier) are neck and neck on per email verification API checks. However, for bulk file API email verification checks, [MillionVerifier](https://centminmod.com/millionverifier) wins by a lot. 
 
 MillionVerifier has more detailed email verification speed information for the bulk file email verification [here](https://help.millionverifier.com/bulk-email-verification/email-verification-speed) which I assume is for the web site dashboard and not for their API.
+
+Updated: May 11, 2023 add [Zerobounce](https://centminmod.com/zerobounce) API support. ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) and will update the below table after I have done some tests.
 
 | Provider Rank For API Speed      | emails/sec | emails/min |
 |----------|--------------|-------------|
@@ -3886,6 +3907,175 @@ mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pop@doma
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'pip@domain1.com';" xenforo
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@tempr.email';" xenforo
 mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gmail.com';" xenforo
+```
+
+## Zerobounce API
+
+Add [Zerobounce](https://centminmod.com/zerobounce) API support
+
+[Zerobounce](https://centminmod.com/zerobounce) API enabled run `-api zerobounce -apikey_zb $zbkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `sub_status` and `free_email_api` JSON fields are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
+
+```
+python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all
+
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "sub_status": "no_dns_entries",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    }
+]
+```
+
+For email per verification API check for list of emails in `emaillist.txt` via `-l emaillist.txt`. The `status`, `sub_status` and `free_email_api` JSON fields are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
+
+```
+time python validate_emails_s3.py -f user@domain1.com -l emaillist.txt -tm all -api zerobounce -apikey_zb $zbkey -tm all
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "do_not_mail",
+        "sub_status": "disposable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes",
+        "free_email_api": "yes"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "invalid",
+        "sub_status": "no_dns_entries",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "valid",
+        "sub_status": "alias_address",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "invalid",
+        "sub_status": "mailbox_not_found",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "invalid",
+        "sub_status": "mailbox_not_found",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "invalid",
+        "sub_status": "mailbox_not_found",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "invalid",
+        "sub_status": "mailbox_not_found",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "invalid",
+        "sub_status": "mailbox_not_found",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "do_not_mail",
+        "sub_status": "disposable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "free_email_api": "yes"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "do_not_mail",
+        "sub_status": "role_based",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "valid",
+        "sub_status": "",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "invalid",
+        "sub_status": "mailbox_not_found",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "valid",
+        "sub_status": "",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "valid",
+        "sub_status": "",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "valid",
+        "sub_status": "",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes"
+    }
+]
+
+real    0m4.794s
+user    0m2.218s
+sys     0m0.065s
 ```
 
 # API Merge
