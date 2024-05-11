@@ -1669,11 +1669,46 @@ Personal experience with all 5 providers:
 - Proofy.io has the most restrictive API limits but I can't seem to find any documentation of the actual limits, so I have to code it so it isn't as fast as other providers for per email verification checks. It will be the slowest of the 5 providers for per email verification checks. For the sample 15 email addresses tested below, took ~9.5 seconds to complete per email address verification checks
 - Proofy.io only has [single email check](https://proofy.io/using-api) and [batch email checks](https://proofy.io/using-api) but no bulk file API support.
 - The number of API returned status value classifications returned by the 5 providers differs. Some have a more detailed classifications for emails than others.
-  - EmailListVerify has 18 classifications [ok, error, invalid_mx, smtp_error, smtp_protocol, unknown_email, attempt_rejected, relay_error, antispam_system, email_disabled, domain_error, ok_for_all, dead_server, syntax_error, unknown, accept_all, disposable, spamtrap]
-  - MillionVerifier has 5 classifications [ok, catch_all, unknown, disposable, invalid]
-  - MyEmailVerifier has 4 classifications [valid, invalid, catch-all, unknown]
-  - CaptainVerify has 4 classifications [valid, invalid, risky, unknown]
-  - Proofy.io has 4 classifications [deliverable, risky, undeliverable, unknown]
+  - EmailListVerify has 18 classifications:
+    - ok
+    - error
+    - invalid_mx
+    - smtp_error
+    - smtp_protocol
+    - unknown_email
+    - attempt_rejected
+    - relay_error
+    - antispam_system
+    - email_disabled
+    - domain_error
+    - ok_for_all
+    - dead_server
+    - syntax_error
+    - unknown
+    - accept_all
+    - disposable
+    - spamtrap
+  - MillionVerifier has 5 classifications:
+    - ok
+    - catch_all
+    - unknown
+    - disposable
+    - invalid
+  - MyEmailVerifier has 4 classifications:
+    - valid
+    - invalid
+    - catch-all
+    - unknown
+  - CaptainVerify has 4 classifications:
+    - valid
+    - invalid
+    - risky
+    - unknown
+  - Proofy.io has 4 classifications:
+    - deliverable
+    - risky
+    - undeliverable
+    - unknown
 
 ## Email Verification Provider Comparison Costs
 
