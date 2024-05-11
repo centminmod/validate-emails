@@ -4078,6 +4078,40 @@ user    0m2.218s
 sys     0m0.065s
 ```
 
+Test ZeroBounce per email check API `-api zerobounce -apikey_zb $zbkey` with Cloudflare Cache `-apicache zerobounce -apicachettl 900`
+
+```
+time python validate_emails_s3.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all -apicache zerobounce -apicachettl 900
+
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    }
+]
+
+real    0m0.777s
+user    0m0.253s
+sys     0m0.034s
+```
+
+Log inspection
+
+```
+cat $(ls -Art | tail -3 | grep 'email_verification')
+
+2024-05-11 11:28:05,131 - INFO - Cache result: {'address': 'hnyfmw@canadlan-drugs.com', 'status': 'invalid', 'sub_status': 'no_dns_entries', 'free_email': False, 'did_you_mean': None, 'account': 'hnyfmw', 'domain': 'canadlan-drugs.com', 'domain_age_days': '2026', 'smtp_provider': '', 'mx_found': 'false', 'mx_record': '', 'firstname': None, 'lastname': None, 'gender': None, 'country': None, 'region': None, 'city': None, 'zipcode': None, 'processed_at': '2024-05-11 10:37:39.035'}
+```
+
+Cloudflare KV storage entries
+
+| Key                                        | Value                                           |
+|--------------------------------------------|--------------------------------------------------|
+| zerobounce:hnyfmw@canadlan-drugs.com  | {"result":{"address":"hnyfmw@canadlan-drugs.com","status":"invalid","sub_status":"no_dns_entries","free_email":false,"did_you_mean":null,"account":"hnyfmw","domain":"canadlan-drugs.com","domain_age_days":"2026","smtp_provider":"","mx_found":"false","mx_record":"","firstname":null,"lastname":null,"gender":null,"country":null,"region":null,"city":null,"zipcode":null,"processed_at":"2024-05-11 11:39:24.133"},"timestamp":1715427564270,"ttl":900}  |
+
 # API Merge
 
 Added support for `-apimerge` argument which allows you to merge Merging [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results. 
@@ -5168,7 +5202,7 @@ Remember to replace `results.txt` with the actual path to your file if it's loca
 
 # Cloudflare HTTP Forward Proxy Cache With KV Storage
 
-`validate_emails.py` script's [EmailListVerify](https://centminmod.com/emaillistverify) per email check API routines has been updated to support a custom Cloudflare HTTP forward proxy Worker cache configuration which can take the script's API request and forward it to EmailListVerify's API endpoint. The Cloudflare Worker script will then save the API result into Cloudflare KV storage on their edge servers and save with a date timestamp. This can potentially reduce your overall [EmailListVerify](https://centminmod.com/emaillistverify) per email verification costs if you need to run `validate_emails.py` a few times back to back bypassing having to need to call `validate_emails.py` API itself.
+`validate_emails.py` script's [EmailListVerify](https://centminmod.com/emaillistverify)and [Zerobounce](https://centminmod.com/zerobounce) per email check API routines has been updated to support a custom Cloudflare HTTP forward proxy Worker cache configuration which can take the script's API request and forward it to EmailListVerify's API endpoint. The Cloudflare Worker script will then save the API result into Cloudflare KV storage on their edge servers and save with a date timestamp. This can potentially reduce your overall [EmailListVerify](https://centminmod.com/emaillistverify) per email verification costs if you need to run `validate_emails.py` a few times back to back bypassing having to need to call `validate_emails.py` API itself.
 
 `validate_emails.py` script added `-apicache`, `-apicachettl`, `-apicache-purge` and `-apicachecheck` arguments:
 
@@ -5300,6 +5334,40 @@ Cloudflare KV storage entries
 | Key                                        | Value                                           |
 |--------------------------------------------|--------------------------------------------------|
 | emaillistverify:hnyfmw5@canadlan-drugs.com  | {"result":"unknown","timestamp":1715175271549,"ttl":120}  |
+
+For ZeroBounce per email check API `-api zerobounce -apikey_zb $zbkey` with Cloudflare Cache `-apicache zerobounce -apicachettl 900`
+
+```
+time python validate_emails_s3.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all -apicache zerobounce -apicachettl 900
+
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no"
+    }
+]
+
+real    0m0.777s
+user    0m0.253s
+sys     0m0.034s
+```
+
+Log inspection
+
+```
+cat $(ls -Art | tail -3 | grep 'email_verification')
+
+2024-05-11 11:28:05,131 - INFO - Cache result: {'address': 'hnyfmw@canadlan-drugs.com', 'status': 'invalid', 'sub_status': 'no_dns_entries', 'free_email': False, 'did_you_mean': None, 'account': 'hnyfmw', 'domain': 'canadlan-drugs.com', 'domain_age_days': '2026', 'smtp_provider': '', 'mx_found': 'false', 'mx_record': '', 'firstname': None, 'lastname': None, 'gender': None, 'country': None, 'region': None, 'city': None, 'zipcode': None, 'processed_at': '2024-05-11 10:37:39.035'}
+```
+
+Cloudflare KV storage entries
+
+| Key                                        | Value                                           |
+|--------------------------------------------|--------------------------------------------------|
+| zerobounce:hnyfmw@canadlan-drugs.com  | {"result":{"address":"hnyfmw@canadlan-drugs.com","status":"invalid","sub_status":"no_dns_entries","free_email":false,"did_you_mean":null,"account":"hnyfmw","domain":"canadlan-drugs.com","domain_age_days":"2026","smtp_provider":"","mx_found":"false","mx_record":"","firstname":null,"lastname":null,"gender":null,"country":null,"region":null,"city":null,"zipcode":null,"processed_at":"2024-05-11 11:39:24.133"},"timestamp":1715427564270,"ttl":900}  |
 
 ## Cloudflare Cache Purge Support
 
