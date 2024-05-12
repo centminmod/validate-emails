@@ -1899,6 +1899,7 @@ Personal experience with all 5 providers:
 - Reoon as added on May 12, 2024 and says they take around 20 minutes to verify a set of 50,000 mixed-quality email addresses. The 15 email address sameple test took 2.176 seconds to complete.
 - Reoon doesn't charge for `unknown` status emails
 - Reoon do not store any uploaded data for more than 15 days
+- Reon has detailed API credit usage and balance logs just like MillionVerifier
 - Bouncify was added May 12, 2024 and seems to be the slowest to date for API response for single email and 15 sample email address API tests took 184+ seconds even though they have a 120 concurrent request API limit and seem to have trouble validating the `@yahoo.com` and `@hotmail.com` accounts in my 15 email address sample list [here](#bouncify-api).
 - The number of API returned status value classifications returned by the various providers differs. Some have a more detailed classifications for emails than others.
   - EmailListVerify has 18 classifications:
