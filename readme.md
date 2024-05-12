@@ -2019,7 +2019,7 @@ Below are their respectivate pay as you go credit pricing for email verification
 
 ## Email Verification Provider API Speed & Rate Limits
 
-From fastest to slowest ranked from my API tests overall and from gathered API documentation from each respective email verification provider's web site. Speed wise, [EmailListVerify](https://centminmod.com/emaillistverify) and [MillionVerifier](https://centminmod.com/millionverifier) are neck and neck on per email verification API checks. However, for bulk file API email verification checks, [MillionVerifier](https://centminmod.com/millionverifier) wins by a lot. 
+From fastest to slowest ranked from my API tests overall and from gathered API documentation from each respective email verification provider's web site. Speed wise on command line, [EmailListVerify](https://centminmod.com/emaillistverify) and [MillionVerifier](https://centminmod.com/millionverifier) are neck and neck on per email verification API checks. However, for bulk file API email verification checks, [MillionVerifier](https://centminmod.com/millionverifier) wins by a lot. Also added tests as a [PHP Wrapper](#php-wrapper) where each API providers' times performed differently commanded to command line.
 
 MillionVerifier has more detailed email verification speed information for the bulk file email verification [here](https://help.millionverifier.com/bulk-email-verification/email-verification-speed) which I assume is for the web site dashboard and not for their API.
 
