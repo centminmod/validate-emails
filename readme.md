@@ -1897,6 +1897,7 @@ Personal experience with all 5 providers:
 - ZeroBounce doesn't charge for `unknown` status emails
 - ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) - 50,000 requests in 10 seconds (validations) before temporarily blocking for 1 minute. A maximum of 250 requests in 1 minute for the` bulkapi.zerobounce.net/` before temporarily blocking for 1 hour. And allow a maximum of 20 requests in 1 minute for the `bulkapi.zerobounce.net/v2/validatebatch` before temporarily blocking for 10 minutes. Rate limits seem more complicated so will need to test my script to ensure it operates under their rate limits.
 - Reoon as added on May 12, 2024 and says they take around 20 minutes to verify a set of 50,000 mixed-quality email addresses. The 15 email address sameple test took 2.176 seconds to complete.
+- Reoon unfortunately incorrectly classified `op999@gmail.com` as a `valid` email when it isn't and marked by all other APIs as `invalid`/`undeliverable`/`email_disabled`
 - Reoon doesn't charge for `unknown` status emails
 - Reoon do not store any uploaded data for more than 15 days
 - Reon has detailed API credit usage and balance logs just like MillionVerifier
