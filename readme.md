@@ -32,6 +32,7 @@
   - [MyEmailVerifier API](#myemailverifier-api)
   - [Zerobounce API](#zerobounce-api),
   - [Reoon API](#reoon-api)
+  - [Bouncify API](#bouncify-api)
   - [API Merge](#api-merge)
     - [API Merge Filters](#api-merge-filters)
 - [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
@@ -63,6 +64,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
   - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
   - [Zerobounce](https://centminmod.com/zerobounce) [[example](#zerobounce-api)]
   - [Reoon](https://centminmod.com/reoon) [[example](#reoon-api)]
+  - [Bouncify](https://centminmod.com/bouncify) [[example](#bouncify-api)]
   - [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
 - Supports [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage) for [EmailListVerify](https://centminmod.com/emaillistverify) per email check API
 - Classifies email addresses into various categories based on the syntax, DNS, and SMTP response
@@ -94,14 +96,14 @@ usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATC
                              [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
                              [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
                              [-wf WORKER_FACTOR]
-                             [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier,zerobounce,reoon}]
+                             [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier,zerobounce,reoon,bouncify}]
                              [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
                              [-apibulk {emaillistverify,millionverifier,proofy}] [-apikey_cv CAPTAINVERIFY_API_KEY]
                              [-apikey_pf PROOFY_API_KEY] [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS]
                              [-pf_batchsize PROOFY_BATCH_SIZE] [-apikey_mev MYEMAILVERIFIER_API_KEY] [-apikey_zb ZEROBOUNCE_API_KEY]
-                             [-apikey_rn REOON_API_KEY] [-reoon_mode {quick,power}] [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
-                             [-apicache {emaillistverify,zerobounce}] [-apicachettl APICACHETTL] [-apicachecheck {count,list,purge}]
-                             [-apicache-purge] [-store {r2,s3}] [-store-list]
+                             [-apikey_rn REOON_API_KEY] [-reoon_mode {quick,power}] [-apikey_bf BOUNCIFY_API_KEY]
+                             [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge] [-apicache {emaillistverify,zerobounce}]
+                             [-apicachettl APICACHETTL] [-apicachecheck {count,list,purge}] [-apicache-purge] [-store {r2,s3}] [-store-list]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
@@ -187,9 +189,11 @@ The available arguments are:
   - `-apikey_zb`, `--zerobounce_api_key` (optional):
     - Description: The API key for the Zerobounce.net service.
   - `-apikey_rn`, `--reoon_api_key` (optional):
-    - Description: The API key for the Zerobounce.net service.
+    - Description: The API key for the Reoon service.
   - `-reoon_mode`, `--reoon_mode`
     - Description: Reoon verification mode `quick` or `power`
+  - `-apikey_bf`, `--bouncify_api_key`
+    - Description: The API key for the Bouncify service.
   - `-apikey_pf`, `--proofy_api_key` (optional):
     - Description: The API key for the Proofy service.
   - `-apiuser_pf`, `--proofy_user_id` (optional):
@@ -970,6 +974,29 @@ user    0m0.358s
 sys     0m0.028s
 ```
 
+`validate_emails.py` using external [Bouncify](https://centminmod.com/bouncify) API enabled run `-api bouncify -apikey_bf $bfkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `free_email_api`, `disposable_email_api`, `role_api`, and `spamtrap_api` JSON field are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api bouncify -apikey_bf $bfkey -tm all
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    }
+]
+
+real    0m7.900s
+user    0m0.357s
+sys     0m0.030s
+```
+
 ## EmailListVerify
 
 Here's a comparison using a commercial paid service [EmailListVerify](https://centminmod.com/emaillistverify) for the same `emaillist.txt` tested above. You can sign up using my affiliate link for [EmailListVerify](https://centminmod.com/emaillistverify) and free accounts get 100 free email verifications for starters.
@@ -1727,7 +1754,7 @@ python validate_emails.py -f user@domain.com -e user+to@domain.com -tm syntax
 
 # API Support
 
-In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy), [Zerobounce](https://centminmod.com/zerobounce), [Reoon(https://centminmod.com/reoon). Links to services maybe affiliate links. If you found this information useful ;)
+In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy), [Zerobounce](https://centminmod.com/zerobounce), [Reoon(https://centminmod.com/reoon), [Bouncify](https://centminmod.com/bouncify). Links to services maybe affiliate links. If you found this information useful ;)
 
 Updated: Added [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
 
@@ -1868,9 +1895,10 @@ Personal experience with all 5 providers:
 - ZeroBounce API was added on May 11, 2024. For sample 15 email addresses, it took 4.794 seconds via per email check API. They have 100 free email credits per month, making it possible to keep my script's support and development testing costs down to a minimum. API documentation is very well documented. Only annoying this right now is the web site login session durations are very short, so annoyingly you get logged out very quickly making it more secure. Make sure you use a password manager to make re-logins less annoying. Though if you're using a script and their API, you don't have to login as frequently.
 - ZeroBounce doesn't charge for `unknown` status emails
 - ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) - 50,000 requests in 10 seconds (validations) before temporarily blocking for 1 minute. A maximum of 250 requests in 1 minute for the` bulkapi.zerobounce.net/` before temporarily blocking for 1 hour. And allow a maximum of 20 requests in 1 minute for the `bulkapi.zerobounce.net/v2/validatebatch` before temporarily blocking for 10 minutes. Rate limits seem more complicated so will need to test my script to ensure it operates under their rate limits.
-- Reoon says they take around 20 minutes to verify a set of 50,000 mixed-quality email addresses.
+- Reoon as added on May 12, 2024 and says they take around 20 minutes to verify a set of 50,000 mixed-quality email addresses.
 - Reoon doesn't charge for `unknown` status emails
 - Reoon do not store any uploaded data for more than 15 days
+- Bouncify was added May 12, 2024 and seems to be the slowest to date for API response for single email and 15 sample email address API tests even though they have a 120 concurrent request API limit and seem to have trouble validating the `@yahoo.com` and `@hotmail.com` accounts in my 15 email address sample list [here](#bouncify-api).
 - The number of API returned status value classifications returned by the various providers differs. Some have a more detailed classifications for emails than others.
   - EmailListVerify has 18 classifications:
     - ok
@@ -1950,6 +1978,11 @@ Personal experience with all 5 providers:
     - invalid
     - disposable
     - spamtrap
+  - Bouncify has 4 classifications
+    - deliverable
+    - undeliverable
+    - unknown
+    - accept-all
 
 
 ## Email Verification Provider Comparison Costs
@@ -1968,6 +2001,7 @@ Below are their respectivate pay as you go credit pricing for email verification
 | [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-results-table-compare)) | - | - | $16 (0.0032)| $29 (0.0029)| - | $63 (0.0021)| $99 (0.00198)| $124 (0.00177)| $149 (0.00149)|
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-results-table-compare)) | - | $20 (0.01) | $45 (0.009) | $80 (0.008) | $190 (0.0076) | - | $375 (0.0075) | - | $425 (0.00425) |
 | [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | - | - | - | $11.91 (0.00119) | $29.66 (0.00119) | - | $58.95 (0.00118) | $87.86 (0.00126) | $116.40 (0.00116) |
+| [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-results-table-compare)) | - | - | - | $19 (0.0019) | - | $39 (0.0013) | - | - | $99 (0.001) |
 
 | Provider | 200k | 250k | 300k | 500k | 1m | 2.5m | 5m | 10m |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
@@ -1978,6 +2012,7 @@ Below are their respectivate pay as you go credit pricing for email verification
 | [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-results-table-compare)) | $229 (0.001145)| - | $289 (0.000963)| $429 (0.000858)| $699 (0.000699)| $1399 (0.00056)| - | - |
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-results-table-compare)) | - | $940 (0.00376) | - | $1800 (0.0036) | $2750 (0.00275) | - | - | - |
 | [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | $226.80 (0.00113) | $279.75 (0.00112) | $331.20 (0.00110) | $522.00 (0.00104) | $960.00 (0.00096) | - | - | - |
+| [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-results-table-compare)) | $149 (0.00075) | - | - | $279 (0.00056) | $479 (0.00048) | - | - | - |
 
 ## Email Verification Provider API Speed & Rate Limits
 
@@ -1987,7 +2022,9 @@ MillionVerifier has more detailed email verification speed information for the b
 
 Updated: May 11, 2024 add [Zerobounce](https://centminmod.com/zerobounce) API support. ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) and will update the below table after I have done some tests.
 
-Updated: May 12, 2024 add [Reoon](https://centminmod.com/reoon) API support. Will update below table after I have done some tests.
+Updated: May 12, 2024 
+  - add [Reoon](https://centminmod.com/reoon) API support. Will update below table after I have done some tests.
+  - add [Bouncify](https://centminmod.com/bouncify) API support. Will update below table after I have done some tests.
 
 | Provider Rank For API Speed      | emails/sec | emails/min |
 |----------|--------------|-------------|
@@ -2012,6 +2049,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user@mailsac.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | yes | yes |
 | user@mailsac.com | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | disposable | null | yes | yes |
 | user@mailsac.com | [Reoon](https://centminmod.com/reoon) | disposable | null | null | yes | yes |
+| user@mailsac.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | yes | yes |
 | xyz@centmil1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | no | no |
 | xyz@centmil1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | xyz@centmil1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
@@ -2019,6 +2057,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | xyz@centmil1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | xyz@centmil1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | no_dns_entries | null | no | no |
 | xyz@centmil1.com | [Reoon](https://centminmod.com/reoon) | invalid | null | null | no | no |
+| xyz@centmil1.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | no | no |
 | user+to@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | no | no |
 | user+to@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | false | no |
 | user+to@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | no | no |
@@ -2026,6 +2065,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user+to@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | no | no |
 | user+to@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | valid | alias_address | null | no | no |
 | user+to@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
+| user+to@domain1.com | [Bouncify](https://centminmod.com/bouncify) | deliverable | null | null | no | no |
 | xyz@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | xyz@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | xyz@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
@@ -2033,6 +2073,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | xyz@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | xyz@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | xyz@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
+| xyz@domain1.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | no | no |
 | abc@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | abc@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | abc@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
@@ -2040,6 +2081,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | abc@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | abc@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | abc@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
+| abc@domain1.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | no | no |
 | 123@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | 123@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | 123@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | no |
@@ -2047,6 +2089,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | 123@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | 123@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | 123@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
+| 123@domain1.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | no | no |
 | pop@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | pop@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | pop@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
@@ -2054,6 +2097,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | pop@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | pop@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | pop@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
+| pop@domain1.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | no | no |
 | pip@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | pip@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | pip@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
@@ -2061,6 +2105,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | pip@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | pip@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | pip@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
+| pip@domain1.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | no | no |
 | user@tempr.email | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | no | yes |
 | user@tempr.email | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | null | false | yes |
 | user@tempr.email | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | yes |
@@ -2068,6 +2113,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user@tempr.email | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | yes |
 | user@tempr.email | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | disposable | null | no | yes |
 | user@tempr.email | [Reoon](https://centminmod.com/reoon) | disposable | null | null | yes | yes |
+| user@tempr.email | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | no | yes |
 | info@domain2.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | no | no |
 | info@domain2.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | false | no |
 | info@domain2.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | no |
@@ -2075,6 +2121,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | info@domain2.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | no | no |
 | info@domain2.com | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | role_based | null | no | no |
 | info@domain2.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
+| info@domain2.com | [Bouncify](https://centminmod.com/bouncify) | deliverable | null | null | no | no |
 | user@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
@@ -2082,6 +2129,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user@gmail.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
 | user@gmail.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
+| user@gmail.com | [Bouncify](https://centminmod.com/bouncify) | deliverable | null | null | yes | no |
 | op999@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | yes | no |
 | op999@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | true | no |
 | op999@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | yes | no |
@@ -2089,6 +2137,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | op999@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | yes | no |
 | op999@gmail.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | yes | no |
 | op999@gmail.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
+| op999@gmail.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | yes | no |
 | user@yahoo.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user@yahoo.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user@yahoo.com | [CaptainVerify](https://centminmod.com/captainverify) | unknown | null | null | yes | no |
@@ -2096,6 +2145,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user@yahoo.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user@yahoo.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
 | user@yahoo.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
+| user@yahoo.com | [Bouncify](https://centminmod.com/bouncify) | accept-all | null | null | yes | no |
 | user1@outlook.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user1@outlook.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user1@outlook.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
@@ -2103,6 +2153,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user1@outlook.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user1@outlook.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
 | user1@outlook.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
+| user1@outlook.com | [Bouncify](https://centminmod.com/bouncify) | deliverable | null | null | yes | no |
 | user2@hotmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user2@hotmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user2@hotmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
@@ -2110,6 +2161,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user2@hotmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user2@hotmail.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
 | user2@hotmail.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
+| user2@hotmail.com | [Bouncify](https://centminmod.com/bouncify) | api_error | null | null | yes | no |
 
 ## EmailListVerify
 
@@ -4697,6 +4749,237 @@ time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api
 real    0m2.176s
 user    0m2.350s
 sys     0m0.050s
+```
+
+Add [Bouncify](https://centminmod.com/bouncify) API support
+
+[Bouncify](https://centminmod.com/bouncify) API enabled run `-api bouncify -apikey_bf $bfkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `free_email_api`, `disposable_email_api`, `role_api`, and `spamtrap_api` JSON field are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api bouncify -apikey_bf $bfkey -tm all
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    }
+]
+
+real    0m7.900s
+user    0m0.357s
+sys     0m0.030s
+```
+
+For email per verification API check for list of emails in `emaillist.txt` via `-l emaillist.txt`. The `status`, `free_email_api`, `disposable_email_api`, `role_api`, and `spamtrap_api` JSON field are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
+
+Seems to be the slowest API processing time email verification providers tested to date and had a API issues. The diagnostic log shows that Bouncify API marked incorrectly that the `user@yahoo.com` email address as an `accept-all` email address and validation for `user2@hotmail.com` email address timed out. Their API docs at https://bouncify.readme.io/reference/single-validation-api, suggest a 120 concurrent request API limit and that `Apart from undeliverable, for the results deliverable, accept-all and unknown do not reject the email address and proceed with your work flow. Both accept-all and unknown emails could not be validated, so they may be valid email address.`
+
+```
+2024-05-12 12:44:44,519 - ERROR - Unexpected API response for user2@hotmail.com: {'result': 'Validation timedout', 'success': False}
+```
+
+```
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api bouncify -apikey_bf $bfkey -tm all
+[
+    {
+        "email": "user@mailsac.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "yes",
+        "free_email_api": "yes",
+        "disposable_email_api": "yes",
+        "role_api": "yes",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "xyz@centmil1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "user+to@domain1.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "xyz@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "abc@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "123@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "pop@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "pip@domain1.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "user@tempr.email",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "free_email_api": "no",
+        "disposable_email_api": "yes",
+        "role_api": "yes",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "info@domain2.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "yes",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "user@gmail.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "op999@gmail.com",
+        "status": "undeliverable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "user@yahoo.com",
+        "status": "accept-all",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "user1@outlook.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    },
+    {
+        "email": "user2@hotmail.com",
+        "status": "api_error",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "no",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    }
+]
+
+real    3m4.412s
+user    0m2.366s
+sys     0m0.049s
+```
+
+Re-trying the Hotmail `user2@hotmail.com` re-tried individually worked without timeouts
+
+```
+time python validate_emails.py -f user@domain1.com -e user2@hotmail.com -tm all -api bouncify -apikey_bf $bfkey -tm all
+[
+    {
+        "email": "user2@hotmail.com",
+        "status": "deliverable",
+        "status_code": null,
+        "free_email": "yes",
+        "disposable_email": "no",
+        "free_email_api": "yes",
+        "disposable_email_api": "no",
+        "role_api": "no",
+        "spamtrap_api": "no"
+    }
+]
+
+real    0m3.516s
+user    0m0.362s
+sys     0m0.025s
 ```
 
 # API Merge
