@@ -40,6 +40,7 @@
   - [Cloudflare Cache Purge Support](#cloudflare-cache-purge-support)
   - [EmailListVeirfy Bulk File API Cloudflare Cache Support](#emaillistveirfy-bulk-file-api-cloudflare-cache-support)
   - [EmailListVerify API Check Times: Regular vs Cached](#emaillistverify-api-check-times-regular-vs-cached)
+- [PHP Wrapper](#php-wrapper)
 
 ## Overview
 The `validate_emails.py` is a Python-based tool for email verification and email validation that allows you to classify your email addresses' status using syntax, DNS, and SMTP (Simple Mail Transfer Protocol) and other checks and 3rd party APIs. Using the script's returned status classifications, you can then clean or scrub your email lists. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support). The script's [API Merge support](#api-merge) also allows you to combine 2 API email verification providers results into one JSON formated output for double verification checks. The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
@@ -7381,3 +7382,46 @@ real    0m0.944s
 user    0m2.316s
 sys     0m0.050s
 ```
+
+# PHP Wrapper
+
+Created a simplistic PHP wrapper script to call `validate_emails.py` from that can test multiple email verification API providers as well as local non-API tests for a single inputted email address. The PHP wrapper will also time how long it takes to return an email verification check's JSON response. This was tested on a PHP 8.3.6 based [Centmin Mod LEMP stack server](https://centminmod.com).
+
+First one is local non-API test = 0.516784s
+
+![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_00.png)
+
+[EmailListVerify](https://centminmod.com/emaillistverify) = 2.96s
+
+![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_01.png)
+
+[MillionVerifier](https://centminmod.com/millionverifier) = 0.84s
+
+![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_02.png)
+
+[CaptainVerify](https://centminmod.com/captainverify) = 21.96s
+
+![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_03.png)
+
+[Proofy.io](https://centminmod.com/proofy) = 31.77s for api_error ran out of credits right now
+
+![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_08.png)
+
+[MyEmailVerifier](https://centminmod.com/myemailverifier) = 3.09s
+
+![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_04.png)
+
+[Zerobounce](https://centminmod.com/zerobounce) = 0.68s
+
+![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_05.png)
+
+[Reoon](https://centminmod.com/reoon) = 0.72s
+
+![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_06.png)
+
+[Bouncify](https://centminmod.com/bouncify) = 1.04s
+
+![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_07.png)
+
+
+
