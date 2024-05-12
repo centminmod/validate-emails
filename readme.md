@@ -4751,6 +4751,8 @@ user    0m2.350s
 sys     0m0.050s
 ```
 
+# Bouncify API
+
 Add [Bouncify](https://centminmod.com/bouncify) API support
 
 [Bouncify](https://centminmod.com/bouncify) API enabled run `-api bouncify -apikey_bf $bfkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `free_email_api`, `disposable_email_api`, `role_api`, and `spamtrap_api` JSON field are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
