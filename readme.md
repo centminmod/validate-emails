@@ -1991,6 +1991,7 @@ Below are their respectivate pay as you go credit pricing for email verification
 
 - Update: May 11, 2024 add [Zerobounce](https://centminmod.com/zerobounce) API support
 - Update: May 12, 2024 add [Reoon](https://centminmod.com/reoon) API support
+          May 12, 2024 add [Bouncify](https://centminmod.com/bouncify) API support
 
 | Provider | 1k | 2k | 5k | 10k | 25k | 30k | 50k | 70k | 100k |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
