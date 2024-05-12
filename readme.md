@@ -918,6 +918,58 @@ sys     0m0.022s
 
 Unfortunately, I ran out of credits to test with [Proofy.io](https://centminmod.com/proofy).
 
+`validate_emails.py` using external [Zerobounce](https://centminmod.com/zerobounce) API enabled run `-api zerobounce -apikey_zb $zbkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `sub_status` and `free_email_api` JSON fields are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
+
+```
+python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all
+
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "sub_status": "no_dns_entries",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": "no"
+    }
+]
+```
+
+`validate_emails.py` using external [Reoon](https://centminmod.com/reoon) API enabled run `-api reoon -apikey_rn $reokey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `role_account`, `mx_accepts_mail`, `spamtrap`, `mx_records`, `overall_score`, `safe_to_send`, `can_connect_smtp`, `inbox_full`, `catch_all`, `deliverable`, `disabled` JSON field is from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
+
+Reoon has 2 modes for single email verification API which can be set via `-reoon_mode` to a value of either `quick` or `power`. The default mode without `-reoon_mode` being set is `quick`.
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api reoon -apikey_rn $reokey -tm all
+
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "yes",
+        "role_account": "no",
+        "mx_accepts_mail": "no",
+        "spamtrap": "no",
+        "mx_records": null,
+        "verification_mode": "quick",
+        "overall_score": null,
+        "safe_to_send": null,
+        "can_connect_smtp": null,
+        "inbox_full": null,
+        "catch_all": null,
+        "deliverable": null,
+        "disabled": null
+    }
+]
+
+real    0m3.748s
+user    0m0.358s
+sys     0m0.028s
+```
+
 ## EmailListVerify
 
 Here's a comparison using a commercial paid service [EmailListVerify](https://centminmod.com/emaillistverify) for the same `emaillist.txt` tested above. You can sign up using my affiliate link for [EmailListVerify](https://centminmod.com/emaillistverify) and free accounts get 100 free email verifications for starters.
