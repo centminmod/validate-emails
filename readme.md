@@ -7387,6 +7387,18 @@ sys     0m0.050s
 
 Created a simplistic PHP wrapper script to call `validate_emails.py` from that can test multiple email verification API providers as well as local non-API tests for a single inputted email address. The PHP wrapper will also time how long it takes to return an email verification check's JSON response. This was tested on a PHP 8.3.6 based [Centmin Mod LEMP stack server](https://centminmod.com).
 
+| Provider | Completion Time |
+| --- | --- |
+| Local (Non-API) | 0.516784s |
+| [EmailListVerify](https://centminmod.com/emaillistverify) | 2.96s |
+| [MillionVerifier](https://centminmod.com/millionverifier) | 0.84s |
+| [CaptainVerify](https://centminmod.com/captainverify) | 21.96s |
+| [Proofy.io](https://centminmod.com/proofy) | 31.77s (API error, ran out of credits) |
+| [MyEmailVerifier](https://centminmod.com/myemailverifier) | 3.09s |
+| [Zerobounce](https://centminmod.com/zerobounce) | 0.68s |
+| [Reoon](https://centminmod.com/reoon) | 0.72s |
+| [Bouncify](https://centminmod.com/bouncify) | 1.04s |
+
 First one is local non-API test = 0.516784s
 
 ![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_00.png)
