@@ -2026,13 +2026,18 @@ Updated: May 12, 2024
   - add [Reoon](https://centminmod.com/reoon) API support. Will update below table after I have done some tests.
   - add [Bouncify](https://centminmod.com/bouncify) API support. Will update below table after I have done some tests.
 
+Table also takes into account API rate limits besides my single and 15 email address sample tests.
+
 | Provider Rank For API Speed      | emails/sec | emails/min |
 |----------|--------------|-------------|
 | 1. [MillionVerifier](https://centminmod.com/millionverifier)  | 400/s       | no doc mention     |
 | 2. [EmailListVerify](https://centminmod.com/emaillistverify)  | no doc mention       | no doc mention      |
-| 3. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
-| 4. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
-| 5. [Proofy.io](https://centminmod.com/proofy)  | no doc mention       | no doc mention      |
+| 3. [Reoon](https://centminmod.com/reoon)  | no doc mention       | no doc mention      |
+| 4. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
+| 5. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
+| 6. [Zerobounce](https://centminmod.com/zerobounce)  | 50,000 per 10s but 1 min block    | no doc mention      |
+| 7. [Proofy.io](https://centminmod.com/proofy)  | no doc mention       | no doc mention      |
+| 8. [Bouncify](https://centminmod.com/bouncify)  | no doc mention       | 120/min      |
 
 ## Email Verification Results Table Compare
 
