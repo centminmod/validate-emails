@@ -2164,7 +2164,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | op999@gmail.com | [Reoon](https://centminmod.com/reoon) | valid (quick mode) or invalid (power mode) | null | null | yes | no |
 | op999@gmail.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | yes | no |
 | user@yahoo.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
-| user@yahoo.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
+| user@yahoo.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok (per email API) or unknown (bulk email API) | null | null | true | no |
 | user@yahoo.com | [CaptainVerify](https://centminmod.com/captainverify) | unknown | null | null | yes | no |
 | user@yahoo.com | [Proofy.io](https://centminmod.com/proofy) | unknown | null | null | no | no |
 | user@yahoo.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
