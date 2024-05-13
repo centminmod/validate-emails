@@ -100,14 +100,15 @@ usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATC
                              [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
                              [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
                              [-wf WORKER_FACTOR]
-                             [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier,zerobounce,reoon,bouncify}]
+                             [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier,zerobounce,reoon,bouncify,bounceless}]
                              [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
-                             [-apibulk {emaillistverify,millionverifier,proofy}] [-apikey_cv CAPTAINVERIFY_API_KEY]
+                             [-apibulk {emaillistverify,millionverifier,proofy,bounceless}] [-apikey_cv CAPTAINVERIFY_API_KEY]
                              [-apikey_pf PROOFY_API_KEY] [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS]
                              [-pf_batchsize PROOFY_BATCH_SIZE] [-apikey_mev MYEMAILVERIFIER_API_KEY] [-apikey_zb ZEROBOUNCE_API_KEY]
                              [-apikey_rn REOON_API_KEY] [-reoon_mode {quick,power}] [-apikey_bf BOUNCIFY_API_KEY]
-                             [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge] [-apicache {emaillistverify,zerobounce}]
-                             [-apicachettl APICACHETTL] [-apicachecheck {count,list,purge}] [-apicache-purge] [-store {r2,s3}] [-store-list]
+                             [-apikey_bl BOUNCELESS_API_KEY] [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
+                             [-apicache {emaillistverify,zerobounce}] [-apicachettl APICACHETTL] [-apicachecheck {count,list,purge}]
+                             [-apicache-purge] [-store {r2,s3}] [-store-list]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
@@ -2105,6 +2106,7 @@ Below are their respectivate pay as you go credit pricing for email verification
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-results-table-compare)) | - | $20 (0.01) | $45 (0.009) | $80 (0.008) | $190 (0.0076) | - | $375 (0.0075) | - | $425 (0.00425) |
 | [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | - | - | - | $11.91 (0.00119) | $29.66 (0.00119) | - | $58.95 (0.00118) | $87.86 (0.00126) | $116.40 (0.00116) |
 | [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-results-table-compare)) | - | - | - | $19 (0.0019) | - | $39 (0.0013) | - | - | $99 (0.001) |
+| [Bounceless](https://centminmod.com/bounceless) | - | - | $29 (0.0058) | - | $99 (0.00396) | - | - | - | $299 (0.00299) |
 
 | Provider | 200k | 250k | 300k | 500k | 1m | 2.5m | 5m | 10m |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
@@ -2116,6 +2118,7 @@ Below are their respectivate pay as you go credit pricing for email verification
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-results-table-compare)) | - | $940 (0.00376) | - | $1800 (0.0036) | $2750 (0.00275) | - | - | - |
 | [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | $226.80 (0.00113) | $279.75 (0.00112) | $331.20 (0.00110) | $522.00 (0.00104) | $960.00 (0.00096) | - | - | - |
 | [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-results-table-compare)) | $149 (0.00075) | - | - | $279 (0.00056) | $479 (0.00048) | - | - | - |
+| [Bounceless](https://centminmod.com/bounceless) | - | - | - | $799 (0.001598) | $899 (0.000899) | - | - | - |
 
 ## Email Verification Provider API Speed & Rate Limits
 
