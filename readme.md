@@ -6098,6 +6098,8 @@ Remember to replace `results.txt` with the actual path to your file if it's loca
 - `-apicache-purge` will purge Cloudflare CDN/KV cache when `-apicachecheck` set to `purge` options to query the 
 - `-apicachettl` this sets the cache TTL duration in seconds for how long Cloudflare CDN/KV stores in cache. Default value is 300s or 5mins
 
+One usage case for this would be if you verify a list of 1,000 email addresses and in a short amount of time (i.e. 24hrs) have an additional 500 email addresses added to the email list to total 1,500 emails. Then if you had originally verified the list with `-apicache` and `-apicachettl 172800` parameters, and did a second verification run, the original 1,000 email addresses would of already been stored in Cloudflare CDN and/or Cloudflare Worker KV storage caching so would not result in an API request/costs. Leaving only the 500 new email addresses resulting in an API request/costs. However, you would get a full JSON format result output for all 1,500 email addresses.
+
 Examples to illustrate how the Cloudflare HTTP forward proxy caching KV worker workers for testing email address `hnyfmw5@canadlan-drugs.com`
 
 Via direct EmailListVerify API call returns email address status = `unknown`
