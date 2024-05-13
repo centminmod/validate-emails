@@ -2094,7 +2094,7 @@ Below are their respectivate pay as you go credit pricing for email verification
   - May 11, 2024 add [Zerobounce](https://centminmod.com/zerobounce) API support
   - May 12, 2024 add [Reoon](https://centminmod.com/reoon) API support
   - May 12, 2024 add [Bouncify](https://centminmod.com/bouncify) API support
-  - May 14, 2024 add [Bounceless](https://centminmod.com/bounceless) API support
+  - May 14, 2024 add [Bounceless](https://centminmod.com/bounceless) API support - seems there's difference in pricing for 500K on their web site at US$649 but logged into my dashboard pricing is US$799.
 
 | Provider | 1k | 2k | 5k | 10k | 25k | 30k | 50k | 70k | 100k |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
@@ -2118,7 +2118,7 @@ Below are their respectivate pay as you go credit pricing for email verification
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-results-table-compare)) | - | $940 (0.00376) | - | $1800 (0.0036) | $2750 (0.00275) | - | - | - |
 | [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | $226.80 (0.00113) | $279.75 (0.00112) | $331.20 (0.00110) | $522.00 (0.00104) | $960.00 (0.00096) | - | - | - |
 | [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-results-table-compare)) | $149 (0.00075) | - | - | $279 (0.00056) | $479 (0.00048) | - | - | - |
-| [Bounceless](https://centminmod.com/bounceless) | - | - | - | $799 (0.001598) | $899 (0.000899) | - | - | - |
+| [Bounceless](https://centminmod.com/bounceless) | - | - | - | $649 (0.001298) | $899 (0.000899) | - | - | - |
 
 ## Email Verification Provider API Speed & Rate Limits
 
