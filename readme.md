@@ -1903,7 +1903,16 @@ Personal experience with all commercial email verification providers:
 - ZeroBounce doesn't charge for `unknown` status emails
 - ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) - 50,000 requests in 10 seconds (validations) before temporarily blocking for 1 minute. A maximum of 250 requests in 1 minute for the` bulkapi.zerobounce.net/` before temporarily blocking for 1 hour. And allow a maximum of 20 requests in 1 minute for the `bulkapi.zerobounce.net/v2/validatebatch` before temporarily blocking for 10 minutes. Rate limits seem more complicated so will need to test my script to ensure it operates under their rate limits.
 - Reoon as added on May 12, 2024 and says they take around 20 minutes to verify a set of 50,000 mixed-quality email addresses. The 15 email address sameple test took 2.176 seconds to complete.
-- Reoon unfortunately incorrectly classified `op999@gmail.com` as a `valid` email when it isn't and marked by all other APIs as `invalid`/`undeliverable`/`email_disabled`
+- Reoon unfortunately incorrectly classified `op999@gmail.com` as a `valid` email when it isn't and marked by all other APIs as `invalid`/`undeliverable`/`email_disabled`. This seems to be due to Reoon having 2 modes for their single email verification API for a `quick` and `power` modes. My initial tests are with `quick` mode. But I will need to do testing with `power` mode in future. Even their web site dashboard based single email verification check returns correct `invalid` status for this email suggesting they used `power` mode there too. I honestly do not know why anyone would use `quick` mode give how common Gmail email addresses are.
+  - From their documentation:
+    * The disadvantages of `quick` mode verification: Deep verification and detailed information are less available compared to the POWER mode. So individual inbox status will not be checked in this mode. The quick verification mode includes:
+      * Email syntax validation.
+      * Disposable/temporary email check.
+      * MX validation and records.
+      * Domain email acceptance validation.
+      * Invalid email detection.
+      * Expired/invalid domain detection.
+      * Role account check.
 - Reoon doesn't charge for `unknown` status emails
 - Reoon do not store any uploaded data for more than 15 days
 - Reon has detailed API credit usage and balance logs just like MillionVerifier
@@ -2160,7 +2169,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user@yahoo.com | [Proofy.io](https://centminmod.com/proofy) | unknown | null | null | no | no |
 | user@yahoo.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user@yahoo.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
-| user@yahoo.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
+| user@yahoo.com | [Reoon](https://centminmod.com/reoon) | valid (quick mode) or invalid (power mode) | null | null | yes | no |
 | user@yahoo.com | [Bouncify](https://centminmod.com/bouncify) | accept-all | null | null | yes | no |
 | user1@outlook.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user1@outlook.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
