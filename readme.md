@@ -18,6 +18,7 @@
   - [Xenforo](#xenforo)
   - [Xenforo Email Bounce Log](#xenforo-email-bounce-log)
 - [API Support](#api-support)
+  - [API Usage Commands](#api-usage-commands)
   - [Personal Experience](#personal-experience)
   - [Email Verification Provider Comparison Costs](#email-verification-provider-comparison-costs)
   - [Email Verification Provider API Speed & Rate Limits](#email-verification-provider-api-speed--rate-limits)
@@ -947,7 +948,7 @@ python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm a
 Reoon has 2 modes for single email verification API which can be set via `-reoon_mode` to a value of either `quick` or `power`. The default mode without `-reoon_mode` being set is `quick`.
 
 ```
-time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api reoon -apikey_rn $reokey -tm all
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api reoon -apikey_rn $reokey
 
 [
     {
@@ -979,7 +980,7 @@ sys     0m0.028s
 `validate_emails.py` using external [Bouncify](https://centminmod.com/bouncify) API enabled run `-api bouncify -apikey_bf $bfkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `free_email_api`, `disposable_email_api`, `role_api`, and `spamtrap_api` JSON field are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
 
 ```
-time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api bouncify -apikey_bf $bfkey -tm all
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api bouncify -apikey_bf $bfkey
 [
     {
         "email": "hnyfmw@canadlan-drugs.com",
@@ -1759,6 +1760,68 @@ python validate_emails.py -f user@domain.com -e user+to@domain.com -tm syntax
 In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy), [Zerobounce](https://centminmod.com/zerobounce), [Reoon](https://centminmod.com/reoon), [Bouncify](https://centminmod.com/bouncify). Links to services maybe affiliate links. If you found this information useful ;)
 
 Updated: Added [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
+
+## API Usage Commands
+
+`validate_emails.py` supports passing individual email's comma separated via `-e` flag i.e. `-e user@domain1.com,user@domain2.com` or passing `-l` flag for a text file with list of email addresses one per line via -`l emaillist.txt`. Both methods use respetive provider's per email verification APIs. Only some providers have support in the script for bulk email API - which is currently [EmailListVerify](https://centminmod.com/emaillistverify) and [MillionVerifier](https://centminmod.com/millionverifier) via `-apibulk` flag i.e. `-l emaillist.txt -apibulk emaillistverify` or `-l emaillist.txt -apibuilk millionverifier`.
+
+You can see a full list and explanation of all argument flags supported at [here](#usage).
+
+The `-api` flag determines which provider you use along with their respective `-apikey*` flag.
+
+[EmailListVerify](https://centminmod.com/emaillistverify)
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey
+```
+
+[MillionVerifier](https://centminmod.com/millionverifier)
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey
+```
+
+[CaptainVerify](https://centminmod.com/captainverify)
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api captainverify -apikey_cv $cvkey
+```
+
+[Proofy.io](https://centminmod.com/proofy)
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -apikey_pf $pkey -apiuser_pf $puser
+```
+
+[MyEmailVerifier](https://centminmod.com/myemailverifier)
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api myemailverifier -apikey_mev $mevkey
+```
+
+[Zerobounce](https://centminmod.com/zerobounce)
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api zerobounce -apikey_zb $zbkey
+```
+
+[Reoon](https://centminmod.com/reoon)
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api reoon -apikey_rn $reokey
+```
+
+[Bouncify](https://centminmod.com/bouncify)
+
+```
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api bouncify -apikey_bf $bfkey
+```
+
+**Notes:**
+
+- Some providers have enabled optional [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
+- All providers support optional `-store` flag to save email verification results to remote [S3 storage](#s3-storage-support) i.e. Amazon AWS S3 or Cloudflare R2 object storage buckets
+- There's also work on a [PHP Wrapper](#php-wrapper) script.
 
 ## Personal Experience
 
@@ -3706,7 +3769,7 @@ Add [Proofy.io](https://centminmod.com/proofy) API support
 [Proofy.io](https://centminmod.com/proofy) API enabled run `-api proofy -apikey_pf $pkey -apiuser_pf $puser`
 
 ```
-validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -apikey_pf $pkey -apiuser_pf $puser -xf -xfdb xenforo -xfprefix xf_
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -apikey_pf $pkey -apiuser_pf $puser -xf -xfdb xenforo -xfprefix xf_
 [
     {
         "email": "user@mailsac.com",
@@ -4110,7 +4173,7 @@ Add [Zerobounce](https://centminmod.com/zerobounce) API support
 [Zerobounce](https://centminmod.com/zerobounce) API enabled run `-api zerobounce -apikey_zb $zbkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `sub_status` and `free_email_api` JSON fields are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
 
 ```
-python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all
+python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey
 
 [
     {
@@ -4128,7 +4191,7 @@ python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm a
 For email per verification API check for list of emails in `emaillist.txt` via `-l emaillist.txt`. The `status`, `sub_status` and `free_email_api` JSON fields are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
 
 ```
-time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api zerobounce -apikey_zb $zbkey -tm all
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api zerobounce -apikey_zb $zbkey
 [
     {
         "email": "user@mailsac.com",
@@ -4336,7 +4399,7 @@ Add [Reoon](https://centminmod.com/reoon) API support
 Reoon has 2 modes for single email verification API which can be set via `-reoon_mode` to a value of either `quick` or `power`. The default mode without `-reoon_mode` being set is `quick`.
 
 ```
-time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api reoon -apikey_rn $reokey -tm all
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api reoon -apikey_rn $reokey
 
 [
     {
@@ -4368,7 +4431,7 @@ sys     0m0.028s
 With `-reoon_mode power`. Currently, script hasn't been configured to grab the additional information provided by `power` mode.
 
 ```
-time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api reoon -apikey_rn $reokey -tm all -reoon_mode power
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api reoon -apikey_rn $reokey -reoon_mode power
 
 [
     {
@@ -4400,7 +4463,7 @@ sys     0m0.026s
 For email per verification API check for list of emails in `emaillist.txt` via `-l emaillist.txt`. The `status` JSON field is from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
 
 ```
-time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api reoon -apikey_rn $reokey -tm all
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api reoon -apikey_rn $reokey
 
 [
     {
@@ -4783,7 +4846,7 @@ Add [Bouncify](https://centminmod.com/bouncify) API support
 [Bouncify](https://centminmod.com/bouncify) API enabled run `-api bouncify -apikey_bf $bfkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `free_email_api`, `disposable_email_api`, `role_api`, and `spamtrap_api` JSON field are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
 
 ```
-time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api bouncify -apikey_bf $bfkey -tm all
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api bouncify -apikey_bf $bfkey
 [
     {
         "email": "hnyfmw@canadlan-drugs.com",
@@ -4812,7 +4875,7 @@ Seems to be the slowest API processing time email verification providers tested 
 ```
 
 ```
-time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api bouncify -apikey_bf $bfkey -tm all
+time python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api bouncify -apikey_bf $bfkey
 [
     {
         "email": "user@mailsac.com",
@@ -4989,7 +5052,7 @@ sys     0m0.049s
 Re-trying the Hotmail `user2@hotmail.com` re-tried individually worked without timeouts
 
 ```
-time python validate_emails.py -f user@domain1.com -e user2@hotmail.com -tm all -api bouncify -apikey_bf $bfkey -tm all
+time python validate_emails.py -f user@domain1.com -e user2@hotmail.com -tm all -api bouncify -apikey_bf $bfkey
 [
     {
         "email": "user2@hotmail.com",
