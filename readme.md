@@ -7441,7 +7441,7 @@ First one is local non-API test = 0.516784s
 
 ## PHP Wrapper With Cloudflare Cache And S3 Store Support
 
-Updated PHP wrapper script with single and multiple email support via `validate_emails.php` per email verification routines and added Cloudflare Cache support (enabled for [EmailListVerify](https://centminmod.com/emaillistverify) and [Zerobounce](https://centminmod.com/zerobounce)) and also S3 stored email verification results to either Amazon AWS S3 or Cloudflare R2 object storage buckets.
+Updated PHP wrapper script with single and multiple email support via `validate_emails.py` per email verification routines and added Cloudflare Cache support (enabled for [EmailListVerify](https://centminmod.com/emaillistverify) and [Zerobounce](https://centminmod.com/zerobounce)) and also S3 stored email verification results to either Amazon AWS S3 or Cloudflare R2 object storage buckets.
 
 Note: Timings reported include time for S3 storage - in this case saving to Cloudflare R2 bucket
 
