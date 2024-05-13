@@ -2161,7 +2161,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | op999@gmail.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
 | op999@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | yes | no |
 | op999@gmail.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | yes | no |
-| op999@gmail.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
+| op999@gmail.com | [Reoon](https://centminmod.com/reoon) | valid (quick mode) or invalid (power mode) | null | null | yes | no |
 | op999@gmail.com | [Bouncify](https://centminmod.com/bouncify) | undeliverable | null | null | yes | no |
 | user@yahoo.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user@yahoo.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
@@ -2169,7 +2169,7 @@ Tested on the same sample `emaillist.txt` of email addresses. These are their re
 | user@yahoo.com | [Proofy.io](https://centminmod.com/proofy) | unknown | null | null | no | no |
 | user@yahoo.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user@yahoo.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
-| user@yahoo.com | [Reoon](https://centminmod.com/reoon) | valid (quick mode) or invalid (power mode) | null | null | yes | no |
+| user@yahoo.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
 | user@yahoo.com | [Bouncify](https://centminmod.com/bouncify) | accept-all | null | null | yes | no |
 | user1@outlook.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user1@outlook.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
