@@ -41,6 +41,7 @@
   - [EmailListVeirfy Bulk File API Cloudflare Cache Support](#emaillistveirfy-bulk-file-api-cloudflare-cache-support)
   - [EmailListVerify API Check Times: Regular vs Cached](#emaillistverify-api-check-times-regular-vs-cached)
 - [PHP Wrapper](#php-wrapper)
+  - [PHP Wrapper With Cloudflare Cache And S3 Store Support](#php-wrapper-with-cloudflare-cache-and-s3-store-support)
 
 ## Overview
 The `validate_emails.py` is a Python-based tool for email verification and email validation that allows you to classify your email addresses' status using syntax, DNS, and SMTP (Simple Mail Transfer Protocol) and other checks and 3rd party APIs. Using the script's returned status classifications, you can then clean or scrub your email lists. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support). The script's [API Merge support](#api-merge) also allows you to combine 2 API email verification providers results into one JSON formated output for double verification checks. The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
@@ -7438,4 +7439,24 @@ First one is local non-API test = 0.516784s
 ![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_07.png)
 
 
+## PHP Wrapper With Cloudflare Cache And S3 Store Support
 
+Updated PHP wrapper script with single and multiple email support via `validate_emails.php` per email verification routines and added Cloudflare Cache support (enabled for [EmailListVerify](https://centminmod.com/emaillistverify) and [Zerobounce](https://centminmod.com/zerobounce)) and also S3 stored email verification results to either Amazon AWS S3 or Cloudflare R2 object storage buckets.
+
+Note: Timings reported include time for S3 storage - in this case saving to Cloudflare R2 bucket
+
+Single email address [EmailListVerify](https://centminmod.com/emaillistverify) runs including a debug run
+
+![Email verification PHP Wrapper script with Cloudflare Cache & S3 storage support](screenshots/php-wrappers/validate_email_php_wrapper_multi-style2-cloudflare-cache-s3-02.png)
+
+![Email verification PHP Wrapper script with Cloudflare Cache & S3 storage support](screenshots/php-wrappers/validate_email_php_wrapper_multi-style2-cloudflare-cache-s3-02a.png)
+
+![Email verification PHP Wrapper script with Cloudflare Cache & S3 storage support](screenshots/php-wrappers/validate_email_php_wrapper_multi-style2-cloudflare-cache-s3-02b.png)
+
+Multiple email addresses [EmailListVerify](https://centminmod.com/emaillistverify) runs including a debug run
+
+![Email verification PHP Wrapper script with Cloudflare Cache & S3 storage support](screenshots/php-wrappers/validate_email_php_wrapper_multi-style2-cloudflare-cache-s3-02c.png)
+
+![Email verification PHP Wrapper script with Cloudflare Cache & S3 storage support](screenshots/php-wrappers/validate_email_php_wrapper_multi-style2-cloudflare-cache-s3-02d.png)
+
+![Email verification PHP Wrapper script with Cloudflare Cache & S3 storage support](screenshots/php-wrappers/validate_email_php_wrapper_multi-style2-cloudflare-cache-s3-02e.png)
