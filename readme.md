@@ -1762,8 +1762,9 @@ Updated: Added [API Merge support](#api-merge) via `-apimerge` argument to merge
 
 ## Personal Experience
 
-Personal experience with all 5 providers:
+Personal experience with all commercial email verification providers:
 
+- Disclaimer: I've already been using EmailListVerify since 2015 and Proofy.io since 2022. While the rest of the mentioned providers are new experiences for me.
 - EmailListVerify and MillionVerifier while being cheaper than the others seem to be better for the following:
   - API documentation
   - Less restrictive on API connection and rate limits. Meaning if you are doing per email API checks for many email addresses, the speed of completion will be faster. Though if you're doing many email address checks, you'd want to use their respective bulk email API end points to upload a single text file for processing.
@@ -6098,7 +6099,9 @@ Remember to replace `results.txt` with the actual path to your file if it's loca
 - `-apicache-purge` will purge Cloudflare CDN/KV cache when `-apicachecheck` set to `purge` options to query the 
 - `-apicachettl` this sets the cache TTL duration in seconds for how long Cloudflare CDN/KV stores in cache. Default value is 300s or 5mins
 
-One usage case for this would be if you verify a list of 1,000 email addresses and in a short amount of time (i.e. 24hrs) have an additional 500 email addresses added to the email list to total 1,500 emails. Then if you had originally verified the list with `-apicache` and `-apicachettl 172800` parameters, and did a second verification run, the original 1,000 email addresses would of already been stored in Cloudflare CDN and/or Cloudflare Worker KV storage caching so would not result in an API request/costs. Leaving only the 500 new email addresses resulting in an API request/costs. However, you would get a full JSON format result output for all 1,500 email addresses.
+One usage case for this would be if you verify a list of 1,000 email addresses and in a short amount of time (i.e. 24hrs) have an additional 500 email addresses added to the email list to total 1,500 emails. Then if you had originally verified the list with `-apicache` and `-apicachettl 172800` parameters, and did a second verification run, the original 1,000 email addresses would of already been stored in Cloudflare CDN and/or Cloudflare Worker KV storage caching so would not result in an API request/costs. Leaving only the 500 new email addresses resulting in an API request/costs. However, you would get a full JSON formatted result output for all 1,500 email addresses - ready for further processing/manipulation etc. Of course, you can also just have 2 separate verification runs for 1,000 emails and then for 500 emails and have 2 separate JSON formatted result outputs to work with which you can combine etc.
+
+Another usage case is in case of email duplication in your lists. If you have the email address referenced multiple times in an email list, then using  `-apicache` and `-apicachettl 172800` parameters like parameters for first verification run, would allow it process detected duplicates via the Cloudflare CDN / Worker KV cached return results rather than make needless duplicate API request calls which would cost money. A lot of email verification providers offer email list deduplication as a built in feature while others offer it for additional costs. But with Cloudflare CDN / Worker KV caching in place, you wouldn't nedd to worry about the email verification provider's support for email deduplication. Thus saving your money $$$$$!
 
 Examples to illustrate how the Cloudflare HTTP forward proxy caching KV worker workers for testing email address `hnyfmw5@canadlan-drugs.com`
 
