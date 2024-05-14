@@ -303,7 +303,7 @@ api_url=http=https://your_cf_worker.com
 
 ### S3 Storage Support
 
-Commercial email verification providers usually only store your file based uploaded or bulk file API uploaded files for a defined duration i.e. 30 days before they are deleted. And per email check API results are usually not stored at all. So if you need to store your per email check or bulk file API email verification results for longer, the `validate_emails.py` script now supports saving your results to S3 object storage providers - Cloudflare R2 or Amazon AWS S3.
+Commercial email verification providers usually only store your file based uploaded or bulk file API uploaded files for a defined duration i.e. 15 to 30 days before they are deleted. And per email check API results are usually not stored at all. So if you need to store your per email check or bulk file API email verification results for longer, the `validate_emails.py` script now supports saving your results to S3 object storage providers - Cloudflare R2 or Amazon AWS S3.
 
 Add optional Cloudflare R2 S3 object storage or Amazon AWS S3 object storage which will allow you to save your `validate_emails.py` ran JSON output in externel Cloudflare R2 or Amazon AWS S3 object storage buckets via `validate_emails.ini` defined:
 
