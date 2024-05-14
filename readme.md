@@ -2164,7 +2164,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 - `user@tempr.email` another known disposable email address
 - `info@domain2.com` known valid Google Workspae email address that is working
 - `user@gmail.com` known valid Gmail address
-- `op999@gmail.com` known invalid user does not exit Gmail address AFAIKA
+- `op999@gmail.com` known invalid user does not exist Gmail address AFAIKA
 - `user@yahoo.com` known valid Yahoo email address that is working
 
 | Email | API | status | sub_status | status_code | free_email | disposable_email |
