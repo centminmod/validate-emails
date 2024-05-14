@@ -180,6 +180,8 @@ The available arguments are:
       - `proofy`: Use the Proofy API.
       - `zerobounce`: Use the Zerobounce.net API.
       - `reoon`: Use the Zerobounce.net API.
+      - `bouncify`: Use the Bouncify API.
+      - `bounceless`: Use the Bounceless API.
   - `-apimerge`, `--api_merge` (optional):
     - Description: Merge and combine `emaillistverify` or `millionverifier` API results into one result
   - `-apibulk`, `--api_bulk` (optional):
@@ -200,6 +202,8 @@ The available arguments are:
     - Description: Reoon verification mode `quick` or `power`
   - `-apikey_bf`, `--bouncify_api_key`
     - Description: The API key for the Bouncify service.
+  - `-apikey_bl`, `--bounceless_api_key`
+    - Description: The API key for the Bounceless service.
   - `-apikey_pf`, `--proofy_api_key` (optional):
     - Description: The API key for the Proofy service.
   - `-apiuser_pf`, `--proofy_user_id` (optional):
