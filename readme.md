@@ -1975,7 +1975,7 @@ Personal experience with all commercial email verification providers:
 - ZeroBounce doesn't charge for `unknown` status emails
 - ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) - 50,000 requests in 10 seconds (validations) before temporarily blocking for 1 minute. A maximum of 250 requests in 1 minute for the` bulkapi.zerobounce.net/` before temporarily blocking for 1 hour. And allow a maximum of 20 requests in 1 minute for the `bulkapi.zerobounce.net/v2/validatebatch` before temporarily blocking for 10 minutes. Rate limits seem more complicated so will need to test my script to ensure it operates under their rate limits.
 - Reoon as added on May 12, 2024 and says they take around 20 minutes to verify a set of 50,000 mixed-quality email addresses. The 15 email address sameple test took 2.176 seconds to complete.
-- Reoon unfortunately incorrectly classified `op999@gmail.com` as a `valid` email when it isn't and marked by all other APIs as `invalid`/`undeliverable`/`email_disabled`. This seems to be due to Reoon having 2 modes for their single email verification API for a `quick` and `power` modes. My initial tests are with `quick` mode. But I will need to do testing with `power` mode in future. Even their web site dashboard based single email verification check returns correct `invalid` status for this email suggesting they used `power` mode there too. I honestly do not know why anyone would use `quick` mode give how common Gmail email addresses are.
+- Reoon unfortunately incorrectly classified `op999@gmail.com` as a `valid` email when it isn't and marked by all other APIs as `invalid`/`undeliverable`/`email_disabled`. This seems to be due to Reoon having 2 modes for their single email verification API for a `quick` and `power` modes. My initial tests are with `quick` mode. But I will need to do testing with `power` mode in future. Even their web site dashboard based single email verification check returns correct `invalid` status for this email suggesting they used `power` mode there too. I honestly do not know why anyone would use `quick` mode given how common Gmail email addresses are.
   - From their documentation:
     * The disadvantages of `quick` mode verification: Deep verification and detailed information are less available compared to the POWER mode. So individual inbox status will not be checked in this mode. The quick verification mode includes:
       * Email syntax validation.
@@ -1989,7 +1989,7 @@ Personal experience with all commercial email verification providers:
 - Reoon do not store any uploaded data for more than 15 days
 - Reon has detailed API credit usage and balance logs just like MillionVerifier
 - Bouncify was added May 12, 2024 and seems to be the slowest to date for API response for single email and 15 sample email address API tests took 184+ seconds even though they have a 120 concurrent request API limit and seem to have trouble validating the `@yahoo.com` and `@hotmail.com` accounts in my 15 email address sample list [here](#bouncify-api).
-- Bouncessless was added May 14, 2024. Probably the 2nd or 3rd slowes per email address verification APIs and seems highly inaccurate on 15 email address sample list not a single known valid email address was deemed as valid by the API. Instead the valid email addresses were all deemed `unknown`. After 1/2 day later I retested and Bounceless now fluctuates between an `unknown` and `valid` status for known Gmail address. So doesn't seem as reliable for detecting Gmail email addresses compared to other email verification providers tested and compared in the [Email Verification Results Table](#email-verification-results-table-compare). Bounceless API also doesn't recognise Gmail/Workspace emails using `+` alias i.e. `user+to@domain1.com` and deems them as invalid syntax!
+- Bouncessless was added May 14, 2024. Probably the 2nd or 3rd slowest per email address verification APIs and seems highly inaccurate on 15 email address sample list not a single known valid email address was deemed as valid by the API. Instead the valid email addresses were all deemed `unknown`. After 1/2 day later I retested and Bounceless now fluctuates between an `unknown` and `valid` status for known Gmail address. So doesn't seem as reliable for detecting Gmail email addresses compared to other email verification providers tested and compared in the [Email Verification Results Table](#email-verification-results-table-compare). Bounceless API also doesn't recognise Gmail/Workspace emails using `+` alias i.e. `user+to@domain1.com` and deems them as invalid syntax! I double checked this on their web site dashboard and `user+to@domain1.com` email address was still marked as invalid syntax.
 - The number of API returned status value classifications returned by the various providers differs. Some have a more detailed classifications for emails than others.
   - EmailListVerify has 18 classifications:
     - ok
@@ -2143,11 +2143,12 @@ Table also takes into account API rate limits besides my single and 15 email add
 | 1. [MillionVerifier](https://centminmod.com/millionverifier)  | 400/s       | no doc mention     |
 | 2. [EmailListVerify](https://centminmod.com/emaillistverify)  | no doc mention       | no doc mention      |
 | 3. [Reoon](https://centminmod.com/reoon)  | no doc mention       | no doc mention      |
-| 4. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
-| 5. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
-| 6. [Zerobounce](https://centminmod.com/zerobounce)  | 50,000 per 10s but 1 min block    | no doc mention      |
+| 4. [Zerobounce](https://centminmod.com/zerobounce)  | 50,000 per 10s but 1 min block    | no doc mention      |
+| 5. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
+| 6. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
 | 7. [Proofy.io](https://centminmod.com/proofy)  | no doc mention       | no doc mention      |
-| 8. [Bouncify](https://centminmod.com/bouncify)  | no doc mention       | 120/min      |
+| 8. [Bounceless](https://centminmod.com/bounceless)  | no doc mention       | no doc mention      |
+| 9. [Bouncify](https://centminmod.com/bouncify)  | no doc mention       | 120/min      |
 
 ## Email Verification Results Table Compare
 
