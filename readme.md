@@ -2156,6 +2156,17 @@ Table comparing the JSON field values for each email address across the differen
 
 Tested on the same sample `emaillist.txt` of email addresses. These are their respective returned values for `status` JSON field which retrieved from the respective API services. While `status_code` (not used with external APIs), `free_email` and `disposable_email` JSON fields are from local script code/databases where applicable. The `sub_status` is a JSON field only for [Zerobounce](https://centminmod.com/zerobounce).
 
+Pay attention to specific email addresses compared for the accuracy of the email verification providers's API results:
+
+- `user@mailsac.com` this is a known disposable email address
+- `xyz@centmil1.com` this is a domain that doesn't exist so would not have valid DNS or MX DNS records
+- `user+to@domain1.com` this is a Google Workspace email address using `+` user aliasing and is a valid working email address
+- `user@tempr.email` another known disposable email address
+- `info@domain2.com` known valid Google Workspae email address that is working
+- `user@gmail.com` known valid Gmail address
+- `op999@gmail.com` known invalid user does not exit Gmail address AFAIKA
+- `user@yahoo.com` known valid Yahoo email address that is working
+
 | Email | API | status | sub_status | status_code | free_email | disposable_email |
 |----------------------|-------------------|------------|-----------------|-------------|------------|------------------|
 | user@mailsac.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | yes | yes |
