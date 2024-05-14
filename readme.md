@@ -2144,8 +2144,8 @@ Table also takes into account API rate limits besides my single and 15 email add
 | 2. [EmailListVerify](https://centminmod.com/emaillistverify)  | no doc mention       | no doc mention      |
 | 3. [Reoon](https://centminmod.com/reoon)  | no doc mention       | no doc mention      |
 | 4. [Zerobounce](https://centminmod.com/zerobounce)  | 50,000 per 10s but 1 min block    | no doc mention      |
-| 5. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
-| 6. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
+| 5. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
+| 6. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
 | 7. [Proofy.io](https://centminmod.com/proofy)  | no doc mention       | no doc mention      |
 | 8. [Bounceless](https://centminmod.com/bounceless)  | no doc mention       | no doc mention      |
 | 9. [Bouncify](https://centminmod.com/bouncify)  | no doc mention       | 120/min      |
