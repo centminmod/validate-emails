@@ -1989,7 +1989,7 @@ Personal experience with all commercial email verification providers:
 - Reoon do not store any uploaded data for more than 15 days
 - Reon has detailed API credit usage and balance logs just like MillionVerifier
 - Bouncify was added May 12, 2024 and seems to be the slowest to date for API response for single email and 15 sample email address API tests took 184+ seconds even though they have a 120 concurrent request API limit and seem to have trouble validating the `@yahoo.com` and `@hotmail.com` accounts in my 15 email address sample list [here](#bouncify-api).
-- Bouncessless was added May 14, 2024. Probably the 2nd or 3rd slowes per email address verification APIs and seems highly inaccurate on 15 email address sample list not a single known valid email address was deemed as valid by the API. Instead the valid email addresses were all deemed `unknown`. Bounceless API also doesn't recognise Gmail/Workspace emails using `+` alias i.e. `user+to@domain1.com` and deems them as invalid syntax!
+- Bouncessless was added May 14, 2024. Probably the 2nd or 3rd slowes per email address verification APIs and seems highly inaccurate on 15 email address sample list not a single known valid email address was deemed as valid by the API. Instead the valid email addresses were all deemed `unknown`. After 1/2 day later I retested and Bounceless now fluctuates between an `unknown` and `valid` status for known Gmail address. So doesn't seem as reliable for detecting Gmail email addresses compared to other email verification providers tested and compared in the [Email Verification Results Table](#email-verification-results-table-compare). Bounceless API also doesn't recognise Gmail/Workspace emails using `+` alias i.e. `user+to@domain1.com` and deems them as invalid syntax!
 - The number of API returned status value classifications returned by the various providers differs. Some have a more detailed classifications for emails than others.
   - EmailListVerify has 18 classifications:
     - ok
@@ -5361,6 +5361,30 @@ time curl -s "https://apps.bounceless.io/api/singlemaildetails?secret=$blkey&ema
 
 real    0m15.825s
 user    0m0.028s
+sys     0m0.004s
+```
+
+After 1/2 day, I tried retesting Bounceless API against known valid Gmail address, and it seems it fluctuates between a result status of `unknown` and `valid` between runs. Maybe it's due to some security mechanisms on Gmail's server end but other commercial provider's APIs have always returned correctly for this known valid Gmail address. Note though the slower API result times >12-15 seconds remain.
+
+```
+time curl -s "https://apps.bounceless.io/api/singlemaildetails?secret=$blkey&email=user@gmail.com" | jq -r
+{
+  "success": true,
+  "accept_all": false,
+  "result": "valid",
+  "reason": "valid",
+  "role": false,
+  "free": true,
+  "disposable": false,
+  "user": "user",
+  "domain": "gmail.com",
+  "email": "user@gmail.com",
+  "did_you_mean": null,
+  "message": ""
+}
+
+real    0m12.500s
+user    0m0.029s
 sys     0m0.004s
 ```
 
