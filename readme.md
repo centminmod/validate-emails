@@ -2136,7 +2136,7 @@ Updated: May 12, 2024
 Updated: May 14, 2024 
   - add [Bounceless](https://centminmod.com/bounceless) API support. Will update below table after I have done some tests.
 
-Table also takes into account API rate limits besides my single and 15 email address sample tests.
+Table also takes into account API rate limits besides my single and 15 email address sample tests. For example, if CaptainVerify takes 20+ seconds to verify a single email address and MyEmailVerifier takes 2-3 seconds, then the higher rate limit per min of CaptainVerify wouldn't matter as CaptainVerify would only be able to handle 3 emails/min versus MyEmailVerifier 20-30 emails/min.
 
 | Provider Rank For API Speed      | emails/sec | emails/min |
 |----------|--------------|-------------|
