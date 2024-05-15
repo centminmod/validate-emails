@@ -22,6 +22,7 @@
   - [Personal Experience](#personal-experience)
   - [Email Verification Provider Comparison Costs](#email-verification-provider-comparison-costs)
   - [Email Verification Provider API Speed & Rate Limits](#email-verification-provider-api-speed--rate-limits)
+    - [Email Verification Provider API Speed Benchmarks](#email-verification-provider-api-speed-benchmarks)
   - [Email Verification Results Table Compare](#email-verification-results-table-compare)
   - [EmailListVerify](#emaillistverify)
   - [EmailListVerify Bulk File API](#emaillistverify-bulk-file-api)
@@ -2154,6 +2155,211 @@ Table also takes into account API rate limits besides my single and 15 email add
 | 8. [Bounceless](https://centminmod.com/bounceless)  | no doc mention       | no doc mention      |
 | 9. [Bouncify](https://centminmod.com/bouncify)  | no doc mention       | 120/min      |
 
+### Email Verification Provider API Speed Benchmarks
+
+Prior to May 16, 2024, the focus for speed of API returned results as based on `validate_emails.py` completion time, but the Python script uses concurrent threads defined by optional script argument `-wf` for worker factor to process per email verifications when there's more than 1 email address to process. By default `-wf` worker factor controlled how many threads were used in `validate_emails.py` and it defaults to a value of `16` for all API providers except [CaptainVerify API](#captainverify-api) and [MyEmailVerifier API](#myemailverifier-api) due to their more restrictive API rate limits, I had to set `-wf` worker factor to default to 1. This results in timed `validate_emails.py` script run completion being slower for [CaptainVerify API](#captainverify-api) and [MyEmailVerifier API](#myemailverifier-api) to ensure any API requests do not exceed their respective API rate limits.
+
+So to properly calculate per email verification API response time `api_response_time` and `api_thread_number` thread pool number, I also added these metrics to the API JSON response. So to do a email verification check for `hnyfmw@canadlan-drugs.com`, the API response took `2.0609` seconds while `validate_emails.py` script run took `4.313` seconds using thread pool `0_0`. However, you have to remember that overall speed will depend on the individual API response time and would need to factor in the respective email verification provider's API rate limits.
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api emaillistverify -apikey $elvkey
+[
+    {
+        "email": "hnyfmw@canadlan-drugs.com",
+        "status": "unknown",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "api_response_time": 2.0609,
+        "api_thread_number": "thread-pool-0_0"
+    }
+]
+
+real    0m4.313s
+user    0m0.352s
+sys     0m0.029s
+```
+
+With `api_response_time` and `api_thread_number` now available in JSON result output, I can now benchmark all tested email verification API providers more accurately for per email verificate API response times. Below are the tabulated comparison results. I didn't test [Proofy API](#proofy-api) as I ran out of credits and [Bounceless API](#bounceless-api) wasn't worth testing given it's inaccurate results for [Gmail accounts](#bounceless-api).
+
+The benchmark tests were against the 15 email address sample list `-l emaillist.txt` from the commands
+
+```
+# [EmailListVerify](https://centminmod.com/emaillistverify)
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api emaillistverify -apikey $elvkey
+
+# [MillionVerifier](https://centminmod.com/millionverifier)
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api millionverifier -apikey_mv $mvkey
+
+# [CaptainVerify](https://centminmod.com/captainverify)
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api captainverify -apikey_cv $cvkey
+
+# [MyEmailVerifier](https://centminmod.com/myemailverifier)
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api myemailverifier -apikey_mev $mevkey
+
+# [Zerobounce](https://centminmod.com/zerobounce)
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api zerobounce -apikey_zb $zbkey
+
+# [Reoon](https://centminmod.com/reoon)
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api reoon -apikey_rn $reokey
+
+# [Bouncify](https://centminmod.com/bouncify)
+python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api bouncify -apikey_bf $bfkey
+```
+
+First table provides the average, min, median, max and 99th percentile API response times for all 15 email addresses broken down by email verification API provider. The table is ordered by provider name alphabetically.
+
+Providers ranked from fastest to slowest for average and maximum API response times for all 15 email addresses checked:
+
+Ranked by Average API Response Time (fastest to slowest) for all 15 email addresses checked:
+
+1. **Zerobounce**: Average API Response Time = 0.3922 seconds
+2. **MillionVerifier**: Average API Response Time = 0.4649 seconds
+3. **EmailListVerify**: Average API Response Time = 1.3805 seconds
+4. **Reoon**: Average API Response Time = 1.3850 seconds
+5. **CaptainVerify**: Average API Response Time = 2.1669 seconds
+6. **MyEmailVerifier**: Average API Response Time = 3.9018 seconds
+7. **Bouncify**: Average API Response Time = 13.3857 seconds
+
+Ranked by Maximum API Response Time (fastest to slowest) for all 15 email addresses checked:
+
+1. **MillionVerifier**: Max API Response Time = 0.5481 seconds
+2. **Zerobounce**: Max API Response Time = 1.0279 seconds
+3. **Reoon**: Max API Response Time = 3.0198 seconds
+4. **EmailListVerify**: Max API Response Time = 3.1766 seconds
+5. **MyEmailVerifier**: Max API Response Time = 4.903 seconds
+6. **CaptainVerify**: Max API Response Time = 21.5099 seconds
+7. **Bouncify**: Max API Response Time = 180.6231 seconds
+
+From the data, we can observe that:
+
+- Zerobounce and MillionVerifier are the fastest email verification API providers in terms of both average and maximum API response times.
+- Bouncify is the slowest provider, with the highest average and maximum API response times by a significant margin.
+- CaptainVerify has a relatively high maximum API response time of 21.5099 seconds (due to the email check for `xyz@centmil1.com`), although its average response time is better than Bouncify and MyEmailVerifier.
+- Reoon, EmailListVerify, and MyEmailVerifier have relatively similar average and maximum API response times, ranking in the mid-range among the providers.
+- However, you have to remember that overall speed will depend on the individual API response time and would need to factor in the respective email verification provider's API rate limits.
+
+| API Provider | Average api_response_time | Min api_response_time | Median api_response_time | Max api_response_time | 99th Percentile api_response_time |
+|--------------|---------------------------|----------------------|-------------------------|----------------------|----------------------------------|
+| [bouncify](https://centminmod.com/bouncify) | 13.3857 | 0.6154 | 1.3655 | 180.6231 | 180.6231 |
+| [captainverify](https://centminmod.com/captainverify) | 2.1669 | 0.501 | 0.5793 | 21.5099 | 21.5099 |
+| [emaillistverify](https://centminmod.com/emaillistverify) | 1.3805 | 0.6449 | 1.1035 | 3.1766 | 3.1766 |
+| [millionverifier](https://centminmod.com/millionverifier) | 0.4649 | 0.4145 | 0.4442 | 0.5481 | 0.5481 |
+| [myemailverifier](https://centminmod.com/myemailverifier) | 3.9018 | 2.631 | 4.0985 | 4.903 | 4.903 |
+| [reoon](https://centminmod.com/reoon) | 1.3850 | 0.7275 | 1.3763 | 3.0198 | 3.0198 |
+| [zerobounce](https://centminmod.com/zerobounce) | 0.3922 | 0.259 | 0.3464 | 1.0279 | 1.0279 |
+
+Next comparison table shows each of the 15 sample email addresses' individual API response times, returned `status` check results and also the `validated_emails.py` script's execution times. Email addresses are sorted alphabetically.
+
+| email | API Provider | status | api_response_time | free_email | disposable_email | api_thread_number | validated_emails.py Time |
+|-------|--------------|--------|-------------------|------------|-------------------|-------------------|-----------|
+| 123@domain1.com | [bouncify](https://centminmod.com/bouncify) | undeliverable | 1.0689 | no | no | thread-pool-0_5 | 181.576 |
+| 123@domain1.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.5636 | no | no | thread-pool-0_5 | 22.836 |
+| 123@domain1.com | [emaillistverify](https://centminmod.com/emaillistverify) | email_disabled | 1.0654 | no | no | thread-pool-0_5 | 4.208 |
+| 123@domain1.com | [millionverifier](https://centminmod.com/millionverifier) | invalid | 0.5352 | no | no | thread-pool-0_5 | 1.614 |
+| 123@domain1.com | [myemailverifier](https://centminmod.com/myemailverifier) | invalid | 4.663 | no | no | thread-pool-0_5 | 6.461 |
+| 123@domain1.com | [reoon](https://centminmod.com/reoon) | unknown | 0.7413 | no | no | thread-pool-0_5 | 5.744 |
+| 123@domain1.com | [zerobounce](https://centminmod.com/zerobounce) | invalid | 0.4128 | no | no | thread-pool-0_5 | 2.930 |
+| abc@domain1.com | [bouncify](https://centminmod.com/bouncify) | undeliverable | 2.7131 | no | no | thread-pool-0_4 | 181.576 |
+| abc@domain1.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.5862 | no | no | thread-pool-0_4 | 22.836 |
+| abc@domain1.com | [emaillistverify](https://centminmod.com/emaillistverify) | email_disabled | 1.0523 | no | no | thread-pool-0_4 | 4.208 |
+| abc@domain1.com | [millionverifier](https://centminmod.com/millionverifier) | invalid | 0.4321 | no | no | thread-pool-0_4 | 1.614 |
+| abc@domain1.com | [myemailverifier](https://centminmod.com/myemailverifier) | invalid | 4.903 | no | no | thread-pool-0_4 | 6.461 |
+| abc@domain1.com | [reoon](https://centminmod.com/reoon) | unknown | 1.655 | no | no | thread-pool-0_4 | 5.744 |
+| abc@domain1.com | [zerobounce](https://centminmod.com/zerobounce) | invalid | 0.259 | no | no | thread-pool-0_4 | 2.930 |
+| info@domain2.com | [bouncify](https://centminmod.com/bouncify) | deliverable | 2.0478 | no | no | thread-pool-0_9 | 181.576 |
+| info@domain2.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.5693 | no | no | thread-pool-0_9 | 22.836 |
+| info@domain2.com | [emaillistverify](https://centminmod.com/emaillistverify) | valid | 1.3723 | no | no | thread-pool-0_9 | 4.208 |
+| info@domain2.com | [millionverifier](https://centminmod.com/millionverifier) | ok | 0.4314 | no | no | thread-pool-0_9 | 1.614 |
+| info@domain2.com | [myemailverifier](https://centminmod.com/myemailverifier) | valid | 3.9004 | no | no | thread-pool-0_9 | 6.461 |
+| info@domain2.com | [reoon](https://centminmod.com/reoon) | role_account | 1.478 | no | no | thread-pool-0_9 | 5.744 |
+| info@domain2.com | [zerobounce](https://centminmod.com/zerobounce) | do_not_mail | 0.3873 | no | no | thread-pool-0_9 | 2.930 |
+| op999@gmail.com | [bouncify](https://centminmod.com/bouncify) | undeliverable | 1.3655 | yes | no | thread-pool-0_11 | 181.576 |
+| op999@gmail.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.5564 | no | no | thread-pool-0_11 | 22.836 |
+| op999@gmail.com | [emaillistverify](https://centminmod.com/emaillistverify) | email_disabled | 1.3844 | yes | no | thread-pool-0_11 | 4.208 |
+| op999@gmail.com | [millionverifier](https://centminmod.com/millionverifier) | invalid | 0.4443 | yes | no | thread-pool-0_11 | 1.614 |
+| op999@gmail.com | [myemailverifier](https://centminmod.com/myemailverifier) | invalid | 4.5972 | yes | no | thread-pool-0_11 | 6.461 |
+| op999@gmail.com | [reoon](https://centminmod.com/reoon) | invalid | 0.9289 | yes | no | thread-pool-0_11 | 5.744 |
+| op999@gmail.com | [zerobounce](https://centminmod.com/zerobounce) | invalid | 0.3605 | yes | no | thread-pool-0_11 | 2.930 |
+| pip@domain1.com | [bouncify](https://centminmod.com/bouncify) | undeliverable | 2.0223 | no | no | thread-pool-0_7 | 181.576 |
+| pip@domain1.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.5787 | no | no | thread-pool-0_7 | 22.836 |
+| pip@domain1.com | [emaillistverify](https://centminmod.com/emaillistverify) | email_disabled | 1.0572 | no | no | thread-pool-0_7 | 4.208 |
+| pip@domain1.com | [millionverifier](https://centminmod.com/millionverifier) | invalid | 0.4273 | no | no | thread-pool-0_7 | 1.614 |
+| pip@domain1.com | [myemailverifier](https://centminmod.com/myemailverifier) | invalid | 4.1387 | no | no | thread-pool-0_7 | 6.461 |
+| pip@domain1.com | [reoon](https://centminmod.com/reoon) | invalid | 1.0709 | no | no | thread-pool-0_7 | 5.744 |
+| pip@domain1.com | [zerobounce](https://centminmod.com/zerobounce) | invalid | 0.3377 | no | no | thread-pool-0_7 | 2.930 |
+| pop@domain1.com | [bouncify](https://centminmod.com/bouncify) | undeliverable | 0.9657 | no | no | thread-pool-0_6 | 181.576 |
+| pop@domain1.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.5909 | no | no | thread-pool-0_6 | 22.836 |
+| pop@domain1.com | [emaillistverify](https://centminmod.com/emaillistverify) | email_disabled | 1.0636 | no | no | thread-pool-0_6 | 4.208 |
+| pop@domain1.com | [millionverifier](https://centminmod.com/millionverifier) | invalid | 0.5378 | no | no | thread-pool-0_6 | 1.614 |
+| pop@domain1.com | [myemailverifier](https://centminmod.com/myemailverifier) | invalid | 3.396 | no | no | thread-pool-0_6 | 6.461 |
+| pop@domain1.com | [reoon](https://centminmod.com/reoon) | invalid | 1.5885 | no | no | thread-pool-0_6 | 5.744 |
+| pop@domain1.com | [zerobounce](https://centminmod.com/zerobounce) | invalid | 0.3464 | no | no | thread-pool-0_6 | 2.930 |
+| user+to@domain1.com | [bouncify](https://centminmod.com/bouncify) | deliverable | 2.6186 | no | no | thread-pool-0_2 | 181.576 |
+| user+to@domain1.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.6153 | no | no | thread-pool-0_2 | 22.836 |
+| user+to@domain1.com | [emaillistverify](https://centminmod.com/emaillistverify) | valid | 0.8685 | no | no | thread-pool-0_2 | 4.208 |
+| user+to@domain1.com | [millionverifier](https://centminmod.com/millionverifier) | ok | 0.4145 | no | no | thread-pool-0_2 | 1.614 |
+| user+to@domain1.com | [myemailverifier](https://centminmod.com/myemailverifier) | valid | 3.002 | no | no | thread-pool-0_2 | 6.461 |
+| user+to@domain1.com | [reoon](https://centminmod.com/reoon) | valid | 1.6539 | no | no | thread-pool-0_2 | 5.744 |
+| user+to@domain1.com | [zerobounce](https://centminmod.com/zerobounce) | valid | 0.3708 | no | no | thread-pool-0_2 | 2.930 |
+| user1@outlook.com | [bouncify](https://centminmod.com/bouncify) | deliverable | 1.6912 | yes | no | thread-pool-0_13 | 181.576 |
+| user1@outlook.com | [captainverify](https://centminmod.com/captainverify) | valid | 3.5499 | yes | no | thread-pool-0_13 | 22.836 |
+| user1@outlook.com | [emaillistverify](https://centminmod.com/emaillistverify) | valid | 1.1035 | yes | no | thread-pool-0_13 | 4.208 |
+| user1@outlook.com | [millionverifier](https://centminmod.com/millionverifier) | ok | 0.4181 | yes | no | thread-pool-0_13 | 1.614 |
+| user1@outlook.com | [myemailverifier](https://centminmod.com/myemailverifier) | valid | 4.6978 | yes | no | thread-pool-0_13 | 6.461 |
+| user1@outlook.com | [reoon](https://centminmod.com/reoon) | valid | 1.453 | yes | no | thread-pool-0_13 | 5.744 |
+| user1@outlook.com | [zerobounce](https://centminmod.com/zerobounce) | valid | 0.3327 | yes | no | thread-pool-0_13 | 2.930 |
+| user2@hotmail.com | [bouncify](https://centminmod.com/bouncify) | api_error | 180.6231 | yes | no | thread-pool-0_14 | 181.576 |
+| user2@hotmail.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.5793 | no | no | thread-pool-0_14 | 22.836 |
+| user2@hotmail.com | [emaillistverify](https://centminmod.com/emaillistverify) | valid | 0.6449 | yes | no | thread-pool-0_14 | 4.208 |
+| user2@hotmail.com | [millionverifier](https://centminmod.com/millionverifier) | ok | 0.4245 | yes | no | thread-pool-0_14 | 1.614 |
+| user2@hotmail.com | [myemailverifier](https://centminmod.com/myemailverifier) | valid | 4.1951 | yes | no | thread-pool-0_14 | 6.461 |
+| user2@hotmail.com | [reoon](https://centminmod.com/reoon) | valid | 1.3763 | yes | no | thread-pool-0_14 | 5.744 |
+| user2@hotmail.com | [zerobounce](https://centminmod.com/zerobounce) | valid | 0.3696 | yes | no | thread-pool-0_14 | 2.930 |
+| user@gmail.com | [bouncify](https://centminmod.com/bouncify) | deliverable | 0.678 | yes | no | thread-pool-0_10 | 181.576 |
+| user@gmail.com | [captainverify](https://centminmod.com/captainverify) | valid | 0.5302 | yes | no | thread-pool-0_10 | 22.836 |
+| user@gmail.com | [emaillistverify](https://centminmod.com/emaillistverify) | valid | 1.3648 | yes | no | thread-pool-0_10 | 4.208 |
+| user@gmail.com | [millionverifier](https://centminmod.com/millionverifier) | ok | 0.4417 | yes | no | thread-pool-0_10 | 1.614 |
+| user@gmail.com | [myemailverifier](https://centminmod.com/myemailverifier) | valid | 2.631 | yes | no | thread-pool-0_10 | 6.461 |
+| user@gmail.com | [reoon](https://centminmod.com/reoon) | valid | 1.1321 | yes | no | thread-pool-0_10 | 5.744 |
+| user@gmail.com | [zerobounce](https://centminmod.com/zerobounce) | valid | 0.3301 | yes | no | thread-pool-0_10 | 2.930 |
+| user@mailsac.com | [bouncify](https://centminmod.com/bouncify) | undeliverable | 0.825 | yes | yes | thread-pool-0_0 | 181.576 |
+| user@mailsac.com | [captainverify](https://centminmod.com/captainverify) | risky | 0.501 | no | yes | thread-pool-0_0 | 22.836 |
+| user@mailsac.com | [emaillistverify](https://centminmod.com/emaillistverify) | unknown | 2.0574 | yes | yes | thread-pool-0_0 | 4.208 |
+| user@mailsac.com | [millionverifier](https://centminmod.com/millionverifier) | disposable | 0.516 | yes | yes | thread-pool-0_0 | 1.614 |
+| user@mailsac.com | [myemailverifier](https://centminmod.com/myemailverifier) | invalid | 3.8669 | yes | yes | thread-pool-0_0 | 6.461 |
+| user@mailsac.com | [reoon](https://centminmod.com/reoon) | disposable | 3.0198 | yes | yes | thread-pool-0_0 | 5.744 |
+| user@mailsac.com | [zerobounce](https://centminmod.com/zerobounce) | do_not_mail | 0.3632 | yes | yes | thread-pool-0_0 | 2.930 |
+| user@tempr.email | [bouncify](https://centminmod.com/bouncify) | undeliverable | 0.6154 | no | yes | thread-pool-0_8 | 181.576 |
+| user@tempr.email | [captainverify](https://centminmod.com/captainverify) | invalid | 0.5697 | no | no | thread-pool-0_8 | 22.836 |
+| user@tempr.email | [emaillistverify](https://centminmod.com/emaillistverify) | unknown | 2.0571 | no | yes | thread-pool-0_8 | 4.208 |
+| user@tempr.email | [millionverifier](https://centminmod.com/millionverifier) | disposable | 0.5481 | no | yes | thread-pool-0_8 | 1.614 |
+| user@tempr.email | [myemailverifier](https://centminmod.com/myemailverifier) | invalid | 4.1935 | no | yes | thread-pool-0_8 | 6.461 |
+| user@tempr.email | [reoon](https://centminmod.com/reoon) | disposable | 1.0481 | yes | yes | thread-pool-0_8 | 5.744 |
+| user@tempr.email | [zerobounce](https://centminmod.com/zerobounce) | do_not_mail | 0.3356 | no | yes | thread-pool-0_8 | 2.930 |
+| user@yahoo.com | [bouncify](https://centminmod.com/bouncify) | accept-all | 0.7072 | yes | no | thread-pool-0_12 | 181.576 |
+| user@yahoo.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.597 | no | no | thread-pool-0_12 | 22.836 |
+| user@yahoo.com | [emaillistverify](https://centminmod.com/emaillistverify) | valid | 1.3502 | yes | no | thread-pool-0_12 | 4.208 |
+| user@yahoo.com | [millionverifier](https://centminmod.com/millionverifier) | unknown | 0.5145 | yes | no | thread-pool-0_12 | 1.614 |
+| user@yahoo.com | [myemailverifier](https://centminmod.com/myemailverifier) | valid | 3.118 | yes | no | thread-pool-0_12 | 6.461 |
+| user@yahoo.com | [reoon](https://centminmod.com/reoon) | valid | 1.1854 | yes | no | thread-pool-0_12 | 5.744 |
+| user@yahoo.com | [zerobounce](https://centminmod.com/zerobounce) | valid | 1.0279 | yes | no | thread-pool-0_12 | 2.930 |
+| xyz@centmil1.com | [bouncify](https://centminmod.com/bouncify) | undeliverable | 0.805 | no | no | thread-pool-0_1 | 181.576 |
+| xyz@centmil1.com | [captainverify](https://centminmod.com/captainverify) | unknown | 21.5099 | no | no | thread-pool-0_1 | 22.836 |
+| xyz@centmil1.com | [emaillistverify](https://centminmod.com/emaillistverify) | unknown | 3.1766 | no | no | thread-pool-0_1 | 4.208 |
+| xyz@centmil1.com | [millionverifier](https://centminmod.com/millionverifier) | invalid | 0.4452 | no | no | thread-pool-0_1 | 1.614 |
+| xyz@centmil1.com | [myemailverifier](https://centminmod.com/myemailverifier) | invalid | 4.0985 | no | no | thread-pool-0_1 | 6.461 |
+| xyz@centmil1.com | [reoon](https://centminmod.com/reoon) | invalid | 0.7275 | no | no | thread-pool-0_1 | 5.744 |
+| xyz@centmil1.com | [zerobounce](https://centminmod.com/zerobounce) | invalid | 0.3171 | no | no | thread-pool-0_1 | 2.930 |
+| xyz@domain1.com | [bouncify](https://centminmod.com/bouncify) | undeliverable | 2.0397 | no | no | thread-pool-0_3 | 181.576 |
+| xyz@domain1.com | [captainverify](https://centminmod.com/captainverify) | invalid | 0.607 | no | no | thread-pool-0_3 | 22.836 |
+| xyz@domain1.com | [emaillistverify](https://centminmod.com/emaillistverify) | email_disabled | 1.0901 | no | no | thread-pool-0_3 | 4.208 |
+| xyz@domain1.com | [millionverifier](https://centminmod.com/millionverifier) | invalid | 0.4442 | no | no | thread-pool-0_3 | 1.614 |
+| xyz@domain1.com | [myemailverifier](https://centminmod.com/myemailverifier) | invalid | 3.1271 | no | no | thread-pool-0_3 | 6.461 |
+| xyz@domain1.com | [reoon](https://centminmod.com/reoon) | invalid | 1.7166 | no | no | thread-pool-0_3 | 5.744 |
+| xyz@domain1.com | [zerobounce](https://centminmod.com/zerobounce) | invalid | 0.3335 | no | no | thread-pool-0_3 | 2.930 |
+
+
 ## Email Verification Results Table Compare
 
 Table comparing the JSON field values for each email address across the different Email cleaning service APIs and also compared to local script non-API queries results.
@@ -2168,7 +2374,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 - `user@tempr.email` another known disposable email address
 - `info@domain2.com` known valid Google Workspae email address that is working
 - `user@gmail.com` known valid Gmail address
-- `op999@gmail.com` known invalid user does not exist Gmail address AFAIKA
+- `op999@gmail.com` known invalid user does not exist Gmail address AFAIK
 - `user@yahoo.com` known valid Yahoo email address that is working
 
 | Email | API | status | sub_status | status_code | free_email | disposable_email |
