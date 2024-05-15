@@ -2234,7 +2234,7 @@ Ranked by Maximum API Response Time (fastest to slowest) for all 15 email addres
 From the data, we can observe that:
 
 - Zerobounce and MillionVerifier are the fastest email verification API providers in terms of both average and maximum API response times. MillionVerifier overall would be fastest if you take into account the max API response times.
-- Bouncify is the slowest provider, with the highest average and maximum API response times by a significant margin.
+- Bouncify is the slowest provider, with the highest average and maximum API response times by a significant margin. The email check for `user2@hotmail.com` retuned an `api_error` and API response time for that check was `180.6231` seconds. If you excluded the `api_error` timed result, the average API response time for remaining 14 sample email addresses would of been `1.44` seconds.
 - CaptainVerify has a relatively high maximum API response time of 21.5099 seconds (due to the email check for `xyz@centmil1.com`), although its average response time is better than Bouncify and MyEmailVerifier.
 - Reoon, EmailListVerify, and MyEmailVerifier have relatively similar average and maximum API response times, ranking in the mid-range among the providers.
 - However, you have to remember that overall speed will depend on the individual API response time and would need to factor in the respective email verification provider's API rate limits.
