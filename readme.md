@@ -2180,7 +2180,7 @@ user    0m0.352s
 sys     0m0.029s
 ```
 
-With `api_response_time` and `api_thread_number` now available in JSON result output, I can now benchmark all tested email verification API providers more accurately for per email verificate API response times. Below are the tabulated comparison results. I didn't test [Proofy API](#proofy-api) as I ran out of credits and [Bounceless API](#bounceless-api) wasn't worth testing given it's inaccurate results for [Gmail accounts](#bounceless-api).
+With `api_response_time` and `api_thread_number` now available in JSON result output, I can now benchmark all tested email verification API providers more accurately for per email verificate API response times. Below are the tabulated comparison results. I didn't test [Proofy API](#proofy-api) as I ran out of credits and Proofy doesn't have a bulk file API support and [Bounceless API](#bounceless-api) wasn't worth testing given it's inaccurate results for [Gmail accounts](#bounceless-api).
 
 The benchmark tests were against the 15 email address sample list `-l emaillist.txt` from the commands
 
@@ -2213,23 +2213,23 @@ Providers ranked from fastest to slowest for average and maximum API response ti
 
 Ranked by Average API Response Time (fastest to slowest) for all 15 email addresses checked:
 
-1. **Zerobounce**: Average API Response Time = 0.3922 seconds
-2. **MillionVerifier**: Average API Response Time = 0.4649 seconds
-3. **EmailListVerify**: Average API Response Time = 1.3805 seconds
-4. **Reoon**: Average API Response Time = 1.3850 seconds
-5. **CaptainVerify**: Average API Response Time = 2.1669 seconds
-6. **MyEmailVerifier**: Average API Response Time = 3.9018 seconds
-7. **Bouncify**: Average API Response Time = 13.3857 seconds
+1. **[zerobounce](https://centminmod.com/zerobounce)**: Average API Response Time = 0.3922 seconds
+2. **[millionverifier](https://centminmod.com/millionverifier)**: Average API Response Time = 0.4649 seconds
+3. **[emaillistverify](https://centminmod.com/emaillistverify)**: Average API Response Time = 1.3805 seconds
+4. **[reoon](https://centminmod.com/reoon)**: Average API Response Time = 1.3850 seconds
+5. **[captainverify](https://centminmod.com/captainverify)**: Average API Response Time = 2.1669 seconds
+6. **[myemailverifier](https://centminmod.com/myemailverifier)**: Average API Response Time = 3.9018 seconds
+7. **[bouncify](https://centminmod.com/bouncify)**: Average API Response Time = 13.3857 seconds
 
 Ranked by Maximum API Response Time (fastest to slowest) for all 15 email addresses checked:
 
-1. **MillionVerifier**: Max API Response Time = 0.5481 seconds
-2. **Zerobounce**: Max API Response Time = 1.0279 seconds
-3. **Reoon**: Max API Response Time = 3.0198 seconds
-4. **EmailListVerify**: Max API Response Time = 3.1766 seconds
-5. **MyEmailVerifier**: Max API Response Time = 4.903 seconds
-6. **CaptainVerify**: Max API Response Time = 21.5099 seconds
-7. **Bouncify**: Max API Response Time = 180.6231 seconds
+1. **[millionverifier](https://centminmod.com/millionverifier)**: Max API Response Time = 0.5481 seconds
+2. **[zerobounce](https://centminmod.com/zerobounce)**: Max API Response Time = 1.0279 seconds
+3. **[reoon](https://centminmod.com/reoon)**: Max API Response Time = 3.0198 seconds
+4. **[emaillistverify](https://centminmod.com/emaillistverify)**: Max API Response Time = 3.1766 seconds
+5. **[myemailverifier](https://centminmod.com/myemailverifier)**: Max API Response Time = 4.903 seconds
+6. **[captainverify](https://centminmod.com/captainverify)**: Max API Response Time = 21.5099 seconds
+7. **[bouncify](https://centminmod.com/bouncify)**: Max API Response Time = 180.6231 seconds
 
 From the data, we can observe that:
 
