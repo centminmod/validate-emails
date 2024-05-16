@@ -39,6 +39,7 @@
   - [API Merge](#api-merge)
     - [API Merge Filters](#api-merge-filters)
 - [Cloudflare HTTP Forward Proxy Cache With KV Storage](#cloudflare-http-forward-proxy-cache-with-kv-storage)
+  - [MillionVerifier Cloudflare Cache Support](#millionverifier-cloudflare-cache-support)
   - [ZeroBounce Cloudflare Cache Support](#zerobounce-cloudflare-cache-support)
   - [Cloudflare Cache Purge Support](#cloudflare-cache-purge-support)
   - [EmailListVeirfy Bulk File API Cloudflare Cache Support](#emaillistveirfy-bulk-file-api-cloudflare-cache-support)
@@ -304,7 +305,7 @@ api_url=http=https://your_cf_worker.com
 
 ### S3 Storage Support
 
-Commercial email verification providers usually only store your file based uploaded or bulk file API uploaded files for a defined duration i.e. 15 to 30 days before they are deleted. And per email check API results are usually not stored at all. So if you need to store your per email check or bulk file API email verification results for longer, the `validate_emails.py` script now supports saving your results to S3 object storage providers - Cloudflare R2 or Amazon AWS S3.
+Commercial email verification providers usually only store your file based uploaded or bulk file API uploaded files for a defined duration i.e. 15 to 30 days before they are deleted. And per email check API results are usually not stored at all. So if you need to store your per email check or bulk file API email verification results for longer, the `validate_emails.py` script now supports saving your results to S3 object storage providers - Cloudflare R2 or Amazon AWS S3. Saving such email verification result logs might be usual for historic comparisons and checks. According to [ZeroBounce](https://www.zerobounce.net/email-list-decay/), on average an email list decays by an average of 25.74% yearly with the leading causes of bounced emails being invalid email addresses and catch-all email addresses. 
 
 Add optional Cloudflare R2 S3 object storage or Amazon AWS S3 object storage which will allow you to save your `validate_emails.py` ran JSON output in externel Cloudflare R2 or Amazon AWS S3 object storage buckets via `validate_emails.ini` defined:
 
@@ -1976,7 +1977,7 @@ Personal experience with all commercial email verification providers:
 - ZeroBounce, only annoying issues right now are on their web site end and not their API specifically:
   1. initial login to web site dashboard are very slow as is reloading the dashboard i.e. browser F5 refresh. Sometimes just stuck with their purple reloading page progress icon that never actually loads the web page/dashboard.
   2. the web site login session durations are very short, so annoyingly you get logged out very quickly making it more secure. Make sure you use a password manager to make re-logins less annoying. Though if you're using a script and their API, you don't have to login as frequently.
-- ZeroBounce offers per email, batch email and bulk file API endpoints. However, on trial freemium plan, I seem to be only able to get per email API to work. The batch email API seems to complain of invalid API key or no credits API response message, despite the single per email API working with the same API key and a positive credit balance.
+- ZeroBounce offers per email, batch email and bulk file API endpoints.
 - ZeroBounce doesn't charge for `unknown` status emails
 - ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) - 50,000 requests in 10 seconds (validations) before temporarily blocking for 1 minute. A maximum of 250 requests in 1 minute for the` bulkapi.zerobounce.net/` before temporarily blocking for 1 hour. And allow a maximum of 20 requests in 1 minute for the `bulkapi.zerobounce.net/v2/validatebatch` before temporarily blocking for 10 minutes. Rate limits seem more complicated so will need to test my script to ensure it operates under their rate limits.
 - Reoon as added on May 12, 2024 and says they take around 20 minutes to verify a set of 50,000 mixed-quality email addresses. The 15 email address sameple test took 2.176 seconds to complete.
@@ -6700,7 +6701,7 @@ Remember to replace `results.txt` with the actual path to your file if it's loca
 
 # Cloudflare HTTP Forward Proxy Cache With KV Storage
 
-`validate_emails.py` script's [EmailListVerify](https://centminmod.com/emaillistverify) and [Zerobounce](https://centminmod.com/zerobounce) per email check API routines has been updated to support a custom Cloudflare HTTP forward proxy Worker cache configuration which can take the script's API request and forward it to EmailListVerify's API endpoint. The Cloudflare Worker script will then save the API result into Cloudflare KV storage on their edge servers and save with a date timestamp. This can potentially reduce your overall [EmailListVerify](https://centminmod.com/emaillistverify) per email verification costs if you need to run `validate_emails.py` a few times back to back bypassing having to need to call `validate_emails.py` API itself.
+`validate_emails.py` script's [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier) and [Zerobounce](https://centminmod.com/zerobounce) per email check API routines has been updated to support a custom Cloudflare HTTP forward proxy Worker cache configuration which can take the script's API request and forward it to EmailListVerify's API endpoint. The Cloudflare Worker script will then save the API result into Cloudflare KV storage on their edge servers and save with a date timestamp. This can potentially reduce your overall [EmailListVerify](https://centminmod.com/emaillistverify) per email verification costs if you need to run `validate_emails.py` a few times back to back bypassing having to need to call `validate_emails.py` API itself.
 
 `validate_emails.py` script added `-apicache`, `-apicachettl`, `-apicache-purge` and `-apicachecheck` arguments:
 
@@ -6836,6 +6837,60 @@ Cloudflare KV storage entries
 | Key                                        | Value                                           |
 |--------------------------------------------|--------------------------------------------------|
 | emaillistverify:hnyfmw5@canadlan-drugs.com  | {"result":"unknown","timestamp":1715175271549,"ttl":120}  |
+
+## MillionVerifier Cloudflare Cache Support
+
+May 17, 2023 added MillionVerifier Cloudflare cache support.
+
+For MillionVerifier per email check API `-api millionverifier -apikey_mv $mvkey` with Cloudflare Cache `-apicache millionverifier -apicachettl 120`. Added `api_response_time` and `api_thread_number` JSON fields which measure the response time from Cloudflare Worker KV cached storage/store or Cloudflare CDN cache.
+
+Note: updated MillionVerifier API JSON response to also report API returned `subresult` value.
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw2@canadlan-drugs.com -tm all -api millionverifier -apikey_mv $mvkey -apicache millionverifier -apicachettl 120
+[
+    {
+        "email": "hnyfmw2@canadlan-drugs.com",
+        "status": "invalid",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "api_response_time": 0.0001,
+        "api_thread_number": "cached",
+        "free_email_api": "no",
+        "role_api": "no",
+        "subresult": "dns_error"
+    }
+]
+
+real    0m0.776s
+user    0m0.271s
+sys     0m0.021s
+```
+
+Compared with uncached regular API response where MillionVerifier's API `api_response_time` = `0.2962` seconds compared to Cloudflare cached `api_response_time` = `0.001` seconds. While `validate_emails.py` script time difference was `0.776s` cached vs `1.631s` uncached.
+
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw2@canadlan-drugs.com -tm all -api millionverifier -apikey_mv $mvkey
+[
+    {
+        "email": "hnyfmw2@canadlan-drugs.com",
+        "status": "invalid",
+        "subresult": "dns_error",
+        "status_code": null,
+        "free_email": "no",
+        "disposable_email": "no",
+        "free_email_api": false,
+        "role_api": false,
+        "api_response_time": 0.2962,
+        "api_thread_number": "thread-pool-0_0"
+    }
+]
+
+real    0m1.631s
+user    0m0.356s
+sys     0m0.025s
+```
 
 ## ZeroBounce Cloudflare Cache Support
 
