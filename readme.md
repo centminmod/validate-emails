@@ -2146,10 +2146,10 @@ Table also takes into account API rate limits besides my single and 15 email add
 
 | Provider Rank For API Speed      | emails/sec | emails/min |
 |----------|--------------|-------------|
-| 1. [MillionVerifier](https://centminmod.com/millionverifier)  | 400/s       | no doc mention     |
-| 2. [EmailListVerify](https://centminmod.com/emaillistverify)  | no doc mention       | no doc mention      |
-| 3. [Reoon](https://centminmod.com/reoon)  | no doc mention       | no doc mention      |
-| 4. [Zerobounce](https://centminmod.com/zerobounce)  | 50,000 per 10s but 1 min block    | no doc mention      |
+| 1. [Zerobounce](https://centminmod.com/zerobounce)  | 50,000 per 10s but 1 min block    | no doc mention      |
+| 2. [MillionVerifier](https://centminmod.com/millionverifier)  | 400/s       | no doc mention     |
+| 3. [EmailListVerify](https://centminmod.com/emaillistverify)  | no doc mention       | no doc mention      |
+| 4. [Reoon](https://centminmod.com/reoon)  | no doc mention       | no doc mention      |
 | 5. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
 | 6. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
 | 7. [Proofy.io](https://centminmod.com/proofy)  | no doc mention       | no doc mention      |
