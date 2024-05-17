@@ -2037,7 +2037,7 @@ Personal experience with all commercial email verification providers:
     - risky
     - undeliverable
     - unknown
-  - ZeroBounce has 7 classifications and also 23 `sub_status` classifications:
+  - ZeroBounce has [7 classifications](https://www.zerobounce.net/docs/email-validation-api-quickstart/#status_codes__v2__) and also [23 `sub_status` classifications](https://www.zerobounce.net/docs/email-validation-api-quickstart/#status_codes__v2__):
     - classifications:
       - valid
       - invalid
@@ -6900,36 +6900,56 @@ sys     0m0.025s
 For ZeroBounce per email check API `-api zerobounce -apikey_zb $zbkey` with Cloudflare Cache `-apicache zerobounce -apicachettl 900`
 
 ```
-time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey -tm all -apicache zerobounce -apicachettl 900
-
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -api zerobounce -apikey_zb $zbkey -tm all -apicache zerobounce -apicachettl 900
 [
     {
         "email": "hnyfmw@canadlan-drugs.com",
         "status": "invalid",
         "status_code": null,
         "free_email": "no",
-        "disposable_email": "no"
+        "disposable_email": "no",
+        "api_response_time": 0.0,
+        "api_thread_number": "cached"
     }
 ]
 
-real    0m0.777s
-user    0m0.253s
-sys     0m0.034s
+real    0m0.784s
+user    0m0.260s
+sys     0m0.027s
 ```
 
 Log inspection
 
 ```
-cat $(ls -Art | tail -3 | grep 'email_verification')
-
-2024-05-11 11:28:05,131 - INFO - Cache result: {'address': 'hnyfmw@canadlan-drugs.com', 'status': 'invalid', 'sub_status': 'no_dns_entries', 'free_email': False, 'did_you_mean': None, 'account': 'hnyfmw', 'domain': 'canadlan-drugs.com', 'domain_age_days': '2026', 'smtp_provider': '', 'mx_found': 'false', 'mx_record': '', 'firstname': None, 'lastname': None, 'gender': None, 'country': None, 'region': None, 'city': None, 'zipcode': None, 'processed_at': '2024-05-11 10:37:39.035'}
+cat logs/$(ls -Art logs | tail -3 | grep 'email_verification')                                       
+2024-05-17 00:19:14,801 - INFO - Making cache check request to: https://cfworkerdomain.com?email=hnyfmw%40canadlan-drugs.com&cachettl=900&apicache=zerobounce
+2024-05-17 00:19:14,986 - INFO - Cache result: {'address': 'hnyfmw@canadlan-drugs.com', 'status': 'invalid', 'sub_status': 'no_dns_entries', 'free_email': False, 'did_you_mean': None, 'account': 'hnyfmw', 'domain': 'canadlan-drugs.com', 'domain_age_days': '2032', 'smtp_provider': '', 'mx_found': 'false', 'mx_record': '', 'firstname': None, 'lastname': None, 'gender': None, 'country': None, 'region': None, 'city': None, 'zipcode': None, 'processed_at': '2024-05-17 00:08:48.644'}
 ```
 
-Cloudflare KV storage entries
+Compared to regular non-cached ZeroBounce API request with `api_response_time` = `0.159` seconds using `api_thread_number` thread pool = `0_0`. While `validate_emails.py` script time difference was `0.784s` cached vs `4.501s` uncached.
 
-| Key                                        | Value                                           |
-|--------------------------------------------|--------------------------------------------------|
-| zerobounce:hnyfmw@canadlan-drugs.com  | {"result":{"address":"hnyfmw@canadlan-drugs.com","status":"invalid","sub_status":"no_dns_entries","free_email":false,"did_you_mean":null,"account":"hnyfmw","domain":"canadlan-drugs.com","domain_age_days":"2026","smtp_provider":"","mx_found":"false","mx_record":"","firstname":null,"lastname":null,"gender":null,"country":null,"region":null,"city":null,"zipcode":null,"processed_at":"2024-05-11 11:39:24.133"},"timestamp":1715427564270,"ttl":900}  |
+```
+time python validate_emails.py -f user@domain1.com -e hnyfmw@canadlan-drugs.com -tm all -api zerobounce -apikey_zb $zbkey
+[
+    [
+        {
+            "email": "hnyfmw@canadlan-drugs.com",
+            "status": "invalid",
+            "sub_status": "no_dns_entries",
+            "status_code": null,
+            "free_email": "no",
+            "disposable_email": "no",
+            "free_email_api": "no",
+            "api_response_time": 0.158,
+            "api_thread_number": "thread-pool-0_0"
+        }
+    ]
+]
+
+real    0m4.501s
+user    0m0.353s
+sys     0m0.027s
+```
 
 ## Cloudflare Cache Purge Support
 
