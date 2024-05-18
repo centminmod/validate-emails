@@ -98,20 +98,19 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
 
 ```
 python validate_emails.py
-usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATCH_SIZE] [-d] [-v] [-delay DELAY]
-                             [--cache-timeout CACHE_TIMEOUT] [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}]
-                             [-dns {asyncio,concurrent,sequential}] [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE]
-                             [-smtp {default,ses,generic,rotate}] [-xf] [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile]
-                             [-wf WORKER_FACTOR]
-                             [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier,zerobounce,reoon,bouncify,bounceless}]
-                             [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
-                             [-apibulk {emaillistverify,millionverifier,proofy,bounceless}] [-apikey_cv CAPTAINVERIFY_API_KEY]
-                             [-apikey_pf PROOFY_API_KEY] [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS]
-                             [-pf_batchsize PROOFY_BATCH_SIZE] [-apikey_mev MYEMAILVERIFIER_API_KEY] [-apikey_zb ZEROBOUNCE_API_KEY]
-                             [-apikey_rn REOON_API_KEY] [-reoon_mode {quick,power}] [-apikey_bf BOUNCIFY_API_KEY]
-                             [-apikey_bl BOUNCELESS_API_KEY] [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
-                             [-apicache {emaillistverify,zerobounce}] [-apicachettl APICACHETTL] [-apicachecheck {count,list,purge}]
-                             [-apicache-purge] [-store {r2,s3}] [-store-list]
+usage: validate_emails.py [-h] -f FROM_EMAIL [-e EMAILS] [-l LIST_FILE] [-b BATCH_SIZE] [-d] [-v] [-delay DELAY] [--cache-timeout CACHE_TIMEOUT]
+                          [-t TIMEOUT] [-r RETRIES] [-tm {syntax,dns,smtp,all,disposable}] [-dns {asyncio,concurrent,sequential}]
+                          [-p {thread,asyncio}] [-bl BLACKLIST_FILE] [-wl WHITELIST_FILE] [-smtp {default,ses,generic,rotate}] [-xf]
+                          [-xfdb XF_DATABASE] [-xfprefix XF_PREFIX] [-profile] [-wf WORKER_FACTOR]
+                          [-api {emaillistverify,millionverifier,captainverify,proofy,myemailverifier,zerobounce,reoon,bouncify,bounceless}]
+                          [-apikey EMAILLISTVERIFY_API_KEY] [-apikey_mv MILLIONVERIFIER_API_KEY]
+                          [-apibulk {emaillistverify,millionverifier,proofy,bounceless}] [-apikey_cv CAPTAINVERIFY_API_KEY]
+                          [-apikey_pf PROOFY_API_KEY] [-apiuser_pf PROOFY_USER_ID] [-pf_max_connections PROOFY_MAX_CONNECTIONS]
+                          [-pf_batchsize PROOFY_BATCH_SIZE] [-apikey_mev MYEMAILVERIFIER_API_KEY] [-apikey_zb ZEROBOUNCE_API_KEY]
+                          [-apikey_rn REOON_API_KEY] [-reoon_mode {quick,power}] [-reoon_max_connections REOON_MAX_CONNECTIONS]
+                          [-apikey_bf BOUNCIFY_API_KEY] [-apikey_bl BOUNCELESS_API_KEY] [-mev_max_connections MEV_MAX_CONNECTIONS] [-apimerge]
+                          [-apicache {emaillistverify,zerobounce,millionverifier}] [-apicachettl APICACHETTL]
+                          [-apicachecheck {count,list,purge}] [-apicache-purge] [-store {r2,s3}] [-store-list]
 validate_emails.py: error: the following arguments are required: -f/--from_email
 ```
 
@@ -214,6 +213,8 @@ The available arguments are:
     - Description: Maximum number of concurrent connections for the Proofy.io API (default: 1)
   - `-mev_max_connections` (optional):
     - Description: Maximum number of concurrent connections for the MyEmailVerifier API (default: 1)
+  - `-reoon_max_connections` (optional):
+    - Description: Maximum number of concurrent connections for the Reoon API (default: 5)
   - `-apicache`, `--api_cache` (optional):
     - Description: Set the appropriate API's Cloudflare Worker KV cacheKey prefix. Available options are:
       - `emaillistverify`: Use with the EmailListVerify API.
@@ -1990,7 +1991,7 @@ Personal experience with all commercial email verification providers:
 - ZeroBounce offers per email, batch email and bulk file API endpoints.
 - ZeroBounce doesn't charge for `unknown` status emails
 - ZeroBounce API rate limit speeds are outlined in there documentation [here](https://www.zerobounce.net/docs/api-dashboard/#API_Rate_Limits) - 50,000 requests in 10 seconds (validations) before temporarily blocking for 1 minute. A maximum of 250 requests in 1 minute for the` bulkapi.zerobounce.net/` before temporarily blocking for 1 hour. And allow a maximum of 20 requests in 1 minute for the `bulkapi.zerobounce.net/v2/validatebatch` before temporarily blocking for 10 minutes. Rate limits seem more complicated so will need to test my script to ensure it operates under their rate limits.
-- Reoon as added on May 12, 2024 and says they take around 20 minutes to verify a set of 50,000 mixed-quality email addresses. The 15 email address sameple test took 2.176 seconds to complete.
+- Reoon as added on May 12, 2024 and per email verification API should be kept at [less than 5 concurrent threads](https://www.reoon.com/articles/api-documentation-of-reoon-email-verifier/). They say they take around 20 minutes to verify a set of 50,000 mixed-quality email addresses. The 15 email address sameple test took 2.176 seconds to complete.
 - Reoon unfortunately incorrectly classified `op999@gmail.com` as a `valid` email when it isn't and marked by all other APIs as `invalid`/`undeliverable`/`email_disabled`. This seems to be due to Reoon having 2 modes for their single email verification API for a `quick` and `power` modes. My initial tests are with `quick` mode. But I will need to do testing with `power` mode in future. Even their web site dashboard based single email verification check returns correct `invalid` status for this email suggesting they used `power` mode there too. I honestly do not know why anyone would use `quick` mode given how common Gmail email addresses are.
   - From their documentation:
     * The disadvantages of `quick` mode verification: Deep verification and detailed information are less available compared to the POWER mode. So individual inbox status will not be checked in this mode. The quick verification mode includes:
