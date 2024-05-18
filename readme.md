@@ -2206,7 +2206,7 @@ user    0m0.352s
 sys     0m0.029s
 ```
 
-With `api_response_time` and `api_thread_number` now available in JSON result output, I can now benchmark all tested email verification API providers more accurately for per email verificate API response times. Below are the tabulated comparison results. I didn't test [Proofy API](#proofy-api) as I ran out of credits and Proofy doesn't have a bulk file API support and [Bounceless API](#bounceless-api) wasn't worth testing given it's inaccurate results for [Gmail accounts](#bounceless-api).
+With `api_response_time` and `api_thread_number` now available in JSON result output, I can now benchmark all tested email verification API providers more accurately for per email verification API response times. Below are the tabulated comparison results. I didn't test [Proofy API](#proofy-api) as I ran out of credits and Proofy doesn't have a bulk file API support and [Bounceless API](#bounceless-api) wasn't worth testing given it's inaccurate results for [Gmail accounts](#bounceless-api).
 
 The benchmark tests were against the 15 email address sample list `-l emaillist.txt` from the commands
 
