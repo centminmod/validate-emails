@@ -2113,7 +2113,11 @@ Below are their respectivate pay as you go credit pricing for email verification
   - May 12, 2024 add [Bouncify](https://centminmod.com/bouncify) API support
   - May 14, 2024 add [Bounceless](https://centminmod.com/bounceless) API support - seems there's difference in pricing for 500K on their web site at US$649 but logged into my dashboard pricing is US$799.
 
-Cheapest provider for each PAYG email bundled of email verifications credits will have a :heavy_dollar_sign: next to it
+**Notes:**
+
+- Cheapest provider for each PAYG email bundled of email verifications credits will have a :heavy_dollar_sign: next to it
+- Given the results of the [Email Verification Provider API Speed Benchmarks](#email-verification-provider-api-speed-benchmarks) and my [personal experiences](#personal-experience), the top 4 contenders for me personally would be: [Zerobounce](https://centminmod.com/zerobounce), [MillionVerifier](https://centminmod.com/millionverifier), [EmailListVerify](https://centminmod.com/emaillistverify) and [Reoon](https://centminmod.com/reoon).
+- [MillionVerifier](https://centminmod.com/millionverifier) would nearly get the best overall for performance to price ratio, but it's sometimes inaccurate classification for valid Yahoo email addresses means you can't rely on it for Yahoo emails at least. Still it's cheap, so you could run all non-Yahoo email addresses through [MillionVerifier](https://centminmod.com/millionverifier) and separately run Yahoo email addresses through [EmailListVerify](https://centminmod.com/emaillistverify) and still work out cheaper than using [Zerobounce](https://centminmod.com/zerobounce). My `validate_emails.py` script would make such verifications easy to do support multipler email verification API providers in the one script :sunglasses: Though [Zerobounce](https://centminmod.com/zerobounce) has the [fastest API response times](#email-verification-provider-api-speed-benchmarks).
 
 | Provider | 1k | 2k | 5k | 10k | 25k | 30k | 50k | 70k | 100k |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
