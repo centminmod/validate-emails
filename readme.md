@@ -220,6 +220,8 @@ The available arguments are:
   - `-apicache`, `--api_cache` (optional):
     - Description: Set the appropriate API's Cloudflare Worker KV cacheKey prefix. Available options are:
       - `emaillistverify`: Use with the EmailListVerify API.
+      - `zerobounce`: Use with the ZeroBounce API.
+      - `millionverifier`: Use with the MillionVerifier API.
   - `-apicachettl` (optional):
     - Description:  this sets the cache TTL duration in seconds for how long Cloudflare CDN/KV stores in cache (default: 300 seconds)
   - `-apicachecheck` (optional):
