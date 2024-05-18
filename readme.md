@@ -2113,28 +2113,30 @@ Below are their respectivate pay as you go credit pricing for email verification
   - May 12, 2024 add [Bouncify](https://centminmod.com/bouncify) API support
   - May 14, 2024 add [Bounceless](https://centminmod.com/bounceless) API support - seems there's difference in pricing for 500K on their web site at US$649 but logged into my dashboard pricing is US$799.
 
+Cheapest provider for each PAYG email bundled of email verifications credits will have a :heavy_dollar_sign: next to it
+
 | Provider | 1k | 2k | 5k | 10k | 25k | 30k | 50k | 70k | 100k |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
-| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#email-verification-results-table-compare)) | $4 (0.0008) | - | $15 (0.003)| $24 (0.0024)| $49 (0.00196)| - | $89 (0.00178)| - | $169 (0.00169)|
+| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#email-verification-results-table-compare)) | $4 (0.0008) :heavy_dollar_sign: | - | $15 (0.003) :heavy_dollar_sign:| $24 (0.0024)| $49 (0.00196)| - | $89 (0.00178)| - | $169 (0.00169)|
 | [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#email-verification-results-table-compare)) | - | - | - | $37 (0.0037)| $49 (0.00196)| - | $77 (0.00154)| - | $129 (0.00129)|
-| [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#email-verification-results-table-compare)) | - | $14 (0.007)| $28 (0.0056)| $39 (0.0039)| $79 (0.00316)| - | $149 (0.00298)| - | $239 (0.00239)|
+| [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#email-verification-results-table-compare)) | - | $14 (0.007) :heavy_dollar_sign:| $28 (0.0056)| $39 (0.0039)| $79 (0.00316)| - | $149 (0.00298)| - | $239 (0.00239)|
 | [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#email-verification-results-table-compare)) | $7 (0.007) | - | $30 (0.006) | $60 (0.006) | $75 (0.003) | - | $150 (0.003) | - | $200 (0.002) |
 | [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-results-table-compare)) | - | - | $16 (0.0032)| $29 (0.0029)| - | $63 (0.0021)| $99 (0.00198)| $124 (0.00177)| $149 (0.00149)|
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-results-table-compare)) | - | $20 (0.01) | $45 (0.009) | $80 (0.008) | $190 (0.0076) | - | $375 (0.0075) | - | $425 (0.00425) |
-| [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | - | - | - | $11.91 (0.00119) | $29.66 (0.00119) | - | $58.95 (0.00118) | $87.86 (0.00126) | $116.40 (0.00116) |
-| [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-results-table-compare)) | - | - | - | $19 (0.0019) | - | $39 (0.0013) | - | - | $99 (0.001) |
+| [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | - | - | - | $11.91 (0.00119) :heavy_dollar_sign: | $29.66 (0.00119) :heavy_dollar_sign: | - | $58.95 (0.00118) :heavy_dollar_sign: | $87.86 (0.00126) :heavy_dollar_sign: | $116.40 (0.00116) |
+| [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-results-table-compare)) | - | - | - | $19 (0.0019) | - | $39 (0.0013) :heavy_dollar_sign: | - | - | $99 (0.001) :heavy_dollar_sign: |
 | [Bounceless](https://centminmod.com/bounceless) ([demo](#bounceless-api), [results](#email-verification-results-table-compare)) | - | - | $29 (0.0058) | - | $99 (0.00396) | - | - | - | $299 (0.00299) |
 
 | Provider | 200k | 250k | 300k | 500k | 1m | 2.5m | 5m | 10m |
 |----------------------------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
-| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#email-verification-results-table-compare)) | - | $349 (0.001396)| - | $449 (0.000898)| $599 (0.000599)| $1190 (0.000476)| $1990 (0.000398)| $3290 (0.000329)|
-| [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#email-verification-results-table-compare)) | - | - | - | $259 (0.000518)| $389 (0.000389)| - | $1439 (0.000288)| $2529 (0.000253)|
+| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#email-verification-results-table-compare)) | - | $349 (0.001396)| - | $449 (0.000898)| $599 (0.000599)| $1190 (0.000476) :heavy_dollar_sign:| $1990 (0.000398)| $3290 (0.000329)|
+| [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#email-verification-results-table-compare)) | - | - | - | $259 (0.000518) :heavy_dollar_sign:| $389 (0.000389) :heavy_dollar_sign:| - | $1439 (0.000288) :heavy_dollar_sign:| $2529 (0.000253) :heavy_dollar_sign:|
 | [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#email-verification-results-table-compare)) | - | $349 (0.001396)| - | $549 (0.001098)| $749 (0.000749)| $1249 (0.0005) | $1849 (0.00037)| - |
-| [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#email-verification-results-table-compare)) | - | $250 (0.001) | - | $500 (0.001) | $650 (0.00065)| - | $2000 (0.0004) | - |
-| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-results-table-compare)) | $229 (0.001145)| - | $289 (0.000963)| $429 (0.000858)| $699 (0.000699)| $1399 (0.00056)| - | - |
+| [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#email-verification-results-table-compare)) | - | $250 (0.001) :heavy_dollar_sign: | - | $500 (0.001) | $650 (0.00065)| - | $2000 (0.0004) | - |
+| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-results-table-compare)) | $229 (0.001145)| - | $289 (0.000963) :heavy_dollar_sign:| $429 (0.000858)| $699 (0.000699)| $1399 (0.00056)| - | - |
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-results-table-compare)) | - | $940 (0.00376) | - | $1800 (0.0036) | $2750 (0.00275) | - | - | - |
 | [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-results-table-compare)) | $226.80 (0.00113) | $279.75 (0.00112) | $331.20 (0.00110) | $522.00 (0.00104) | $960.00 (0.00096) | - | - | - |
-| [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-results-table-compare)) | $149 (0.00075) | - | - | $279 (0.00056) | $479 (0.00048) | - | - | - |
+| [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-results-table-compare)) | $149 (0.00075) :heavy_dollar_sign: | - | - | $279 (0.00056) | $479 (0.00048) | - | - | - |
 | [Bounceless](https://centminmod.com/bounceless) ([demo](#bounceless-api), [results](#email-verification-results-table-compare)) | - | - | - | $649 (0.001298) | $899 (0.000899) | - | - | - |
 
 ## Email Verification Provider API Speed & Rate Limits
