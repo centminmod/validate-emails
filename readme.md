@@ -58,6 +58,8 @@ To reduce potential 3rd party email verification API costs, this script also sup
 
 Email verification results can also be optionally saved to [Amazon AWS S3 and Cloudflare R2 object storage](#s3-storage-support) for long term storage and retrieval.
 
+You can check out [Email Verification Provider Comparison Costs](#email-verification-provider-comparison-costs) table to visually compare their costs or [jump straight to email verification provider API speed and result benchmarks](#email-verification-provider-api-speed-benchmarks).
+
 The `validate_emails.py` email validation script was written by George Liu (eva2000) for his paid consulting clients usage. The below is public documentation for the script.
 
 ## Features
@@ -4477,7 +4479,7 @@ mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'op999@gm
 
 ## Zerobounce API
 
-Add [Zerobounce](https://centminmod.com/zerobounce) API support
+Add [Zerobounce](https://centminmod.com/zerobounce) API support. They support single per email API, batch email API and bulk email list API endpoints.
 
 [Zerobounce](https://centminmod.com/zerobounce) API enabled run `-api zerobounce -apikey_zb $zbkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `sub_status` and `free_email_api` JSON fields are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
 
