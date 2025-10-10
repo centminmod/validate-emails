@@ -8200,3 +8200,11 @@ Multiple email addresses [EmailListVerify](https://centminmod.com/emaillistverif
 ![Email verification PHP Wrapper script with Cloudflare Cache & S3 storage support](screenshots/php-wrappers/validate_email_php_wrapper_multi-style2-cloudflare-cache-s3-02d.png)
 
 ![Email verification PHP Wrapper script with Cloudflare Cache & S3 storage support](screenshots/php-wrappers/validate_email_php_wrapper_multi-style2-cloudflare-cache-s3-02e.png)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=centminmod/validate-emails&type=Date)](https://www.star-history.com/#centminmod/validate-emails&Date)
+
+## Stats
+
+![Alt](https://repobeats.axiom.co/api/embed/322e03d52927ee0eb11ff0756b715e7700ebcfd3.svg "Repobeats analytics image")
