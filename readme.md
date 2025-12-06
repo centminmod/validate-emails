@@ -1,6 +1,7 @@
-November 21, 2025: Black Friday discount coupons for some email verification providers:
+2025: Black Friday discount coupons for some email verification providers:
 
 * [Zerobounce](https://centminmod.com/zerobounce) Promo code: **SAVE40** Get 40% bonus PAYG credits now!
+* [Bouncify](https://centminmod.com/bouncify) Promo code: **BF2025** Get 20% discount
 * [EmailListVerify](https://centminmod.com/emaillistverify) Promo code: **5BF25** Get 5.5% discount
 * [CaptainVerify](https://centminmod.com/captainverify) Promo code: **BF25** 25% discount on verification packs
 
