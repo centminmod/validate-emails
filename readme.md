@@ -1,9 +1,16 @@
-2025: Black Friday discount coupons for some email verification providers:
+Email verification providers compared in this guide ([pricing table](#email-verification-provider-comparison-costs)):
 
-* [Zerobounce](https://centminmod.com/zerobounce) Promo code: **SAVE40** Get 40% bonus PAYG credits now!
-* [Bouncify](https://centminmod.com/bouncify) Promo code: **BF2025** Get 20% discount
-* [EmailListVerify](https://centminmod.com/emaillistverify) Promo code: **5BF25** Get 5.5% discount
-* [CaptainVerify](https://centminmod.com/captainverify) Promo code: **BF25** 25% discount on verification packs
+| Provider |
+|----------|
+| [EmailListVerify](https://centminmod.com/emaillistverify) ([demo](#emaillistverify-1), [results](#email-verification-provider-api-speed-benchmarks)) |
+| [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#email-verification-provider-api-speed-benchmarks)) |
+| [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#email-verification-provider-api-speed-benchmarks)) |
+| [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#email-verification-provider-api-speed-benchmarks)) |
+| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-provider-api-speed-benchmarks)) |
+| [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-provider-api-speed-benchmarks)) |
+| [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-provider-api-speed-benchmarks)) |
+| [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-provider-api-speed-benchmarks)) |
+| [Bounceless](https://centminmod.com/bounceless) ([demo](#bounceless-api), [results](#email-verification-provider-api-speed-benchmarks)) |
 
 ---
 
