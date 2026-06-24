@@ -6,7 +6,7 @@ Email verification providers compared in this guide ([pricing table](#email-veri
 | [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#email-verification-provider-api-speed-benchmarks)) |
 | [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#email-verification-provider-api-speed-benchmarks)) |
 | [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#email-verification-provider-api-speed-benchmarks)) |
-| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-provider-api-speed-benchmarks)) |
+| <s>Proofy.io</s> ([demo](#proofy-api), [results](#email-verification-provider-api-speed-benchmarks)) — **Note:** Proofy deleted my account without explanation and has not responded to my emails in 6 months |
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-provider-api-speed-benchmarks)) |
 | [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-provider-api-speed-benchmarks)) |
 | [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-provider-api-speed-benchmarks)) |
@@ -64,7 +64,7 @@ Email verification providers compared in this guide ([pricing table](#email-veri
   - [PHP Wrapper With Cloudflare Cache And S3 Store Support](#php-wrapper-with-cloudflare-cache-and-s3-store-support)
 
 ## Overview
-The `validate_emails.py` is a Python-based tool for email verification and email validation that allows you to classify your email addresses' status using syntax, DNS, and SMTP (Simple Mail Transfer Protocol) and other checks and 3rd party APIs. Using the script's returned status classifications, you can then clean or scrub your email lists. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support) for [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy), [Zerobounce](https://centminmod.com/zerobounce), [Reoon](https://centminmod.com/reoon), [Bouncify](https://centminmod.com/bouncify), [Bounceless](https://centminmod.com/bounceless) ([jump straight to email verification provider API speed and result benchmarks](#email-verification-provider-api-speed-benchmarks)). The `validate_emails.py` script is coded to conditionally support each commercial email verification providers' API rate limits and can be tuned via argument `-wf` work factor to adjust the number of concurrent threads used for single email address API requests. This ensures you do not waste time and credit $$$$ running into API rate limits.
+The `validate_emails.py` is a Python-based tool for email verification and email validation that allows you to classify your email addresses' status using syntax, DNS, and SMTP (Simple Mail Transfer Protocol) and other checks and 3rd party APIs. Using the script's returned status classifications, you can then clean or scrub your email lists. This can be done self-hosted locally on a server or via the supported [commercial email verification service APIs](#api-support) for [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), <s>Proofy.io</s>, [Zerobounce](https://centminmod.com/zerobounce), [Reoon](https://centminmod.com/reoon), [Bouncify](https://centminmod.com/bouncify), [Bounceless](https://centminmod.com/bounceless) ([jump straight to email verification provider API speed and result benchmarks](#email-verification-provider-api-speed-benchmarks)). The `validate_emails.py` script is coded to conditionally support each commercial email verification providers' API rate limits and can be tuned via argument `-wf` work factor to adjust the number of concurrent threads used for single email address API requests. This ensures you do not waste time and credit $$$$ running into API rate limits.
 
 The script's [API Merge support](#api-merge) also allows you to combine 2 API email verification providers results into one JSON formated output for double verification checks. The script provides a convenient way to verify the existence and deliverability of email addresses, helping you maintain a clean and accurate email list.
 
@@ -87,7 +87,7 @@ The `validate_emails.py` email validation script was written by George Liu (eva2
   - [MillionVerifier](https://centminmod.com/millionverifier) [[example](#millionverifier), [bulk API](#millionverifier-bulk-file-api)]
   - [MyEmailVerifier](https://centminmod.com/myemailverifier) [[example](#myemailverifier-api)]
   - [CaptainVerify](https://centminmod.com/captainverify) [[example](#captainverify-api)]
-  - [Proofy.io](https://centminmod.com/proofy) [[example](#proofy-api)]
+  - <s>Proofy.io</s> [[example](#proofy-api)]
   - [Zerobounce](https://centminmod.com/zerobounce) [[example](#zerobounce-api)]
   - [Reoon](https://centminmod.com/reoon) [[example](#reoon-api)]
   - [Bouncify](https://centminmod.com/bouncify) [[example](#bouncify-api)]
@@ -955,7 +955,7 @@ user    0m0.457s
 sys     0m0.022s
 ```
 
-Unfortunately, I ran out of credits to test with [Proofy.io](https://centminmod.com/proofy).
+Unfortunately, I ran out of credits to test with <s>Proofy.io</s>.
 
 `validate_emails.py` using external [Zerobounce](https://centminmod.com/zerobounce) API enabled run `-api zerobounce -apikey_zb $zbkey -tm all` with specified email address `-e hnyfmw@canadlan-drugs.com`. The `status`, `sub_status` and `free_email_api` JSON fields are from API and `free_email` and `disposable_email` JSON fields are from local script database checks.
 
@@ -1789,7 +1789,7 @@ python validate_emails.py -f user@domain.com -e user+to@domain.com -tm syntax
 
 # API Support
 
-In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), [Proofy.io](https://centminmod.com/proofy), [Zerobounce](https://centminmod.com/zerobounce), [Reoon](https://centminmod.com/reoon), [Bouncify](https://centminmod.com/bouncify), [Bounceless](https://centminmod.com/bounceless). Links to services maybe affiliate links. If you found this information useful ;)
+In additional to local self-hosted email verification, the script now has added support for the following external Email cleaning service APIs - [EmailListVerify](https://centminmod.com/emaillistverify), [MillionVerifier](https://centminmod.com/millionverifier), [MyEmailVerifier](https://centminmod.com/myemailverifier), [CaptainVerify](https://centminmod.com/captainverify), <s>Proofy.io</s>, [Zerobounce](https://centminmod.com/zerobounce), [Reoon](https://centminmod.com/reoon), [Bouncify](https://centminmod.com/bouncify), [Bounceless](https://centminmod.com/bounceless). Links to services maybe affiliate links. If you found this information useful ;)
 
 Updated: Added [API Merge support](#api-merge) via `-apimerge` argument to merge [EmailListVerify](https://centminmod.com/emaillistverify) + [MillionVerifier](https://centminmod.com/millionverifier) API results together for more accurate email verification results.
 
@@ -1819,7 +1819,7 @@ python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api mill
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api captainverify -apikey_cv $cvkey
 ```
 
-[Proofy.io](https://centminmod.com/proofy)
+<s>Proofy.io</s>
 
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -apikey_pf $pkey -apiuser_pf $puser
@@ -2005,7 +2005,7 @@ Personal experience with all commercial email verification providers:
 - MyEmailVerifier API logging doesn't seem to work. Waited a few days and none of my API tests were logged in their API logging on their dashboard web site.
 - CaptainVerify API is limited to a maximum of 2 simultaneous connections and 50 checks per minute for per email address verification checks. For the sample 15 email addresses tested below, took ~4.6 seconds to complete per email address verification checks
 - Proofy.io has the most restrictive API limits but I can't seem to find any documentation of the actual limits, so I have to code it so it isn't as fast as other providers for per email verification checks. It will be the slowest of the 5 providers for per email verification checks. For the sample 15 email addresses tested below, took ~9.5 seconds to complete per email address verification checks
-- Proofy.io only has [single email check](https://proofy.io/using-api) and [batch email checks](https://proofy.io/using-api) but no bulk file API support.
+- Proofy.io only has single email check and batch email checks but no bulk file API support.
 - ZeroBounce API was added on May 11, 2024. For sample 15 email addresses, it took 4.794 seconds via per email check API. They have 100 free email credits per month, making it possible to keep my script's support and development testing costs down to a minimum. API documentation is very well documented. 
 - ZeroBounce, only annoying issues right now are on their web site end and not their API specifically:
   1. initial login to web site dashboard are very slow as is reloading the dashboard i.e. browser F5 refresh. Sometimes just stuck with their purple reloading page progress icon that never actually loads the web page/dashboard.
@@ -2153,7 +2153,7 @@ Below are their respectivate pay as you go credit pricing for email verification
 | [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#email-verification-provider-api-speed-benchmarks)) | - | $4.90 (0.00245) :heavy_dollar_sign: | - | $39 (0.0039)| $59 (0.00236)| - | $89 (0.00178)| - | $149 (0.00149)|
 | [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#email-verification-provider-api-speed-benchmarks)) | $4 (0.004) :heavy_dollar_sign:| $5 (0.0025)| $9 (0.0018) :heavy_dollar_sign:| $15 (0.0015)| $29 (0.00116) :heavy_dollar_sign:| - | $54 (0.00108) :heavy_dollar_sign:| - | $99 (0.00099) :heavy_dollar_sign:|
 | [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#email-verification-provider-api-speed-benchmarks)) | $8 (0.008) | - | $35 (0.007) | $71 (0.0071) | $89 (0.00356) | - | $177 (0.00354) | - | $236 (0.00236) |
-| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-provider-api-speed-benchmarks)) | $5 (0.005)| - | $16 (0.0032)| $30 (0.003)| $53 (0.00212)| - | $92 (0.00184)| - | $150 (0.0015)|
+| <s>Proofy.io</s> ([demo](#proofy-api), [results](#email-verification-provider-api-speed-benchmarks)) | $5 (0.005)| - | $16 (0.0032)| $30 (0.003)| $53 (0.00212)| - | $92 (0.00184)| - | $150 (0.0015)|
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-provider-api-speed-benchmarks)) | - | $39 (0.0195) | $69 (0.0138) | $129 (0.0129) | $274 (0.01096) | - | $498 (0.00996) | - | $649 (0.00649) |
 | [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-provider-api-speed-benchmarks)) | - | - | - | $11.90 (0.00119) :heavy_dollar_sign: | $29.66 (0.001186) | - | $58.95 (0.001179) | - | $116.40 (0.001164) |
 | [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-provider-api-speed-benchmarks)) | - | - | - | $24 (0.0024) | - | $49 (0.001633) :heavy_dollar_sign: | - | - | $119 (0.00119) |
@@ -2165,7 +2165,7 @@ Below are their respectivate pay as you go credit pricing for email verification
 | [MillionVerifier](https://centminmod.com/millionverifier) ([demo](#millionverifier), [results](#email-verification-provider-api-speed-benchmarks)) | - | - | - | $299 (0.000598)| $449 (0.000449)| - | $1599 (0.00032)| $2599 (0.00026) :heavy_dollar_sign:|
 | [MyEmailVerifier](https://centminmod.com/myemailverifier) ([demo](#myemailverifier-api), [results](#email-verification-provider-api-speed-benchmarks)) | - | $179 (0.000716) :heavy_dollar_sign:| - | $249 (0.000498) :heavy_dollar_sign:| $349 (0.000349) :heavy_dollar_sign:| - | $1499 (0.0003) :heavy_dollar_sign:| - |
 | [CaptainVerify](https://centminmod.com/captainverify) ([demo](#captainverify-api), [results](#email-verification-provider-api-speed-benchmarks)) | - | $295 (0.00118) | - | $590 (0.00118) | $767 (0.000767)| - | $2360 (0.000472) | - |
-| [Proofy.io](https://centminmod.com/proofy) ([demo](#proofy-api), [results](#email-verification-provider-api-speed-benchmarks)) | - | $290 (0.00116)| - | $430 (0.00086)| $700 (0.0007)| $1650 (0.00066)| - | - |
+| <s>Proofy.io</s> ([demo](#proofy-api), [results](#email-verification-provider-api-speed-benchmarks)) | - | $290 (0.00116)| - | $430 (0.00086)| $700 (0.0007)| $1650 (0.00066)| - | - |
 | [Zerobounce](https://centminmod.com/zerobounce) ([demo](#zerobounce-api), [results](#email-verification-provider-api-speed-benchmarks)) | - | $1299 (0.005196) | - | $2199 (0.004398) | $3199 (0.003199) | - | $13499 (0.0027) | $26998 (0.0027) |
 | [Reoon](https://centminmod.com/reoon) ([demo](#reoon-api), [results](#email-verification-provider-api-speed-benchmarks)) | - | - | - | $522.00 (0.001044) | $960.00 (0.00096) | - | - | - |
 | [Bouncify](https://centminmod.com/bouncify) ([demo](#bouncify-api), [results](#email-verification-provider-api-speed-benchmarks)) | $199 (0.000995) :heavy_dollar_sign: | - | - | $379 (0.000758) | $599 (0.000599) | - | - | - |
@@ -2196,7 +2196,7 @@ Table also takes into account API rate limits besides my single and 15 email add
 | 4. [Reoon](https://centminmod.com/reoon)  | no doc mention       | no doc mention      |
 | 5. [MyEmailVerifier](https://centminmod.com/myemailverifier)  | no doc mention       | 30/min      |
 | 6. [CaptainVerify](https://centminmod.com/captainverify)  | no doc mention       | 50/min      |
-| 7. [Proofy.io](https://centminmod.com/proofy)  | no doc mention       | no doc mention      |
+| 7. <s>Proofy.io</s>  | no doc mention       | no doc mention      |
 | 8. [Bounceless](https://centminmod.com/bounceless)  | no doc mention       | no doc mention      |
 | 9. [Bouncify](https://centminmod.com/bouncify)  | no doc mention       | 120/min      |
 
@@ -2446,7 +2446,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | user@mailsac.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | yes | yes |
 | user@mailsac.com | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | null | false | yes |
 | user@mailsac.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | yes |
-| user@mailsac.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | yes |
+| user@mailsac.com | <s>Proofy.io</s> | undeliverable | null | null | no | yes |
 | user@mailsac.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | yes | yes |
 | user@mailsac.com | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | disposable | null | yes | yes |
 | user@mailsac.com | [Reoon](https://centminmod.com/reoon) | disposable | null | null | yes | yes |
@@ -2455,7 +2455,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | xyz@centmil1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | no | no |
 | xyz@centmil1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | xyz@centmil1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
-| xyz@centmil1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| xyz@centmil1.com | <s>Proofy.io</s> | undeliverable | null | null | no | no |
 | xyz@centmil1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | xyz@centmil1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | no_dns_entries | null | no | no |
 | xyz@centmil1.com | [Reoon](https://centminmod.com/reoon) | invalid | null | null | no | no |
@@ -2464,7 +2464,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | user+to@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | no | no |
 | user+to@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | false | no |
 | user+to@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | no | no |
-| user+to@domain1.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | no | no |
+| user+to@domain1.com | <s>Proofy.io</s> | deliverable | null | null | no | no |
 | user+to@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | no | no |
 | user+to@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | valid | alias_address | null | no | no |
 | user+to@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
@@ -2473,7 +2473,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | xyz@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | xyz@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | xyz@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
-| xyz@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| xyz@domain1.com | <s>Proofy.io</s> | undeliverable | null | null | no | no |
 | xyz@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | xyz@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | xyz@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
@@ -2482,7 +2482,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | abc@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | abc@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | abc@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
-| abc@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| abc@domain1.com | <s>Proofy.io</s> | undeliverable | null | null | no | no |
 | abc@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | abc@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | abc@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
@@ -2491,7 +2491,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | 123@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | 123@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | 123@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | no |
-| 123@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| 123@domain1.com | <s>Proofy.io</s> | undeliverable | null | null | no | no |
 | 123@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | 123@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | 123@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
@@ -2500,7 +2500,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | pop@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | pop@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | pop@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
-| pop@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| pop@domain1.com | <s>Proofy.io</s> | undeliverable | null | null | no | no |
 | pop@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | pop@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | pop@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
@@ -2509,7 +2509,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | pip@domain1.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | no | no |
 | pip@domain1.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | false | no |
 | pip@domain1.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | no | no |
-| pip@domain1.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| pip@domain1.com | <s>Proofy.io</s> | undeliverable | null | null | no | no |
 | pip@domain1.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | no |
 | pip@domain1.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | no | no |
 | pip@domain1.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
@@ -2518,7 +2518,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | user@tempr.email | [EmailListVerify](https://centminmod.com/emaillistverify) | unknown | null | null | no | yes |
 | user@tempr.email | [MillionVerifier](https://centminmod.com/millionverifier) | disposable | null | null | false | yes |
 | user@tempr.email | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | yes |
-| user@tempr.email | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | yes |
+| user@tempr.email | <s>Proofy.io</s> | undeliverable | null | null | no | yes |
 | user@tempr.email | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | no | yes |
 | user@tempr.email | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | disposable | null | no | yes |
 | user@tempr.email | [Reoon](https://centminmod.com/reoon) | disposable | null | null | yes | yes |
@@ -2527,7 +2527,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | info@domain2.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | no | no |
 | info@domain2.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | false | no |
 | info@domain2.com | [CaptainVerify](https://centminmod.com/captainverify) | risky | null | null | no | no |
-| info@domain2.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | no | no |
+| info@domain2.com | <s>Proofy.io</s> | deliverable | null | null | no | no |
 | info@domain2.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | no | no |
 | info@domain2.com | [Zerobounce](https://centminmod.com/zerobounce) | do_not_mail | role_based | null | no | no |
 | info@domain2.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | no | no |
@@ -2536,7 +2536,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | user@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
-| user@gmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | yes | no |
+| user@gmail.com | <s>Proofy.io</s> | deliverable | null | null | yes | no |
 | user@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user@gmail.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
 | user@gmail.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
@@ -2545,7 +2545,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | op999@gmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | email_disabled | null | null | yes | no |
 | op999@gmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | invalid | null | null | true | no |
 | op999@gmail.com | [CaptainVerify](https://centminmod.com/captainverify) | invalid | null | null | yes | no |
-| op999@gmail.com | [Proofy.io](https://centminmod.com/proofy) | undeliverable | null | null | no | no |
+| op999@gmail.com | <s>Proofy.io</s> | undeliverable | null | null | no | no |
 | op999@gmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | invalid | null | null | yes | no |
 | op999@gmail.com | [Zerobounce](https://centminmod.com/zerobounce) | invalid | mailbox_not_found | null | yes | no |
 | op999@gmail.com | [Reoon](https://centminmod.com/reoon) | valid (quick mode) or invalid (power mode) | null | null | yes | no |
@@ -2554,7 +2554,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | user@yahoo.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user@yahoo.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok (per email API) or unknown (bulk email API) | null | null | true | no |
 | user@yahoo.com | [CaptainVerify](https://centminmod.com/captainverify) | unknown | null | null | yes | no |
-| user@yahoo.com | [Proofy.io](https://centminmod.com/proofy) | unknown | null | null | no | no |
+| user@yahoo.com | <s>Proofy.io</s> | unknown | null | null | no | no |
 | user@yahoo.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user@yahoo.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
 | user@yahoo.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
@@ -2563,7 +2563,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | user1@outlook.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user1@outlook.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user1@outlook.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |
-| user1@outlook.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | yes | no |
+| user1@outlook.com | <s>Proofy.io</s> | deliverable | null | null | yes | no |
 | user1@outlook.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user1@outlook.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
 | user1@outlook.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
@@ -2572,7 +2572,7 @@ Pay attention to specific email addresses compared for the accuracy of the email
 | user2@hotmail.com | [EmailListVerify](https://centminmod.com/emaillistverify) | valid | null | null | yes | no |
 | user2@hotmail.com | [MillionVerifier](https://centminmod.com/millionverifier) | ok | null | null | true | no |
 | user2@hotmail.com | [CaptainVerify](https://centminmod.com/captainverify) | valid | null | null | yes | no |  
-| user2@hotmail.com | [Proofy.io](https://centminmod.com/proofy) | deliverable | null | null | yes | no |
+| user2@hotmail.com | <s>Proofy.io</s> | deliverable | null | null | yes | no |
 | user2@hotmail.com | [MyEmailVerifier](https://centminmod.com/myemailverifier) | valid | null | null | yes | no |
 | user2@hotmail.com | [Zerobounce](https://centminmod.com/zerobounce) | valid |  | null | yes | no |
 | user2@hotmail.com | [Reoon](https://centminmod.com/reoon) | valid | null | null | yes | no |
@@ -4092,9 +4092,9 @@ mysql -e "UPDATE xf_user SET user_state = 'email_bounce' WHERE email = 'user@yah
 
 ## Proofy API
 
-Add [Proofy.io](https://centminmod.com/proofy) API support
+Add <s>Proofy.io</s> API support
 
-[Proofy.io](https://centminmod.com/proofy) API enabled run `-api proofy -apikey_pf $pkey -apiuser_pf $puser`
+<s>Proofy.io</s> API enabled run `-api proofy -apikey_pf $pkey -apiuser_pf $puser`
 
 ```
 python validate_emails.py -f user@domain1.com -l emaillist.txt -tm all -api proofy -apikey_pf $pkey -apiuser_pf $puser -xf -xfdb xenforo -xfprefix xf_
@@ -8153,7 +8153,7 @@ Created a simplistic PHP wrapper script to call `validate_emails.py` from that c
 | [EmailListVerify](https://centminmod.com/emaillistverify) | 2.96s |
 | [MillionVerifier](https://centminmod.com/millionverifier) | 0.84s |
 | [CaptainVerify](https://centminmod.com/captainverify) | 21.96s |
-| [Proofy.io](https://centminmod.com/proofy) | 31.77s (API error, ran out of credits) |
+| <s>Proofy.io</s> | 31.77s (API error, ran out of credits) |
 | [MyEmailVerifier](https://centminmod.com/myemailverifier) | 3.09s |
 | [Zerobounce](https://centminmod.com/zerobounce) | 0.68s |
 | [Reoon](https://centminmod.com/reoon) | 0.72s |
@@ -8175,7 +8175,7 @@ First one is local non-API test = 0.516784s
 
 ![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_03.png)
 
-[Proofy.io](https://centminmod.com/proofy) = 31.77s for api_error ran out of credits right now
+<s>Proofy.io</s> = 31.77s for api_error ran out of credits right now
 
 ![Email verification PHP Wrapper script](screenshots/php-wrappers/validate_email_php_wrapper_08.png)
 
